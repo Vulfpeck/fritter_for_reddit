@@ -1,10 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_provider_app/auth/auth_notifier.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_provider_app/user/user_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -15,7 +11,7 @@ void main() {
     ),
   );
   runApp(ChangeNotifierProvider(
-    builder: (_) => AuthProvider(),
+    builder: (_) => UserInformationProvider(),
     child: MyApp(),
   ));
 }
@@ -55,52 +51,69 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Tushyboi\'s reddit app'),
       ),
-      body: Provider.of<AuthProvider>(context).isLoading
+      body: Provider.of<UserInformationProvider>(context).isLoading
           ? CircularProgressIndicator()
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Center(
-                  child: Provider.of<AuthProvider>(context).signedIn
+                  child: Provider.of<UserInformationProvider>(context).signedIn
                       ? Text('Signed in')
                       : Text('Sign in on the left'),
+                ),
+                RaisedButton(
+                  child: Text('Refresh access token'),
+                  onPressed:
+                      Provider.of<UserInformationProvider>(context).signedIn
+                          ? () {
+                              Provider.of<UserInformationProvider>(context)
+                                  .performTokenRefresh();
+                            }
+                          : null,
                 ),
               ],
             ),
       drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            Provider.of<AuthProvider>(context).signedIn
-                ? ListTile(
-                    title: Text('Sign out of reddit'),
-                    leading: Icon(Icons.zoom_out_map),
-                    onTap: () {
-                      Provider.of<AuthProvider>(context).signOutUser();
-                    },
-                  )
-                : ListTile(
-                    title: Text('Sign into reddit'),
-                    leading: Icon(Icons.airline_seat_flat),
-                    onTap: () {
-                      Provider.of<AuthProvider>(context).authenticateUser();
-                    },
+        child: Consumer<UserInformationProvider>(
+            builder: (BuildContext context, UserInformationProvider model, _) {
+          if (model.signedIn) {
+            if (model.isLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (model.isLoading == false) {
+              return ListView.builder(
+                itemBuilder: (context, int index) {
+                  return ListTile(
+                    title: Text(model
+                        .userInformation.subredditsList[index].display_name),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(model.userInformation
+                          .subredditsList[index].community_icon),
+                    ),
+                  );
+                },
+                itemCount: model.userInformation.subredditsList.length,
+              );
+            }
+          } else {
+            return SafeArea(
+              child: ListTile(
+                title: Text("Sign into reddit"),
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).accentColor,
+                  child: Icon(
+                    Icons.person_outline,
                   ),
-          ],
-        ),
+                ),
+                onTap: () {
+                  model.performAuthentication();
+                },
+              ),
+            );
+          }
+          return Container();
+        }),
       ),
     );
-  }
-
-  Future<void> getPostsExample() async {
-    http.Response res = await http.get(
-      'http://oauth.reddit.com/api/v1/me/prefs',
-      headers: {
-        'Authorization': 'bearer ' + authToken,
-        'User-Agent': 'fritter_reddit by sexusmexus'
-      },
-    );
-
-    print(json.decode(res.body));
   }
 }
