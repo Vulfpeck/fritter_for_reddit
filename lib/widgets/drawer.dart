@@ -26,9 +26,16 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     style: Theme.of(context).textTheme.subhead,
                   ),
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      model.userSubreddits.data.children[index].community_icon,
-                    ),
+                    backgroundImage: model.userSubreddits.data.children[index]
+                        .community_icon !=
+                        ""
+                        ? NetworkImage(model
+                        .userSubreddits.data.children[index].community_icon)
+                        : model.userSubreddits.data.children[index].icon_img !=
+                        ""
+                        ? NetworkImage(model
+                        .userSubreddits.data.children[index].icon_img)
+                        : AssetImage('assets/default_icon.png'),
                     backgroundColor: model.userSubreddits.data.children[index]
                                 .primary_color ==
                             ""

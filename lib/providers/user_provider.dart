@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/models/subreddits/child.dart';
 import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
 import 'package:flutter_provider_app/secrets.dart';
 import 'package:http/http.dart' as http;
@@ -159,15 +160,21 @@ class UserInformationProvider with ChangeNotifier {
         new UserInformation.fromJsonMap(json.decode(response.body));
 
     final subredditResponse = await http.get(
-      "https://oauth.reddit.com/subreddits/mine/subscriber",
+      "https://oauth.reddit.com/subreddits/mine/?limit=100",
       headers: {
         'Authorization': 'bearer ' + token,
-        'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
+        'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
 
     userSubreddits = new SubredditsSubscribed.fromJsonMap(
         json.decode(subredditResponse.body));
+
+    userSubreddits.data.children.sort((Child a, Child b) {
+      return a.display_name
+          .toLowerCase()
+          .compareTo(b.display_name.toLowerCase());
+    });
 
 //    if (subredditResponse.statusCode == 200) {
 //      userSubreddits = new SubscribedSubreddits.fromJsonMap(
