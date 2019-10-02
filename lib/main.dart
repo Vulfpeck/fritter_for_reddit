@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_provider_app/user/user_provider.dart';
 import 'package:provider/provider.dart';
+
+import 'exports.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -51,7 +52,8 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Tushyboi\'s reddit app'),
       ),
-      body: Provider.of<UserInformationProvider>(context).isLoading
+      body: Provider.of<UserInformationProvider>(context).state ==
+              ViewState.Busy
           ? CircularProgressIndicator()
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -63,32 +65,41 @@ class _HomePageState extends State<HomePage> {
                       : Text('Sign in on the left'),
                 ),
                 RaisedButton(
-                  child: Text('Refresh access token'),
+                    child: Text('Refresh access token'),
+                    onPressed:
+                        Provider.of<UserInformationProvider>(context).signedIn
+                            ? () {
+                                Provider.of<UserInformationProvider>(context)
+                                    .performTokenRefresh();
+                              }
+                            : null),
+                RaisedButton(
+                  child: Text('Sign out'),
                   onPressed:
                       Provider.of<UserInformationProvider>(context).signedIn
                           ? () {
                               Provider.of<UserInformationProvider>(context)
-                                  .performTokenRefresh();
+                                  .signOutUser();
                             }
                           : null,
-                ),
+                )
               ],
             ),
       drawer: Drawer(
         child: Consumer<UserInformationProvider>(
             builder: (BuildContext context, UserInformationProvider model, _) {
           if (model.signedIn) {
-            if (model.isLoading) {
+            if (model.state == ViewState.Busy) {
               return Center(child: CircularProgressIndicator());
-            } else if (model.isLoading == false) {
+            } else if (model.state == ViewState.Idle) {
               return ListView.builder(
                 itemBuilder: (context, int index) {
                   return ListTile(
                     title: Text(model
-                        .userInformation.subredditsList[index].display_name),
+                        .userInformation.subredditsList[index].displayName),
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(model.userInformation
-                          .subredditsList[index].community_icon),
+                      backgroundImage: NetworkImage(model
+                          .userInformation.subredditsList[index].communityIcon),
                     ),
                   );
                 },

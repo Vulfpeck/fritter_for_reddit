@@ -3,57 +3,48 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_provider_app/models/Subreddit.dart';
-import 'package:flutter_provider_app/models/UserInformation.dart';
+import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/secrets.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class UserInformationProvider with ChangeNotifier {
+  final _storageHelper = new SecureStorageHelper();
+
+  bool get signedIn => _storageHelper.signInStatus;
+
   AppUserInformation userInformation;
 
-  bool _signedIn = false;
-  bool _isLoading = false;
-  String _authToken;
-  String _refreshToken;
+  ViewState _state;
 
   UserInformationProvider() {
+    userInformation = new AppUserInformation();
     validateAuthentication();
   }
 
-  bool get signedIn => _signedIn;
-  String get authToken => _authToken;
-  String get refreshToken => _refreshToken;
-  bool get isLoading => _isLoading;
-  final storage = new FlutterSecureStorage();
+  ViewState get state => _state;
 
-  Future<bool> validateAuthentication() async {
-    _isLoading = true;
+  Future<void> validateAuthentication() async {
+    await _storageHelper.fetchData();
+    _state = ViewState.Busy;
     notifyListeners();
-    Map<String, String> allValues = await storage.readAll();
-    print(allValues);
-    if (allValues.containsKey('signedIn') && allValues['signedIn'] == "true") {
-      _authToken = allValues['authToken'];
-      _refreshToken = allValues['refreshToken'];
-      if (await needsTokenRefresh()) {
+
+    print(_storageHelper.debugPrint);
+
+    if (_storageHelper.signInStatus) {
+      if (_storageHelper.needsTokenRefresh()) {
         performTokenRefresh();
       }
       await loadUserInformation();
-      _signedIn = true;
-    } else {
-      _signedIn = false;
     }
 
-    _isLoading = false;
+    _state = ViewState.Idle;
     notifyListeners();
-    print("validateAuthentication: " + signedIn.toString());
-    return signedIn;
   }
 
-  Future<bool> performAuthentication() async {
+  Future<void> performAuthentication() async {
     notifyListeners();
-    _isLoading = true;
+    _state = ViewState.Busy;
     // start a new instance of the server that listens to localhost requests
     Stream<String> onCode = await _server();
     final String url =
@@ -62,7 +53,7 @@ class UserInformationProvider with ChangeNotifier {
             "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
     launch(url);
 
-    // server returns the first acess_code it receives
+    // server returns the first access_code it receives
     final String accessCode = await onCode.first;
 
     // now we use this code to obtain authentication token and other shit
@@ -83,22 +74,14 @@ class UserInformationProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
-      _authToken = map['access_token'];
-      _refreshToken = map["refresh_token"];
-      _signedIn = true;
-      await updateStorageUserCredentials();
+      await _storageHelper.updateCredentials(map['access_token'],
+          map['refresh_token'], DateTime.now().toIso8601String(), true);
       await loadUserInformation();
-      print(signedIn);
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } else {
-      _signedIn = false;
       print("Authentication failed");
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
+    _state = ViewState.Idle;
+    notifyListeners();
   }
 
   Future<Stream<String>> _server() async {
@@ -122,48 +105,20 @@ class UserInformationProvider with ChangeNotifier {
     return onCode.stream;
   }
 
-  Future<void> updateStorageUserCredentials() async {
-    final storage = new FlutterSecureStorage();
-    await storage.write(key: "authToken", value: _authToken);
-    await storage.write(key: "refreshToken", value: _refreshToken);
-    await storage.write(key: "signedIn", value: _signedIn.toString());
-    await storage.write(
-      key: "lastTokenRefresh",
-      value: DateTime.now().toIso8601String(),
-    );
-
-    _authToken = await storage.read(key: 'authToken');
-    _refreshToken = await storage.read(key: 'refreshToken');
-  }
-
   Future<void> signOutUser() async {
-    _isLoading = true;
+    _state = ViewState.Busy;
     notifyListeners();
-    await storage.delete(key: "authToken");
-    await storage.delete(key: "refreshToken");
-    await storage.delete(key: "signedIn");
-    await storage.delete(key: "lastTokenRefresh");
-    _isLoading = false;
-    _signedIn = false;
+    await _storageHelper.clearStorage();
+    _state = ViewState.Idle;
     notifyListeners();
-  }
-
-  Future<bool> needsTokenRefresh() async {
-    Duration time = (DateTime.now()).difference(
-        DateTime.parse(await storage.read(key: 'lastTokenRefresh')));
-    print(time.toString());
-    if (time.inMinutes > 50) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   Future<void> performTokenRefresh() async {
     String user = CLIENT_ID;
     String password = "";
     String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
-    _isLoading = true;
+    _state = ViewState.Busy;
+    print(_storageHelper.refreshToken);
     notifyListeners();
     final response = await http.post(
       "https://www.reddit.com/api/v1/access_token",
@@ -171,31 +126,39 @@ class UserInformationProvider with ChangeNotifier {
         "Authorization": basicAuth,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: "grant_type=refresh_token&refresh_token=$_refreshToken",
+      body:
+          "grant_type=refresh_token&refresh_token=${_storageHelper.refreshToken}",
     );
 
     Map<String, dynamic> map = json.decode(response.body);
     print(map);
-    _authToken = map['access_token'];
-    await updateStorageUserCredentials();
-    _isLoading = false;
+    await _storageHelper.updateAuthToken(map['access_token']);
+    _state = ViewState.Idle;
     notifyListeners();
   }
 
   Future<void> loadUserInformation() async {
+    print("fetch information");
+    String token = _storageHelper.authToken;
+    print(token);
+    print(_storageHelper.debugPrint);
+
     final response = await http.get(
       "https://oauth.reddit.com/api/v1/me",
       headers: {
-        'Authorization': 'bearer ' + _authToken,
+        'Authorization': 'bearer ' + token,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
+
+    print(json.decode(response.body));
+
     Map<String, dynamic> map = json.decode(response.body);
-    List<dynamic> subsList;
+    List<dynamic> subsList = new List<dynamic>();
     final subredditResponse = await http.get(
       "https://oauth.reddit.com/subreddits/mine/subscriber",
       headers: {
-        'Authorization': 'bearer ' + _authToken,
+        'Authorization': 'bearer ' + token,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
@@ -215,21 +178,21 @@ class UserInformationProvider with ChangeNotifier {
         icon_url = e['data']['icon_img'];
       }
       return (new Subreddit(
-          display_name: e['data']['display_name'],
-          header_img: e['data']['header_img'],
-          display_name_prefixed: e['data']['display_name_prefixed'],
+          displayName: e['data']['display_name'],
+          headerImg: e['data']['header_img'],
+          displayNamePrefixed: e['data']['display_name_prefixed'],
           subscribers: e['data']['subscribers'].toString(),
-          community_icon: icon_url,
-          user_is_subscriber: e['data']['user_is_subscriber'].toString(),
+          communityIcon: icon_url,
+          userIsSubscriber: e['data']['user_is_subscriber'].toString(),
           url: e['data']['url']));
     }).toList();
-    for (Subreddit x in subsList) print(x.community_icon);
+    for (Subreddit x in subsList) print(x.communityIcon);
     userInformation = new AppUserInformation(
-      icon_color: map['subreddit']['icon_color'],
-      icon_img: map['subreddit']['icon_img'],
-      display_name_prefixed: map['subreddit']['display_name_prefixed'],
-      comment_karma: map['comment_karma'].toString(),
-      link_karma: map['link_karma'].toString(),
+      iconColor: map['subreddit']['icon_color'],
+      iconImg: map['subreddit']['icon_img'],
+      displayNamePrefixed: map['subreddit']['display_name_prefixed'],
+      commentKarma: map['comment_karma'].toString(),
+      linkKarma: map['link_karma'].toString(),
       subredditsList: subsList,
     );
   }
