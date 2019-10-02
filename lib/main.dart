@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_provider_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
 
 import 'exports.dart';
@@ -85,46 +86,7 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-      drawer: Drawer(
-        child: Consumer<UserInformationProvider>(
-            builder: (BuildContext context, UserInformationProvider model, _) {
-          if (model.signedIn) {
-            if (model.state == ViewState.Busy) {
-              return Center(child: CircularProgressIndicator());
-            } else if (model.state == ViewState.Idle) {
-              return ListView.builder(
-                itemBuilder: (context, int index) {
-                  return ListTile(
-                    title: Text(model
-                        .userInformation.subredditsList[index].displayName),
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(model
-                          .userInformation.subredditsList[index].communityIcon),
-                    ),
-                  );
-                },
-                itemCount: model.userInformation.subredditsList.length,
-              );
-            }
-          } else {
-            return SafeArea(
-              child: ListTile(
-                title: Text("Sign into reddit"),
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).accentColor,
-                  child: Icon(
-                    Icons.person_outline,
-                  ),
-                ),
-                onTap: () {
-                  model.performAuthentication();
-                },
-              ),
-            );
-          }
-          return Container();
-        }),
-      ),
+      drawer: LeftDrawer(),
     );
   }
 }

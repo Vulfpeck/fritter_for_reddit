@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
 import 'package:flutter_provider_app/secrets.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -13,23 +14,24 @@ class UserInformationProvider with ChangeNotifier {
 
   bool get signedIn => _storageHelper.signInStatus;
 
-  AppUserInformation userInformation;
+  UserInformation userInformation;
+  SubredditsSubscribed userSubreddits;
 
   ViewState _state;
 
   UserInformationProvider() {
-    userInformation = new AppUserInformation();
+    print("*** Initializeding user information provider ****");
     validateAuthentication();
   }
 
   ViewState get state => _state;
 
   Future<void> validateAuthentication() async {
+    print("*** Validating authentication ****");
+
     await _storageHelper.fetchData();
     _state = ViewState.Busy;
     notifyListeners();
-
-    print(_storageHelper.debugPrint);
 
     if (_storageHelper.signInStatus) {
       if (_storageHelper.needsTokenRefresh()) {
@@ -39,10 +41,13 @@ class UserInformationProvider with ChangeNotifier {
     }
 
     _state = ViewState.Idle;
+    print(_storageHelper.debugPrint);
     notifyListeners();
   }
 
   Future<void> performAuthentication() async {
+    print("*** Performing authentication ****");
+
     notifyListeners();
     _state = ViewState.Busy;
     // start a new instance of the server that listens to localhost requests
@@ -114,11 +119,11 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> performTokenRefresh() async {
+    print("******* PERFORMING A TOKEN REFRESH *****");
     String user = CLIENT_ID;
     String password = "";
     String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
     _state = ViewState.Busy;
-    print(_storageHelper.refreshToken);
     notifyListeners();
     final response = await http.post(
       "https://www.reddit.com/api/v1/access_token",
@@ -138,10 +143,9 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> loadUserInformation() async {
-    print("fetch information");
+    print("*** Loading user information ****");
+
     String token = _storageHelper.authToken;
-    print(token);
-    print(_storageHelper.debugPrint);
 
     final response = await http.get(
       "https://oauth.reddit.com/api/v1/me",
@@ -151,10 +155,9 @@ class UserInformationProvider with ChangeNotifier {
       },
     );
 
-    print(json.decode(response.body));
+    userInformation =
+        new UserInformation.fromJsonMap(json.decode(response.body));
 
-    Map<String, dynamic> map = json.decode(response.body);
-    List<dynamic> subsList = new List<dynamic>();
     final subredditResponse = await http.get(
       "https://oauth.reddit.com/subreddits/mine/subscriber",
       headers: {
@@ -162,38 +165,16 @@ class UserInformationProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
-    Map<String, dynamic> subRedditMap = json.decode(subredditResponse.body);
-    List<dynamic> myList = subRedditMap['data']['children'];
-//    print(myList);
-    subsList = myList.map((e) {
-      String icon_url = "";
-      if (e['data']['icon_img'] == "") {
-        if (e['data']['community_icon'] == "") {
-          icon_url =
-              e['data']['header_img'] != null ? e['data']['header_img'] : "";
-        } else {
-          icon_url = e['data']['community_icon'];
-        }
-      } else {
-        icon_url = e['data']['icon_img'];
-      }
-      return (new Subreddit(
-          displayName: e['data']['display_name'],
-          headerImg: e['data']['header_img'],
-          displayNamePrefixed: e['data']['display_name_prefixed'],
-          subscribers: e['data']['subscribers'].toString(),
-          communityIcon: icon_url,
-          userIsSubscriber: e['data']['user_is_subscriber'].toString(),
-          url: e['data']['url']));
-    }).toList();
-    for (Subreddit x in subsList) print(x.communityIcon);
-    userInformation = new AppUserInformation(
-      iconColor: map['subreddit']['icon_color'],
-      iconImg: map['subreddit']['icon_img'],
-      displayNamePrefixed: map['subreddit']['display_name_prefixed'],
-      commentKarma: map['comment_karma'].toString(),
-      linkKarma: map['link_karma'].toString(),
-      subredditsList: subsList,
-    );
+
+    userSubreddits = new SubredditsSubscribed.fromJsonMap(
+        json.decode(subredditResponse.body));
+
+//    if (subredditResponse.statusCode == 200) {
+//      userSubreddits = new SubscribedSubreddits.fromJsonMap(
+//        json.decode(subredditResponse.body),
+//      );
+//
+//      print(userSubreddits);
+//    }
   }
 }

@@ -19,8 +19,8 @@ class SecureStorageHelper {
   bool needsTokenRefresh() {
     Duration time =
         (DateTime.now()).difference(DateTime.parse(lastTokenRefresh));
-    print(time.toString());
-    if (time.inMinutes > 50) {
+    print("Time since last token refresh: " + time.inMinutes.toString());
+    if (time.inMinutes > 30) {
       return true;
     } else {
       return false;
@@ -43,11 +43,12 @@ class SecureStorageHelper {
   Future<void> updateAuthToken(String accessToken) async {
     map['authToken'] = accessToken;
     await _storage.write(key: 'authToken', value: accessToken);
+    await _storage.write(
+        key: 'lastTokenRefresh', value: DateTime.now().toIso8601String());
   }
 
   Future<void> fetchData() async {
     map = await _storage.readAll();
-    print(map);
   }
 
   bool getSignInStatus() {
