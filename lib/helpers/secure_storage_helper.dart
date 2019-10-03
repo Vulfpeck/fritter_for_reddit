@@ -8,17 +8,34 @@ class SecureStorageHelper {
     fetchData();
   }
 
-  String get authToken => map['authToken'];
+  Future<String> get authToken async {
+    await fetchData();
+    return map['authToken'];
+  }
+
   String get debugPrint => map.toString();
-  String get refreshToken => map['refreshToken'];
-  String get lastTokenRefresh => map['lastTokenRefresh'];
 
-  bool get signInStatus =>
-      (map.containsKey('signedIn') && map['signedIn'] == "true");
+  Future<String> get refreshToken async {
+    await fetchData();
+    return map['refreshToken'];
+  }
 
-  bool needsTokenRefresh() {
+  Future<String> get lastTokenRefresh async {
+    await fetchData();
+    return map['lastTokenRefresh'];
+  }
+
+  bool get signInStatus {
+    if (map != null)
+      return (map.containsKey('signedIn') && map['signedIn'] == "true");
+    else {
+      return false;
+    }
+  }
+
+  Future<bool> needsTokenRefresh() async {
     Duration time =
-        (DateTime.now()).difference(DateTime.parse(lastTokenRefresh));
+    (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
     print("Time since last token refresh: " + time.inMinutes.toString());
     if (time.inMinutes > 30) {
       return true;
@@ -58,5 +75,6 @@ class SecureStorageHelper {
   Future<void> clearStorage() async {
     map = new Map<String, dynamic>();
     await _storage.deleteAll();
+    await fetchData();
   }
 }

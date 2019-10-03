@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_provider_app/providers/feed_provider.dart';
 import 'package:flutter_provider_app/widgets/drawer.dart';
+import 'package:flutter_provider_app/widgets/feed_list.dart';
 import 'package:provider/provider.dart';
 
 import 'exports.dart';
@@ -12,8 +14,15 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(ChangeNotifierProvider(
-    builder: (_) => UserInformationProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        builder: (_) => UserInformationProvider(),
+      ),
+      ChangeNotifierProvider(
+        builder: (_) => FeedProvider(),
+      )
+    ],
     child: MyApp(),
   ));
 }
@@ -23,6 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      themeMode: ThemeMode.dark,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -50,42 +60,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tushyboi\'s reddit app'),
-      ),
-      body: Provider.of<UserInformationProvider>(context).state ==
-              ViewState.Busy
-          ? CircularProgressIndicator()
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: Provider.of<UserInformationProvider>(context).signedIn
-                      ? Text('Signed in')
-                      : Text('Sign in on the left'),
-                ),
-                RaisedButton(
-                    child: Text('Refresh access token'),
-                    onPressed:
-                        Provider.of<UserInformationProvider>(context).signedIn
-                            ? () {
-                                Provider.of<UserInformationProvider>(context)
-                                    .performTokenRefresh();
-                              }
-                            : null),
-                RaisedButton(
-                  child: Text('Sign out'),
-                  onPressed:
-                      Provider.of<UserInformationProvider>(context).signedIn
-                          ? () {
-                              Provider.of<UserInformationProvider>(context)
-                                  .signOutUser();
-                            }
-                          : null,
-                )
-              ],
-            ),
+      body: FeedList(),
       drawer: LeftDrawer(),
     );
   }

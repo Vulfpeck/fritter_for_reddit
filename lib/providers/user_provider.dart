@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/models/states.dart';
 import 'package:flutter_provider_app/models/subreddits/child.dart';
 import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
 import 'package:flutter_provider_app/secrets.dart';
@@ -11,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class UserInformationProvider with ChangeNotifier {
+  HttpServer server;
   final _storageHelper = new SecureStorageHelper();
 
   bool get signedIn => _storageHelper.signInStatus;
@@ -30,23 +32,26 @@ class UserInformationProvider with ChangeNotifier {
   Future<void> validateAuthentication() async {
     print("*** Validating authentication ****");
 
-    await _storageHelper.fetchData();
     _state = ViewState.Busy;
     notifyListeners();
+    await _storageHelper.fetchData();
 
     if (_storageHelper.signInStatus) {
-      if (_storageHelper.needsTokenRefresh()) {
-        performTokenRefresh();
-      }
+      await performTokenRefresh();
       await loadUserInformation();
+    } else {
+      print("** user is not authenticated");
     }
 
     _state = ViewState.Idle;
-    print(_storageHelper.debugPrint);
+    print("validate authentication debug print" + _storageHelper.debugPrint);
     notifyListeners();
   }
 
   Future<void> performAuthentication() async {
+    if (server != null) {
+      await server.close(force: true);
+    }
     print("*** Performing authentication ****");
 
     notifyListeners();
@@ -61,6 +66,7 @@ class UserInformationProvider with ChangeNotifier {
 
     // server returns the first access_code it receives
     final String accessCode = await onCode.first;
+    print("Local host response: " + accessCode);
 
     // now we use this code to obtain authentication token and other shit
 
@@ -75,9 +81,11 @@ class UserInformationProvider with ChangeNotifier {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body:
-          "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
+      "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
     );
 
+    print(
+        "New authentication response code: " + response.statusCode.toString());
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
       await _storageHelper.updateCredentials(map['access_token'],
@@ -92,7 +100,6 @@ class UserInformationProvider with ChangeNotifier {
 
   Future<Stream<String>> _server() async {
     final StreamController<String> onCode = new StreamController();
-    HttpServer server;
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
       print("Server started");
@@ -133,12 +140,19 @@ class UserInformationProvider with ChangeNotifier {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body:
-          "grant_type=refresh_token&refresh_token=${_storageHelper.refreshToken}",
+      "grant_type=refresh_token&refresh_token=${await _storageHelper
+          .refreshToken}",
     );
 
-    Map<String, dynamic> map = json.decode(response.body);
-    print(map);
-    await _storageHelper.updateAuthToken(map['access_token']);
+    print("Token refresh status code: " + response.statusCode.toString());
+    if (response.statusCode == 200) {
+      Map<String, dynamic> map = json.decode(response.body);
+      print(map);
+      await _storageHelper.updateAuthToken(map['access_token']);
+    } else {
+      print("Failed to refresh token");
+      print(json.decode(response.body));
+    }
     _state = ViewState.Idle;
     notifyListeners();
   }
@@ -146,7 +160,7 @@ class UserInformationProvider with ChangeNotifier {
   Future<void> loadUserInformation() async {
     print("*** Loading user information ****");
 
-    String token = _storageHelper.authToken;
+    String token = await _storageHelper.authToken;
 
     final response = await http.get(
       "https://oauth.reddit.com/api/v1/me",
@@ -155,9 +169,12 @@ class UserInformationProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
+    print("Loading user information response code: " +
+        response.statusCode.toString());
 
-    userInformation =
-        new UserInformation.fromJsonMap(json.decode(response.body));
+    if (response.statusCode == 200)
+      userInformation =
+      new UserInformation.fromJsonMap(json.decode(response.body));
 
     final subredditResponse = await http.get(
       "https://oauth.reddit.com/subreddits/mine/?limit=100",
@@ -167,21 +184,18 @@ class UserInformationProvider with ChangeNotifier {
       },
     );
 
-    userSubreddits = new SubredditsSubscribed.fromJsonMap(
-        json.decode(subredditResponse.body));
+    print("Subreddit list request Response code: " +
+        subredditResponse.statusCode.toString());
 
-    userSubreddits.data.children.sort((Child a, Child b) {
-      return a.display_name
-          .toLowerCase()
-          .compareTo(b.display_name.toLowerCase());
-    });
+    if (subredditResponse.statusCode == 200) {
+      userSubreddits = new SubredditsSubscribed.fromJsonMap(
+          json.decode(subredditResponse.body));
 
-//    if (subredditResponse.statusCode == 200) {
-//      userSubreddits = new SubscribedSubreddits.fromJsonMap(
-//        json.decode(subredditResponse.body),
-//      );
-//
-//      print(userSubreddits);
-//    }
+      userSubreddits.data.children.sort((Child a, Child b) {
+        return a.display_name
+            .toLowerCase()
+            .compareTo(b.display_name.toLowerCase());
+      });
+    }
   }
 }
