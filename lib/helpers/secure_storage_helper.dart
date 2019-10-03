@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+
+import '../secrets.dart';
 
 class SecureStorageHelper {
   final _storage = new FlutterSecureStorage();
@@ -76,5 +81,30 @@ class SecureStorageHelper {
     map = new Map<String, dynamic>();
     await _storage.deleteAll();
     await fetchData();
+  }
+
+  Future<void> performTokenRefresh() async {
+    print("******* PERFORMING A TOKEN REFRESH *****");
+    String user = CLIENT_ID;
+    String password = "";
+    String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
+    final response = await http.post(
+      "https://www.reddit.com/api/v1/access_token",
+      headers: {
+        "Authorization": basicAuth,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: "grant_type=refresh_token&refresh_token=${await refreshToken}",
+    );
+
+    print("Token refresh status code: " + response.statusCode.toString());
+    if (response.statusCode == 200) {
+      Map<String, dynamic> map = json.decode(response.body);
+      print(map);
+      await updateAuthToken(map['access_token']);
+    } else {
+      print("Failed to refresh token");
+      print(json.decode(response.body));
+    }
   }
 }

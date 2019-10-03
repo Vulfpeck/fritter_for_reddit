@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/hex_color.dart';
+import 'package:flutter_provider_app/pages/web_view_sign_in.dart';
 import 'package:flutter_provider_app/providers/feed_provider.dart';
 
 class LeftDrawer extends StatefulWidget {
@@ -9,6 +10,8 @@ class LeftDrawer extends StatefulWidget {
 }
 
 class _LeftDrawerState extends State<LeftDrawer> {
+  var _subredditGoController = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -19,6 +22,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
             return Center(child: CircularProgressIndicator());
           } else if (model.state == ViewState.Idle) {
             return CustomScrollView(
+              physics: BouncingScrollPhysics(),
               slivers: <Widget>[
                 SliverAppBar(
                   brightness: Brightness.light,
@@ -47,8 +51,9 @@ class _LeftDrawerState extends State<LeftDrawer> {
                             Row(
                               children: <Widget>[
                                 IconButton(
-                                    icon: Icon(Icons.refresh),
-                                    onPressed: model.performTokenRefresh),
+                                  icon: Icon(Icons.refresh),
+                                  onPressed: model.performTokenRefresh,
+                                ),
                                 IconButton(
                                   icon: Icon(Icons.beach_access),
                                   onPressed: model.signOutUser,
@@ -64,7 +69,35 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                      index = index - 1;
+                      index = index - 2;
+                      if (index == -2) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: ListTile(
+                            title: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Goto subreddit',
+                                fillColor: Colors.black12,
+                                filled: true,
+                                border: InputBorder.none,
+                              ),
+                              controller: _subredditGoController,
+                              onSubmitted: (value) {
+                                loadNewSubreddit(context, value);
+                              },
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.arrow_forward,
+                              ),
+                              onPressed: () {
+                                loadNewSubreddit(
+                                    context, _subredditGoController.text);
+                              },
+                            ),
+                          ),
+                        );
+                      }
                       if (index == -1) {
                         return ListTile(
                           title: Text(
@@ -122,7 +155,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                         },
                       );
                     },
-                    childCount: model.userSubreddits.data.children.length + 1,
+                    childCount: model.userSubreddits.data.children.length + 2,
                   ),
                 ),
               ],
@@ -139,7 +172,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 ),
               ),
               onTap: () {
-                model.performAuthentication();
+                authenticateUser(model, context);
               },
             ),
           );
@@ -147,5 +180,53 @@ class _LeftDrawerState extends State<LeftDrawer> {
         return Container();
       }),
     );
+  }
+
+  Future<void> authenticateUser(
+      UserInformationProvider model, BuildContext context) async {
+    bool res = true;
+    Navigator.push(context, MaterialPageRoute(builder: (_) {
+      return WebViewSignIn();
+    })).then((val) {
+      res = val;
+      print("Auth Navigator result: " + res.toString());
+    });
+    res = await model.performAuthentication() && res;
+    print("final res: " + res.toString());
+    Navigator.pop(context);
+    if (res) {
+      Provider.of<FeedProvider>(context).fetchPostsListing();
+      Navigator.pop(context);
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text('Authentication failed bitches'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('Retry'),
+                onPressed: () {
+                  authenticateUser(model, context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  loadNewSubreddit(BuildContext context, String text) {
+    final text = _subredditGoController.text.replaceAll(" ", "");
+    Provider.of<FeedProvider>(context)
+        .fetchPostsListing(currentSubreddit: text, currentSort: "hot");
+    Navigator.of(context).pop();
   }
 }

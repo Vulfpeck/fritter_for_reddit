@@ -9,7 +9,6 @@ import 'package:flutter_provider_app/models/subreddits/child.dart';
 import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
 import 'package:flutter_provider_app/secrets.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class UserInformationProvider with ChangeNotifier {
   HttpServer server;
@@ -21,6 +20,9 @@ class UserInformationProvider with ChangeNotifier {
   SubredditsSubscribed userSubreddits;
 
   ViewState _state;
+  ViewState _authenticationStatus;
+
+  ViewState get authenticationStatus => _authenticationStatus;
 
   UserInformationProvider() {
     print("*** Initializeding user information provider ****");
@@ -28,6 +30,10 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   ViewState get state => _state;
+
+  Future<void> performTokenRefresh() async {
+    await _storageHelper.performTokenRefresh();
+  }
 
   Future<void> validateAuthentication() async {
     print("*** Validating authentication ****");
@@ -37,7 +43,7 @@ class UserInformationProvider with ChangeNotifier {
     await _storageHelper.fetchData();
 
     if (_storageHelper.signInStatus) {
-      await performTokenRefresh();
+      await _storageHelper.performTokenRefresh();
       await loadUserInformation();
     } else {
       print("** user is not authenticated");
@@ -48,25 +54,26 @@ class UserInformationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> performAuthentication() async {
+  Future<bool> performAuthentication() async {
     if (server != null) {
       await server.close(force: true);
     }
-    print("*** Performing authentication ****");
 
-    notifyListeners();
-    _state = ViewState.Busy;
+    print("*** Performing authentication ****");
     // start a new instance of the server that listens to localhost requests
     Stream<String> onCode = await _server();
-    final String url =
-        "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
-            CLIENT_ID +
-            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
-    launch(url);
 
     // server returns the first access_code it receives
+
     final String accessCode = await onCode.first;
-    print("Local host response: " + accessCode);
+    print("local host response");
+
+    notifyListeners();
+    _authenticationStatus = ViewState.Busy;
+    if (accessCode == null) {
+      print("isNull");
+      return false;
+    }
 
     // now we use this code to obtain authentication token and other shit
 
@@ -93,9 +100,13 @@ class UserInformationProvider with ChangeNotifier {
       await loadUserInformation();
     } else {
       print("Authentication failed");
+      return false;
     }
+
+    _authenticationStatus = ViewState.Idle;
     _state = ViewState.Idle;
     notifyListeners();
+    return true;
   }
 
   Future<Stream<String>> _server() async {
@@ -109,7 +120,7 @@ class UserInformationProvider with ChangeNotifier {
         ..statusCode = 200
         ..headers.set("Content-Type", ContentType.html.mimeType)
         ..write(
-            "<html><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><h1 style='margin: 0 auto; height:100%; text-align:center;'>Close this window and go frit yourself.</h1></html>");
+            '<html><meta name="viewport" content="width=device-width, initial-scale=1.0"><body> <h2 style="text-align: center; position: absolute; top: 50%; left: 0: right: 0">Signing you in, please wait</h2></body></html>');
       await request.response.close();
       await server.close(force: true);
       onCode.add(code);
@@ -126,41 +137,14 @@ class UserInformationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> performTokenRefresh() async {
-    print("******* PERFORMING A TOKEN REFRESH *****");
-    String user = CLIENT_ID;
-    String password = "";
-    String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
-    _state = ViewState.Busy;
-    notifyListeners();
-    final response = await http.post(
-      "https://www.reddit.com/api/v1/access_token",
-      headers: {
-        "Authorization": basicAuth,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body:
-          "grant_type=refresh_token&refresh_token=${await _storageHelper.refreshToken}",
-    );
-
-    print("Token refresh status code: " + response.statusCode.toString());
-    if (response.statusCode == 200) {
-      Map<String, dynamic> map = json.decode(response.body);
-      print(map);
-      await _storageHelper.updateAuthToken(map['access_token']);
-    } else {
-      print("Failed to refresh token");
-      print(json.decode(response.body));
-    }
-    _state = ViewState.Idle;
-    notifyListeners();
-  }
-
   Future<void> loadUserInformation() async {
     print("*** Loading user information ****");
 
     String token = await _storageHelper.authToken;
 
+    if (token == null) {
+      return;
+    }
     final response = await http.get(
       "https://oauth.reddit.com/api/v1/me",
       headers: {

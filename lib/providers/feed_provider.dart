@@ -8,8 +8,9 @@ import 'package:http/http.dart' as http;
 
 class FeedProvider with ChangeNotifier {
   final SecureStorageHelper _storageHelper = new SecureStorageHelper();
-  String sub = "FrontPage";
-  String sort = "hot";
+  String subName = "FrontPage";
+  String sub = "";
+  String sort = "Hot";
 
   ViewState _state;
 
@@ -36,26 +37,49 @@ class FeedProvider with ChangeNotifier {
 
   Future<void> fetchPostsListing({
     currentSubreddit = "",
-    currentSort = "hot",
+    currentSort = "Hot",
   }) async {
     print("** fetching posts");
 
     _state = ViewState.Busy;
     notifyListeners();
+    _storageHelper.fetchData();
+
+    print(_storageHelper.signInStatus);
+    if (_storageHelper.signInStatus == false) {
+      print("fetch Posts: not signed in ");
+      sort = currentSort;
+      print("Is at frontpage");
+      _currentPage = CurrentPage.FrontPage;
+      final url =
+          "https://www.reddit.com/${currentSort.toString().toLowerCase()}.json";
+      final response = await http.get(url);
+      _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
+      _state = ViewState.Idle;
+      notifyListeners();
+      return;
+    }
+
+    if (await _storageHelper.needsTokenRefresh()) {
+      await _storageHelper.performTokenRefresh();
+    }
 
     http.Response subredditResponse;
+    print("** Fetch posts user is authenticated");
 
     String token = await _storageHelper.authToken;
     String url;
     print("fetch Posts: got token");
+    sort = currentSort;
     if (currentSubreddit == "") {
       print("Is at frontpage");
       _currentPage = CurrentPage.FrontPage;
-      url = "https://oauth.reddit.com/$currentSort/?limit=100";
+      url =
+          "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/?limit=100";
     } else {
       _currentPage = CurrentPage.Other;
       url =
-          "https://oauth.reddit.com/r/$currentSubreddit/$currentSort/?limit=100";
+          "https://oauth.reddit.com/r/$currentSubreddit/${currentSort.toString().toLowerCase()}/?limit=100";
     }
     print(url);
     subredditResponse = await http.get(
