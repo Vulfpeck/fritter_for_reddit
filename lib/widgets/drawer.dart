@@ -35,20 +35,14 @@ class _LeftDrawerState extends State<LeftDrawer> {
                           children: <Widget>[
                             Text(
                               model.userInformation.name,
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline,
+                              style: Theme.of(context).textTheme.headline,
                             ),
                             Text(
                               (model.userInformation.link_karma +
-                                  model.userInformation.comment_karma)
-                                  .toString() +
+                                          model.userInformation.comment_karma)
+                                      .toString() +
                                   " Karma",
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .subhead,
+                              style: Theme.of(context).textTheme.subhead,
                             ),
                             Row(
                               children: <Widget>[
@@ -69,23 +63,18 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
+                    (BuildContext context, int index) {
                       index = index - 1;
                       if (index == -1) {
                         return ListTile(
                           title: Text(
                             'Frontpage',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .subhead,
+                            style: Theme.of(context).textTheme.subhead,
                           ),
                           leading: CircleAvatar(
                             backgroundImage:
-                            AssetImage('assets/default_icon.png'),
-                            backgroundColor: Theme
-                                .of(context)
-                                .accentColor,
+                                AssetImage('assets/default_icon.png'),
+                            backgroundColor: Theme.of(context).accentColor,
                           ),
                           onTap: () {
                             Navigator.of(context).pop();
@@ -98,33 +87,28 @@ class _LeftDrawerState extends State<LeftDrawer> {
                         title: Text(
                           model
                               .userSubreddits.data.children[index].display_name,
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .subhead,
+                          style: Theme.of(context).textTheme.subhead,
                         ),
                         leading: CircleAvatar(
                           backgroundImage: model.userSubreddits.data
-                              .children[index].community_icon !=
-                              ""
+                                      .children[index].community_icon !=
+                                  ""
                               ? NetworkImage(model.userSubreddits.data
-                              .children[index].community_icon)
+                                  .children[index].community_icon)
                               : model.userSubreddits.data.children[index]
-                              .icon_img !=
-                              ""
-                              ? NetworkImage(model.userSubreddits.data
-                              .children[index].icon_img)
-                              : AssetImage('assets/default_icon.png'),
+                                          .icon_img !=
+                                      ""
+                                  ? NetworkImage(model.userSubreddits.data
+                                      .children[index].icon_img)
+                                  : AssetImage('assets/default_icon.png'),
                           backgroundColor: model.userSubreddits.data
-                              .children[index].primary_color ==
-                              ""
-                              ? Theme
-                              .of(context)
-                              .accentColor
+                                      .children[index].primary_color ==
+                                  ""
+                              ? Theme.of(context).accentColor
                               : HexColor(
-                            model.userSubreddits.data.children[index]
-                                .primary_color,
-                          ),
+                                  model.userSubreddits.data.children[index]
+                                      .primary_color,
+                                ),
                         ),
                         onTap: () {
                           print(model.userSubreddits.data.children[index]
@@ -132,9 +116,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                           Provider.of<FeedProvider>(context).fetchPostsListing(
                               currentSubreddit: model.userSubreddits.data
                                   .children[index].display_name);
-                          if (Scaffold
-                              .of(context)
-                              .isDrawerOpen) {
+                          if (Scaffold.of(context).isDrawerOpen) {
                             Navigator.pop(context);
                           }
                         },

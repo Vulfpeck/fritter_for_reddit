@@ -35,7 +35,7 @@ class SecureStorageHelper {
 
   Future<bool> needsTokenRefresh() async {
     Duration time =
-    (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
+        (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
     print("Time since last token refresh: " + time.inMinutes.toString());
     if (time.inMinutes > 30) {
       return true;

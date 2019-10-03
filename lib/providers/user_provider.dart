@@ -81,7 +81,7 @@ class UserInformationProvider with ChangeNotifier {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body:
-      "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
+          "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
     );
 
     print(
@@ -140,8 +140,7 @@ class UserInformationProvider with ChangeNotifier {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body:
-      "grant_type=refresh_token&refresh_token=${await _storageHelper
-          .refreshToken}",
+          "grant_type=refresh_token&refresh_token=${await _storageHelper.refreshToken}",
     );
 
     print("Token refresh status code: " + response.statusCode.toString());
@@ -174,7 +173,7 @@ class UserInformationProvider with ChangeNotifier {
 
     if (response.statusCode == 200)
       userInformation =
-      new UserInformation.fromJsonMap(json.decode(response.body));
+          new UserInformation.fromJsonMap(json.decode(response.body));
 
     final subredditResponse = await http.get(
       "https://oauth.reddit.com/subreddits/mine/?limit=100",
