@@ -14,7 +14,7 @@ class TranslucentSliverAppDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => safeAreaPadding.top;
 
   @override
-  double get maxExtent => minExtent + 250;
+  double get maxExtent => minExtent + 220;
 
   @override
   Widget build(
@@ -48,7 +48,7 @@ class _AppbarSelectorState extends State<AppbarSelector> {
     return Provider.of<FeedProvider>(context).currentPage ==
             CurrentPage.FrontPage
         ? TranslucentAppBarFrontPage(
-            widget.maxExtent,
+            widget.maxExtent - 100,
             widget.minExtent,
           )
         : TranslucentAppBarOther(
@@ -87,7 +87,7 @@ class _TranslucentAppBarOtherState extends State<TranslucentAppBarOther> {
                               ""
                       ? TransparentHexColor(model.subredditInformationEntity
                           .data.bannerBackgroundColor)
-                      : Colors.white,
+                      : TransparentHexColor('#FAF0D9'),
               // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
               child: Stack(
                 overflow: Overflow.clip,
@@ -240,6 +240,7 @@ class _TranslucentAppBarOtherState extends State<TranslucentAppBarOther> {
                               );
                             }).toList();
                           },
+                          onCanceled: () {},
                         )
                       ],
                       primary: true,
@@ -284,7 +285,7 @@ class _TranslucentAppBarFrontPageState
                 // Don't wrap this in any SafeArea widgets, use padding instead
                 padding: EdgeInsets.only(top: 0),
                 height: widget.maxExtent,
-                color: Colors.black12,
+                color: TransparentHexColor('#FAF0D9'),
                 // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
                 child: Stack(
                   overflow: Overflow.clip,
@@ -296,7 +297,6 @@ class _TranslucentAppBarFrontPageState
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
-                            vertical: 32.0,
                           ),
                           child: Row(
                             children: <Widget>[
@@ -308,6 +308,9 @@ class _TranslucentAppBarFrontPageState
                                     'Front Page',
                                     style: Theme.of(context).textTheme.headline,
                                   ),
+                                  Container(
+                                    height: widget.minExtent,
+                                  )
                                 ],
                               ),
                             ],

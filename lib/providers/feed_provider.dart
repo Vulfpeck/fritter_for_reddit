@@ -162,4 +162,27 @@ class FeedProvider with ChangeNotifier {
     _partialState = ViewState.Idle;
     notifyListeners();
   }
+
+  Future<bool> vote(String id, int dir) async {
+    notifyListeners();
+    String url = "https://oauth.reddit.com/api/vote";
+    final String authToken = await _storageHelper.authToken;
+    http.Response voteResponse;
+    voteResponse = await http.post(
+      url + '?dir=$dir&id=$id&rank=2',
+      headers: {
+        'Authorization': 'bearer ' + authToken,
+        'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+      },
+    );
+
+    notifyListeners();
+    if (voteResponse.statusCode == 200) {
+      print("Vote success : " + json.decode(voteResponse.body).toString());
+      return true;
+    } else {
+      print("Vote failed : " + json.decode(voteResponse.body).toString());
+      return false;
+    }
+  }
 }

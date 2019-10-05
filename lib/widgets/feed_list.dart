@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/widgets/feed_card.dart';
@@ -18,7 +19,7 @@ class _FeedListState extends State<FeedList> {
         slivers: <Widget>[
           SliverPersistentHeader(
             floating: true,
-            pinned: true,
+            pinned: false,
             delegate:
                 TranslucentSliverAppDelegate(MediaQuery.of(context).padding),
           ),
@@ -30,13 +31,21 @@ class _FeedListState extends State<FeedList> {
                     (BuildContext context, int index) {
                       var item = model.postFeed.data.children[index].data;
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                        child: item.isSelf == false && item.preview != null
-                            ? FeedCardImage(
-                                item.preview.images.first.source.url,
-                                item.title,
-                                item.preview.images.first.source.height)
-                            : FeedCardSelfText(item),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CommentsSheet();
+                                });
+                          },
+                          child: item.isSelf == false && item.preview != null
+                              ? FeedCardImage(item)
+                              : FeedCardSelfText(item),
+                        ),
                       );
                     },
                     childCount: model.postFeed.data.children.length,
@@ -56,5 +65,33 @@ class _FeedListState extends State<FeedList> {
         ],
       );
     });
+  }
+}
+
+class CommentsSheet extends StatefulWidget {
+  @override
+  _CommentsSheetState createState() => _CommentsSheetState();
+}
+
+class _CommentsSheetState extends State<CommentsSheet> {
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      maxChildSize: 1.0,
+      minChildSize: 0.2,
+      initialChildSize: 0.8,
+      expand: false,
+      builder: (BuildContext context, ScrollController controller) {
+        return ListView.builder(
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (_, index) {
+            return ListTile(
+              title: Text('fuck'),
+            );
+          },
+          controller: controller,
+        );
+      },
+    );
   }
 }

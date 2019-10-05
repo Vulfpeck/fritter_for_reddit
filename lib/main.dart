@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_provider_app/providers/feed_provider.dart';
+import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/drawer.dart';
 import 'package:flutter_provider_app/widgets/feed_list.dart';
 import 'package:provider/provider.dart';
@@ -9,10 +9,7 @@ import 'exports.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      systemNavigationBarColor: Color.fromARGB(0, 255, 255, 255),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
+    SystemUiOverlayStyle(),
   );
   runApp(MultiProvider(
     providers: [
@@ -21,10 +18,50 @@ void main() {
       ),
       ChangeNotifierProvider(
         builder: (_) => FeedProvider(),
+      ),
+      ChangeNotifierProvider(
+        builder: (_) => CommentsProvider(),
       )
     ],
-    child: MyApp(),
+    child: MyTestApp(),
   ));
+}
+
+class MyTestApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyApp(),
+    );
+  }
+}
+
+class Machod extends StatefulWidget {
+  @override
+  _MachodState createState() => _MachodState();
+}
+
+class _MachodState extends State<Machod> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Consumer(
+        builder: (BuildContext context, CommentsProvider model, _) {
+          return Column(
+            children: <Widget>[
+              RaisedButton(
+                child: Text('get comments lol'),
+                onPressed: () {
+                  model.fetchComments();
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
