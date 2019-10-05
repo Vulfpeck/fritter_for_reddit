@@ -7,6 +7,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/states.dart';
 import 'package:flutter_provider_app/models/subreddits/child.dart';
 import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
+import 'package:flutter_provider_app/models/user_profile/user_information_entity.dart';
 import 'package:flutter_provider_app/secrets.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,7 +17,7 @@ class UserInformationProvider with ChangeNotifier {
 
   bool get signedIn => _storageHelper.signInStatus;
 
-  UserInformation userInformation;
+  UserInformationEntity userInformation;
   SubredditsSubscribed userSubreddits;
 
   ViewState _state;
@@ -55,6 +56,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<bool> performAuthentication() async {
+    bool authResult = true;
     if (server != null) {
       await server.close(force: true);
     }
@@ -72,7 +74,7 @@ class UserInformationProvider with ChangeNotifier {
     _authenticationStatus = ViewState.Busy;
     if (accessCode == null) {
       print("isNull");
-      return false;
+      authResult = false;
     }
 
     // now we use this code to obtain authentication token and other shit
@@ -97,16 +99,17 @@ class UserInformationProvider with ChangeNotifier {
       Map<String, dynamic> map = json.decode(response.body);
       await _storageHelper.updateCredentials(map['access_token'],
           map['refresh_token'], DateTime.now().toIso8601String(), true);
+      print('authentication: token stored to secure storage');
       await loadUserInformation();
     } else {
       print("Authentication failed");
-      return false;
+      authResult = false;
     }
 
     _authenticationStatus = ViewState.Idle;
     _state = ViewState.Idle;
     notifyListeners();
-    return true;
+    return authResult;
   }
 
   Future<Stream<String>> _server() async {
@@ -154,10 +157,11 @@ class UserInformationProvider with ChangeNotifier {
     );
     print("Loading user information response code: " +
         response.statusCode.toString());
+    print(json.decode(response.body));
 
     if (response.statusCode == 200)
       userInformation =
-          new UserInformation.fromJsonMap(json.decode(response.body));
+          new UserInformationEntity.fromJson(json.decode(response.body));
 
     final subredditResponse = await http.get(
       "https://oauth.reddit.com/subreddits/mine/?limit=100",

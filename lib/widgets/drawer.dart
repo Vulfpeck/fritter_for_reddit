@@ -42,8 +42,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                               style: Theme.of(context).textTheme.headline,
                             ),
                             Text(
-                              (model.userInformation.link_karma +
-                                          model.userInformation.comment_karma)
+                              (model.userInformation.linkKarma +
+                                          model.userInformation.commentKarma)
                                       .toString() +
                                   " Karma",
                               style: Theme.of(context).textTheme.subhead,

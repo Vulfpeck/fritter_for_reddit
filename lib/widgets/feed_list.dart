@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/widgets/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/feed_card.dart';
 import 'package:flutter_provider_app/widgets/translucent_app_bar.dart';
 
@@ -17,12 +18,60 @@ class _FeedListState extends State<FeedList> {
       return CustomScrollView(
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
-          SliverPersistentHeader(
-            floating: true,
+          SliverAppBar(
+            actions: <Widget>[
+              PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.sort,
+                ),
+                onSelected: (value) {
+                  if (value == 'Close') {
+                  } else
+                    Provider.of<FeedProvider>(context).fetchPostsListing(
+                        currentSort: value, currentSubreddit: model.sub);
+                },
+                itemBuilder: (BuildContext context) {
+                  return <String>[
+                    'Close',
+                    'Best',
+                    'Hot',
+                    'New',
+                    'Controversial',
+                    'Rising'
+                  ].map((String value) {
+                    return new PopupMenuItem<String>(
+                      value: value,
+                      child: new Text(value),
+                    );
+                  }).toList();
+                },
+                onCanceled: () {},
+              ),
+            ],
             pinned: false,
-            delegate:
-                TranslucentSliverAppDelegate(MediaQuery.of(context).padding),
+            snap: true,
+            floating: true,
+            primary: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            iconTheme: IconThemeData.fallback(),
+            brightness: Brightness.light,
+            flexibleSpace: FlexibleSpaceBar(
+              background: model.partialState == ViewState.Busy
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : TranslucentAppBarBackground(),
+            ),
+            expandedHeight:
+                model.currentPage == CurrentPage.FrontPage ? 150 : 200,
           ),
+//          SliverPersistentHeader(
+//            delegate:
+//                TranslucentSliverAppDelegate(MediaQuery.of(context).padding),
+//            pinned: false,
+//            floating: false,
+//          ),
           SliverList(
             delegate: model.state == ViewState.Idle &&
                     Provider.of<UserInformationProvider>(context).state ==
@@ -32,15 +81,18 @@ class _FeedListState extends State<FeedList> {
                       var item = model.postFeed.data.children[index].data;
                       return Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
+                          horizontal: 0.0,
+                          vertical: 4.0,
+                        ),
                         child: GestureDetector(
                           onTap: () {
                             showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return CommentsSheet();
-                                });
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CommentsSheet();
+                              },
+                            );
                           },
                           child: item.isSelf == false && item.preview != null
                               ? FeedCardImage(item)
@@ -65,33 +117,5 @@ class _FeedListState extends State<FeedList> {
         ],
       );
     });
-  }
-}
-
-class CommentsSheet extends StatefulWidget {
-  @override
-  _CommentsSheetState createState() => _CommentsSheetState();
-}
-
-class _CommentsSheetState extends State<CommentsSheet> {
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      maxChildSize: 1.0,
-      minChildSize: 0.2,
-      initialChildSize: 0.8,
-      expand: false,
-      builder: (BuildContext context, ScrollController controller) {
-        return ListView.builder(
-          physics: BouncingScrollPhysics(),
-          itemBuilder: (_, index) {
-            return ListTile(
-              title: Text('fuck'),
-            );
-          },
-          controller: controller,
-        );
-      },
-    );
   }
 }

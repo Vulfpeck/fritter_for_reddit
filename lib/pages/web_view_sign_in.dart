@@ -22,10 +22,11 @@ class _WebViewSignInState extends State<WebViewSignIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign in'),
+        automaticallyImplyLeading: false,
         actions: <Widget>[
           FlatButton.icon(
-            icon: Icon(Icons.done),
-            label: Text('Done'),
+            icon: Icon(Icons.cancel),
+            label: Text('Cancel'),
             onPressed: () {
               Navigator.pop(context, false);
             },
