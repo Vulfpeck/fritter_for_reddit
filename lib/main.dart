@@ -31,6 +31,7 @@ class MyTestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      showPerformanceOverlay: false,
       home: MyApp(),
     );
   }
@@ -45,6 +46,7 @@ class _MachodState extends State<Machod> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(),
       body: Consumer(
         builder: (BuildContext context, CommentsProvider model, _) {

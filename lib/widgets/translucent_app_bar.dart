@@ -17,21 +17,15 @@ class _TranslucentAppBarBackgroundState
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
+        var headerColor = TransparentHexColor("#FAF0D9");
+
         return ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
                 // Don't wrap this in any SafeArea widgets, use padding instead
                 padding: EdgeInsets.only(top: 0),
-                color: model != null
-                    ? model.state != ViewState.Busy
-                        ? model.currentPage == CurrentPage.FrontPage
-                            ? TransparentHexColor("#FAF0D9")
-                            : TransparentHexColor(
-                                model.subredditInformationEntity.data.keyColor,
-                              )
-                        : TransparentHexColor("#FAF0D9")
-                    : TransparentHexColor("#FAF0D9"),
+                color: headerColor,
                 // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
                 child: model != null
                     ? model.state == ViewState.Idle
@@ -62,37 +56,73 @@ class _TranslucentAppBarBackgroundState
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 16.0),
-                                      child: CircleAvatar(
-                                        maxRadius: 24,
-                                        minRadius: 24,
-                                        backgroundImage: model
-                                                    .subredditInformationEntity
-                                                    .data
-                                                    .communityIcon !=
-                                                ""
-                                            ? NetworkImage(model
-                                                .subredditInformationEntity
-                                                .data
-                                                .communityIcon)
-                                            : model.subredditInformationEntity
-                                                        .data.iconImg !=
+                                      child: Row(
+                                        children: <Widget>[
+                                          CircleAvatar(
+                                            maxRadius: 24,
+                                            minRadius: 24,
+                                            backgroundImage: model
+                                                        .subredditInformationEntity
+                                                        .data
+                                                        .communityIcon !=
                                                     ""
                                                 ? NetworkImage(model
                                                     .subredditInformationEntity
                                                     .data
-                                                    .iconImg)
-                                                : AssetImage(
-                                                    'assets/default_icon.png'),
-                                        backgroundColor: model
+                                                    .communityIcon)
+                                                : model.subredditInformationEntity
+                                                            .data.iconImg !=
+                                                        ""
+                                                    ? NetworkImage(model
+                                                        .subredditInformationEntity
+                                                        .data
+                                                        .iconImg)
+                                                    : AssetImage(
+                                                        'assets/default_icon.png'),
+                                            backgroundColor: model
+                                                        .subredditInformationEntity
+                                                        .data
+                                                        .primaryColor ==
+                                                    ""
+                                                ? Theme.of(context).accentColor
+                                                : HexColor(model
                                                     .subredditInformationEntity
                                                     .data
-                                                    .primaryColor ==
-                                                ""
-                                            ? Theme.of(context).accentColor
-                                            : HexColor(model
-                                                .subredditInformationEntity
-                                                .data
-                                                .primaryColor),
+                                                    .primaryColor),
+                                          ),
+                                          Expanded(
+                                            child: Container(),
+                                          ),
+                                          OutlineButton(
+                                            child: model.partialState ==
+                                                    ViewState.Busy
+                                                ? Container(
+                                                    width: 24.0,
+                                                    height: 24.0,
+                                                    child: Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
+                                                  )
+                                                : Text(model
+                                                        .subredditInformationEntity
+                                                        .data
+                                                        .userIsSubscriber
+                                                    ? 'Subscribed'
+                                                    : 'Join'),
+                                            onPressed: () {
+                                              model.unsubscribeFromSubreddit(
+                                                  model
+                                                      .subredditInformationEntity
+                                                      .data
+                                                      .name,
+                                                  !model
+                                                      .subredditInformationEntity
+                                                      .data
+                                                      .userIsSubscriber);
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Row(
@@ -124,33 +154,6 @@ class _TranslucentAppBarBackgroundState
                                               )
                                             ],
                                           ),
-                                        ),
-                                        OutlineButton(
-                                          child: model.partialState ==
-                                                  ViewState.Busy
-                                              ? Container(
-                                                  width: 24.0,
-                                                  height: 24.0,
-                                                  child: Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  ),
-                                                )
-                                              : Text(model
-                                                      .subredditInformationEntity
-                                                      .data
-                                                      .userIsSubscriber
-                                                  ? 'Subscribed'
-                                                  : 'Join'),
-                                          onPressed: () {
-                                            model.unsubscribeFromSubreddit(
-                                                model.subredditInformationEntity
-                                                    .data.name,
-                                                !model
-                                                    .subredditInformationEntity
-                                                    .data
-                                                    .userIsSubscriber);
-                                          },
                                         ),
                                       ],
                                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/feed_card.dart';
 import 'package:flutter_provider_app/widgets/translucent_app_bar.dart';
@@ -72,6 +73,7 @@ class _FeedListState extends State<FeedList> {
 //            pinned: false,
 //            floating: false,
 //          ),
+
           SliverList(
             delegate: model.state == ViewState.Idle &&
                     Provider.of<UserInformationProvider>(context).state ==
@@ -86,17 +88,23 @@ class _FeedListState extends State<FeedList> {
                         ),
                         child: GestureDetector(
                           onTap: () {
+                            Provider.of<CommentsProvider>(context)
+                                .fetchComments(
+                              subredditName: item.subreddit,
+                              postId: item.id,
+                              sort: 'hot',
+                            );
                             showModalBottomSheet(
                               isScrollControlled: true,
                               context: context,
                               builder: (BuildContext context) {
-                                return CommentsSheet();
+                                return CommentsSheet(item);
                               },
                             );
                           },
                           child: item.isSelf == false && item.preview != null
                               ? FeedCardImage(item)
-                              : FeedCardSelfText(item),
+                              : FeedCardSelfText(item, false),
                         ),
                       );
                     },

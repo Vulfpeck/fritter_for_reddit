@@ -61,9 +61,9 @@ class FeedCardImage extends StatelessWidget {
 
 class FeedCardSelfText extends StatelessWidget {
   final PostsFeedDataChildrenData _data;
-
+  final _expandSelfText;
   final HtmlUnescape unescape = new HtmlUnescape();
-  FeedCardSelfText(this._data);
+  FeedCardSelfText(this._data, this._expandSelfText);
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class FeedCardSelfText extends StatelessWidget {
             padding: const EdgeInsets.only(
                 top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
             child: Text(
-              selfText,
+              _expandSelfText ? _data.selftext : selfText,
               style: Theme.of(context).textTheme.body2,
             ),
           ),

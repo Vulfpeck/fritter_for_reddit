@@ -38,11 +38,7 @@ class _PostControlsState extends State<PostControls> {
                     widget.postData.author + " • " + widget.postData.domain,
                   ),
                   Text(
-                    getTimePosted(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          widget.postData.createdUtc.floor() * 1000,
-                          isUtc: true),
-                    ),
+                    getTimePosted(widget.postData.createdUtc),
                   )
                 ],
               ),
@@ -167,7 +163,11 @@ class _PostControlsState extends State<PostControls> {
     );
   }
 
-  String getTimePosted(DateTime postDate) {
+  String getTimePosted(double orig) {
+    DateTime postDate = DateTime.fromMillisecondsSinceEpoch(
+      orig.floor() * 1000,
+      isUtc: true,
+    );
     Duration difference = DateTime.now().toUtc().difference(postDate);
     if (difference.inDays <= 0) {
       if (difference.inHours <= 0) {

@@ -13,6 +13,9 @@ class CommentsProvider with ChangeNotifier {
 
   ViewState get state => _state;
 
+  List<CommentPojo.Child> _commentsList;
+  List<CommentPojo.Child> get commentsList => _commentsList;
+
   CommentsProvider() {}
 
   void process(List<dynamic> commentList, int level) {
@@ -27,26 +30,36 @@ class CommentsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchComments({String subredditName, String sort}) async {
+  Future<void> fetchComments({
+    String subredditName,
+    String postId,
+    String sort,
+  }) async {
+    _state = ViewState.Busy;
+    notifyListeners();
     final url =
-        'https://www.reddit.com/r/android/comments/dd4nl3/_/.json?context=1&showedits=true&threaded=false&limit=100&depth=4';
+        'https://www.reddit.com/r/$subredditName/comments/$postId/_/.json?showedits=true&threaded=false&depth=4';
     final response = await http.get(url,
         headers: {'User-Agent': 'fritter_for_reddit by /u/SexusMexus'});
     if (response.statusCode == 200) {
-      print(json.decode(response.body));
+//      print(json.decode(response.body));
       final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
 
       Queue<CommentPojo.Child> q = Queue.from(c.data.children);
       List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
       while (q.isNotEmpty) {
-        final x = q.removeFirst();
-        if (x.kind != CommentPojo.Kind.MORE)
-          print(x.data.depth.toString() + " " + x.data.author);
-        finalList.add(x);
+        var x = q.removeFirst();
+        if (x.kind == CommentPojo.Kind.T1) {
+          print(" | " * x.data.depth + "-" + x.data.author);
+          finalList.add(x);
+        }
       }
-      notifyListeners();
+
+      _commentsList = finalList;
     } else {
       print('fetch failed');
     }
+    _state = ViewState.Idle;
+    notifyListeners();
   }
 }
