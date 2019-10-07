@@ -79,7 +79,7 @@ class _PostControlsState extends State<PostControls> {
                   Icon(
                     Icons.comment,
                     size: 18,
-                    color: Colors.black38,
+                    color: Colors.grey,
                   ),
                   SizedBox(
                     width: 8.0,
@@ -90,7 +90,7 @@ class _PostControlsState extends State<PostControls> {
                   ),
                   IconButton(
                     icon: Icon(Icons.more_horiz),
-                    color: Colors.black54,
+                    color: Colors.grey,
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
@@ -157,12 +157,11 @@ class _PostControlsState extends State<PostControls> {
                   Text(
                     widget.postData.score.toString(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: likes == null
-                          ? Colors.black54
-                          : likes == true ? Colors.orange : Colors.deepPurple,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: likes == null
+                        ? Theme.of(context).textTheme.button
+                        : Theme.of(context).textTheme.button.copyWith(
+                              color: likes ? Colors.orange : Colors.deepPurple,
+                            ),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_downward),

@@ -19,7 +19,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
     return DraggableScrollableSheet(
       maxChildSize: 1,
       minChildSize: 0.4,
-      initialChildSize: 1,
+      initialChildSize: 0.7,
       expand: false,
       builder: (BuildContext context, ScrollController controller) {
         return Consumer(

@@ -25,7 +25,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
               physics: BouncingScrollPhysics(),
               slivers: <Widget>[
                 SliverAppBar(
-                  brightness: Brightness.light,
                   backgroundColor: Colors.black12,
                   automaticallyImplyLeading: false,
                   expandedHeight: 150,

@@ -30,18 +30,18 @@ class _CommentItemState extends State<CommentItem> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border(
                           left: BorderSide(
-                            color: Colors.black12,
+                            color: Colors.grey,
                             width: widget._comment.data.depth == 0 ? 0 : 2,
                           ),
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: Column(
                           children: <Widget>[
                             SizedBox(

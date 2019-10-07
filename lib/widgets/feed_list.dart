@@ -4,7 +4,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/feed_card.dart';
-import 'package:flutter_provider_app/widgets/translucent_app_bar.dart';
+import 'package:flutter_provider_app/widgets/translucent_app_bar_bg.dart';
 
 class FeedList extends StatefulWidget {
   @override
@@ -55,8 +55,6 @@ class _FeedListState extends State<FeedList> {
             primary: true,
             elevation: 0,
             backgroundColor: Colors.transparent,
-            iconTheme: IconThemeData.fallback(),
-            brightness: Brightness.light,
             flexibleSpace: FlexibleSpaceBar(
               background: model.partialState == ViewState.Busy
                   ? Center(
