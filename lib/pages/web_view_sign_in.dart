@@ -36,8 +36,16 @@ class _WebViewSignInState extends State<WebViewSignIn> {
       body: Consumer(
         builder: (BuildContext context, UserInformationProvider model, _) {
           return model.authenticationStatus == ViewState.Busy
-              ? Center(
-                  child: CircularProgressIndicator(),
+              ? Column(
+                  children: <Widget>[
+                    Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    Text('Hold on tight!'),
+                    Text(
+                        "We're asking reddit to allow us to let you waste your time"),
+                    Text('Authenticating with Reddit'),
+                  ],
                 )
               : SafeArea(
                   child: WebView(

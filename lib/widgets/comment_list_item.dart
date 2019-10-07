@@ -4,11 +4,18 @@ import 'package:flutter_provider_app/models/comment_chain/comment.dart'
     as CommentPojo;
 import 'package:html_unescape/html_unescape.dart';
 
-class CommentItem extends StatelessWidget {
+class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
-  final HtmlUnescape _unescape = new HtmlUnescape();
 
   CommentItem(this._comment);
+
+  @override
+  _CommentItemState createState() => _CommentItemState();
+}
+
+class _CommentItemState extends State<CommentItem> {
+  final HtmlUnescape _unescape = new HtmlUnescape();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -17,23 +24,19 @@ class CommentItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             SizedBox(
-              width: 16 * _comment.data.depth.toDouble(),
+              width: 16 * widget._comment.data.depth.toDouble(),
             ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  right: 0.0,
-                  left: 0.0,
-                  bottom: 4.0,
-                ),
-                child: Column(
-                  children: <Widget>[
-                    DecoratedBox(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.white,
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border(
                           left: BorderSide(
-                            color: Colors.black26,
-                            width: 1,
+                            color: Colors.black12,
+                            width: widget._comment.data.depth == 0 ? 0 : 2,
                           ),
                         ),
                       ),
@@ -41,27 +44,45 @@ class CommentItem extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Column(
                           children: <Widget>[
+                            SizedBox(
+                              height: 12.0,
+                            ),
                             Row(
+                              mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
                                 Flexible(
                                   child: Text(
-                                    _comment.data.author +
+                                    widget._comment.data.author +
                                         " • " +
                                         getTimePosted(
-                                          _comment.data.createdUtc,
-                                        ),
+                                          widget._comment.data.createdUtc,
+                                        ) +
+                                        " • ",
                                     style: Theme.of(context).textTheme.caption,
-                                    softWrap: true,
+                                    softWrap: false,
+                                    overflow: TextOverflow.fade,
                                     maxLines: 100,
                                   ),
                                 ),
+                                Text(
+                                  widget._comment.data.score.toString() +
+                                      " points",
+                                  style: Theme.of(context).textTheme.caption,
+                                  softWrap: false,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.left,
+                                ),
                               ],
+                            ),
+                            SizedBox(
+                              height: 8.0,
                             ),
                             Row(
                               children: <Widget>[
                                 Flexible(
                                   child: Text(
-                                    _unescape.convert(_comment.data.body),
+                                    _unescape
+                                        .convert(widget._comment.data.body),
                                     style: Theme.of(context).textTheme.body1,
                                     softWrap: true,
                                     maxLines: 100,
@@ -69,13 +90,15 @@ class CommentItem extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            SizedBox(
+                              height: 12.0,
+                            )
                           ],
                         ),
                       ),
                     ),
-                    Divider(),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

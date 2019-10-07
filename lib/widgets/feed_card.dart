@@ -8,6 +8,8 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/widgets/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
+import '../exports.dart';
+
 class FeedCardImage extends StatelessWidget {
   final PostsFeedDataChildrenData _data;
 
@@ -20,42 +22,46 @@ class FeedCardImage extends StatelessWidget {
     final mq = MediaQuery.of(context).size;
     final ratio = (mq.width - 16) / _data.preview.images.first.source.width;
     final url = _htmlUnescape.convert(_data.preview.images.first.source.url);
-    return Card(
-      elevation: 10,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          StickyTag(_data.stickied),
-          Padding(
-            padding:
-                const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  _htmlUnescape.convert(_data.title),
-                  style: Theme.of(context).textTheme.title,
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Image(
-              image: CachedNetworkImageProvider(
-                url,
+    return Consumer(builder: (BuildContext context, FeedProvider model, _) {
+      return Card(
+        elevation: 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            StickyTag(_data.stickied),
+            Padding(
+              padding:
+                  const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    _htmlUnescape.convert(_data.title),
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
               ),
-              fit: BoxFit.fitWidth,
-              height:
-                  _data.preview.images.first.source.height.toDouble() * ratio,
             ),
-          ),
-          PostControls(_data),
-        ],
-      ),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    );
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Image(
+                  image: CachedNetworkImageProvider(
+                    url,
+                  ),
+                  fit: BoxFit.fitWidth,
+                  height: _data.preview.images.first.source.height.toDouble() *
+                      ratio,
+                ),
+              ),
+            ),
+            PostControls(_data),
+          ],
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      );
+    });
   }
 }
 
@@ -88,14 +94,16 @@ class FeedCardSelfText extends StatelessWidget {
               style: Theme.of(context).textTheme.title,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
-            child: Text(
-              _expandSelfText ? _data.selftext : selfText,
-              style: Theme.of(context).textTheme.body2,
-            ),
-          ),
+          _data.selftext != ""
+              ? Padding(
+                  padding: const EdgeInsets.only(
+                      top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                  child: Text(
+                    _expandSelfText ? _data.selftext : selfText,
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                )
+              : Container(),
           PostControls(_data),
         ],
       ),

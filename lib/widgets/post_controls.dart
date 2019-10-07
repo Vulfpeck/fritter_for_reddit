@@ -31,30 +31,60 @@ class _PostControlsState extends State<PostControls> {
               SizedBox(
                 height: 4.0,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
-                  Text(
-                    widget.postData.author + " • " + widget.postData.domain,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 0.0),
+                        child: Text(
+                          widget.postData.subredditNamePrefixed,
+                          style: Theme.of(context).textTheme.subtitle.copyWith(
+                                color: Theme.of(context).accentColor,
+                              ),
+                        ),
+                      ),
+                      Text(
+                        'u/' + widget.postData.author,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                    ],
                   ),
-                  Text(
-                    getTimePosted(widget.postData.createdUtc),
-                  )
+                  Expanded(
+                    child: Container(),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Text(
+                        "u/" + widget.postData.domain,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                      Text(
+                        getTimePosted(widget.postData.createdUtc),
+                        style: Theme.of(context).textTheme.caption,
+                      )
+                    ],
+                  ),
                 ],
+              ),
+              SizedBox(
+                height: 4.0,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      widget.postData.subredditNamePrefixed,
-                      style: Theme.of(context)
-                          .textTheme
-                          .subtitle
-                          .copyWith(color: Theme.of(context).accentColor),
-                    ),
+                  Icon(
+                    Icons.comment,
+                    size: 18,
+                    color: Colors.black38,
                   ),
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Text(widget.postData.numComments.toString() + ' Comments'),
                   Expanded(
                     child: Container(),
                   ),
@@ -109,15 +139,15 @@ class _PostControlsState extends State<PostControls> {
                     onPressed: () {
                       if (likes == null) {
                         widget.postData.score++;
-                        likes = true;
+                        widget.postData.likes = likes = true;
                         model.vote(widget.postData.name, 1);
                       } else if (likes == false) {
                         widget.postData.score += 2;
-                        likes = true;
+                        widget.postData.likes = likes = true;
                         model.vote(widget.postData.name, 1);
                       } else {
                         widget.postData.score--;
-                        likes = null;
+                        widget.postData.likes = likes = null;
                         model.vote(widget.postData.name, 0);
                       }
                     },
@@ -140,15 +170,15 @@ class _PostControlsState extends State<PostControls> {
                     onPressed: () {
                       if (likes == null) {
                         widget.postData.score--;
-                        likes = false;
+                        widget.postData.likes = likes = false;
                         model.vote(widget.postData.name, -1);
                       } else if (likes == true) {
                         widget.postData.score -= 2;
-                        likes = false;
+                        widget.postData.likes = likes = false;
                         model.vote(widget.postData.name, -1);
                       } else {
                         widget.postData.score++;
-                        likes = null;
+                        widget.postData.likes = likes = null;
                         model.vote(widget.postData.name, 0);
                       }
                     },

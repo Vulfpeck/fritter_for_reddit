@@ -19,7 +19,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
     return DraggableScrollableSheet(
       maxChildSize: 1,
       minChildSize: 0.4,
-      initialChildSize: 0.9,
+      initialChildSize: 1,
       expand: false,
       builder: (BuildContext context, ScrollController controller) {
         return Consumer(
@@ -117,7 +117,7 @@ class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                   width: 48,
                   child: Material(
                     borderRadius: BorderRadius.circular(100),
-                    elevation: 10,
+                    elevation: 5,
                     color: Colors.white,
                     child: Icon(
                       Icons.close,

@@ -19,6 +19,11 @@ class _TranslucentAppBarBackgroundState
       builder: (BuildContext context, FeedProvider model, _) {
         var headerColor = TransparentHexColor("#FAF0D9");
 
+        if (model.subredditInformationEntity != null &&
+            model.subredditInformationEntity.data.bannerBackgroundColor != "") {
+          headerColor = TransparentHexColor(
+              model.subredditInformationEntity.data.bannerBackgroundColor);
+        }
         return ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
