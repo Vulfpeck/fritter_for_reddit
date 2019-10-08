@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:flutter_provider_app/widgets/comment_list_item.dart';
-import 'package:flutter_provider_app/widgets/feed_card.dart';
+import 'package:flutter_provider_app/widgets/comments/comment_list_item.dart';
+import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
+import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
 
 class CommentsSheet extends StatefulWidget {
   final PostsFeedDataChildrenData item;
@@ -48,6 +49,10 @@ class _CommentsSheetState extends State<CommentsSheet> {
                           SizedBox(
                             height: 32,
                           ),
+                          CommentsControlBar(widget.item),
+                          SizedBox(
+                            height: 32,
+                          ),
                         ],
                       ),
                     ]),
@@ -58,7 +63,10 @@ class _CommentsSheetState extends State<CommentsSheet> {
                             <Widget>[
                               Center(
                                 child: CircularProgressIndicator(),
-                              )
+                              ),
+                              SizedBox(
+                                height: 32.0,
+                              ),
                             ],
                           )
                         : SliverChildBuilderDelegate(
@@ -70,7 +78,16 @@ class _CommentsSheetState extends State<CommentsSheet> {
                             },
                             childCount: model.commentsList.length,
                           ),
-                  )
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        SizedBox(
+                          height: 32,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             );
@@ -118,10 +135,10 @@ class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                   child: Material(
                     borderRadius: BorderRadius.circular(100),
                     elevation: 5,
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     child: Icon(
                       Icons.close,
-                      color: Colors.black,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                   ),
                 ),

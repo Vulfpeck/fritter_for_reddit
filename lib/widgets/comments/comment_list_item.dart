@@ -34,11 +34,16 @@ class _CommentItemState extends State<CommentItem> {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         border: Border(
-                          left: BorderSide(
-                            color: Colors.grey,
-                            width: widget._comment.data.depth == 0 ? 0 : 2,
-                          ),
-                        ),
+                            left: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                              width: widget._comment.data.depth == 0 ? 0 : 2,
+                            ),
+                            top: BorderSide(
+                              color: widget._comment.data.depth == 0
+                                  ? Theme.of(context).dividerColor
+                                  : Colors.transparent,
+                              width: widget._comment.data.depth == 0 ? 1 : 0,
+                            )),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),

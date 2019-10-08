@@ -1,20 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_provider_app/widgets/drawer.dart';
-import 'package:flutter_provider_app/widgets/feed_list.dart';
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    print(MediaQuery.of(context).platformBrightness);
-    return MaterialApp(
-      themeMode: ThemeMode.dark,
-      title: 'Flutter Demo',
-      home: HomePage(),
-    );
-  }
-}
+import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
+import 'package:flutter_provider_app/widgets/feed/feed_list.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -22,10 +8,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String code;
-  String authToken;
-  String refreshToken;
-
   @override
   void initState() {
     super.initState();
@@ -34,10 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        child: FeedList(),
-        value: SystemUiOverlayStyle.dark,
-      ),
+      body: FeedList(),
       drawer: LeftDrawer(),
     );
   }

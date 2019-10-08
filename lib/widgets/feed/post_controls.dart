@@ -59,7 +59,7 @@ class _PostControlsState extends State<PostControls> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Text(
-                        "u/" + widget.postData.domain,
+                        widget.postData.domain,
                         style: Theme.of(context).textTheme.caption,
                       ),
                       Text(
@@ -97,7 +97,6 @@ class _PostControlsState extends State<PostControls> {
                         isScrollControlled: true,
                         useRootNavigator: true,
                         elevation: 10,
-                        backgroundColor: Color.fromARGB(255, 255, 255, 255),
                         builder: (context) {
                           return DraggableScrollableSheet(
                             expand: false,
@@ -121,7 +120,8 @@ class _PostControlsState extends State<PostControls> {
                                         title: Text('View Subreddit'),
                                         leading: CircleAvatar(
                                           backgroundImage: AssetImage(
-                                              'assets/default_icon.png'),
+                                            'assets/default_icon.png',
+                                          ),
                                         ),
                                       )
                                     ]),

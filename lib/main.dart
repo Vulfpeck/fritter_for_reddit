@@ -26,15 +26,15 @@ class MyTestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      showPerformanceOverlay: false,
-      home: MyApp(),
+      home: HomePage(),
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.blue,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.green,
         iconTheme: IconThemeData(
           color: Colors.white,
         ),

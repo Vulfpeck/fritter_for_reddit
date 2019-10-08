@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:flutter_provider_app/widgets/comments_sheet.dart';
-import 'package:flutter_provider_app/widgets/feed_card.dart';
-import 'package:flutter_provider_app/widgets/translucent_app_bar_bg.dart';
+import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
+import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
+import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
 
 class FeedList extends StatefulWidget {
   @override
@@ -20,6 +20,7 @@ class _FeedListState extends State<FeedList> {
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
+            iconTheme: Theme.of(context).iconTheme,
             actions: <Widget>[
               PopupMenuButton<String>(
                 icon: Icon(
@@ -54,6 +55,7 @@ class _FeedListState extends State<FeedList> {
             floating: true,
             primary: true,
             elevation: 0,
+            brightness: MediaQuery.of(context).platformBrightness,
             backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               background: model.partialState == ViewState.Busy

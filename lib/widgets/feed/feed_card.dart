@@ -5,10 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/widgets/post_controls.dart';
+import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-import '../exports.dart';
+import '../../exports.dart';
 
 class FeedCardImage extends StatelessWidget {
   final PostsFeedDataChildrenData _data;
