@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
@@ -12,11 +13,19 @@ class FeedList extends StatefulWidget {
 }
 
 class _FeedListState extends State<FeedList> {
+  ScrollController _controller;
+  @override
+  void initState() {
+    _controller = new ScrollController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<FeedProvider>(
         builder: (BuildContext context, FeedProvider model, _) {
       return CustomScrollView(
+        controller: _controller,
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
@@ -86,6 +95,11 @@ class _FeedListState extends State<FeedList> {
                           vertical: 4.0,
                         ),
                         child: GestureDetector(
+                          onLongPress: () {
+                            if (item.isSelf == false) {
+                              _launchURL(context, item.url);
+                            }
+                          },
                           onTap: () {
                             Provider.of<CommentsProvider>(context)
                                 .fetchComments(
@@ -127,5 +141,23 @@ class _FeedListState extends State<FeedList> {
         ],
       );
     });
+  }
+
+  void _launchURL(BuildContext context, String url) async {
+    try {
+      await launch(
+        url,
+        option: new CustomTabsOption(
+          toolbarColor: Theme.of(context).primaryColor,
+          enableDefaultShare: true,
+          enableUrlBarHiding: true,
+          showPageTitle: true,
+          animation: new CustomTabsAnimation.slideIn(),
+        ),
+      );
+    } catch (e) {
+      // An exception is thrown if browser app is not installed on Android device.
+      debugPrint(e.toString());
+    }
   }
 }

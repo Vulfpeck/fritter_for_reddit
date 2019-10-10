@@ -19,6 +19,8 @@ class CommentsProvider with ChangeNotifier {
 
   List<CommentPojo.Child> _commentsList;
   List<CommentPojo.Child> get commentsList => _commentsList;
+
+  String moreParentLoadingId = "";
   SecureStorageHelper _storageHelper;
 
   CommentsProvider() {
@@ -92,6 +94,7 @@ class CommentsProvider with ChangeNotifier {
     String moreParentId,
   }) async {
     _commentsMoreLoadingState = ViewState.Busy;
+    moreParentLoadingId = moreParentId;
     notifyListeners();
     String childrenString = "";
     if (children != null)
@@ -153,6 +156,7 @@ class CommentsProvider with ChangeNotifier {
     } catch (e) {
       print(e.toString());
     }
+    moreParentLoadingId = "";
     _commentsMoreLoadingState = ViewState.Idle;
     notifyListeners();
   }

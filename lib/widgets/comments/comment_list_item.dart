@@ -51,33 +51,72 @@ class _CommentItemState extends State<CommentItem> {
                             )),
                       ),
                       child: widget._comment.kind == CommentPojo.Kind.MORE
-                          ? Container(
-                              child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                GestureDetector(
-                                  onTap: () {
-                                    print(widget._comment.data.children);
-                                    print(widget.name);
-                                    Provider.of<CommentsProvider>(context)
-                                        .fetchChildren(
-                                      children: widget._comment.data.children,
-                                      id: widget.name,
-                                      moreParentId: widget._comment.data.id,
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'More',
-                                      style: TextStyle(
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ))
+                          ? Consumer(
+                              builder: (BuildContext context,
+                                  CommentsProvider model, _) {
+                                return model.commentsMoreLoadingState ==
+                                            ViewState.Busy &&
+                                        model.moreParentLoadingId != "" &&
+                                        model.moreParentLoadingId ==
+                                            widget._comment.data.id
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 32,
+                                            height: 32,
+                                            padding: EdgeInsets.all(4.0),
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        ],
+                                      )
+                                    : Container(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Material(
+                                                child: InkWell(
+                                                  enableFeedback: true,
+                                                  splashColor: Theme.of(context)
+                                                      .accentColor,
+                                                  onTap: () {
+                                                    print(widget._comment.data
+                                                        .children);
+                                                    print(widget.name);
+                                                    Provider.of<CommentsProvider>(
+                                                            context)
+                                                        .fetchChildren(
+                                                      children: widget._comment
+                                                          .data.children,
+                                                      id: widget.name,
+                                                      moreParentId: widget
+                                                          ._comment.data.id,
+                                                    );
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      'More',
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .accentColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                type: MaterialType.card,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                              },
+                            )
                           : Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12.0),
@@ -89,18 +128,21 @@ class _CommentItemState extends State<CommentItem> {
                                   Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8.0),
-                                        child: widget._comment.data.isSubmitter
-                                            ? Icon(
-                                                Icons.person,
-                                                size: 16,
-                                                color: Theme.of(context)
-                                                    .accentColor,
-                                              )
-                                            : Container(),
-                                      ),
+                                      widget._comment.data.isSubmitter
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 8.0),
+                                              child: widget
+                                                      ._comment.data.isSubmitter
+                                                  ? Icon(
+                                                      Icons.person,
+                                                      size: 16,
+                                                      color: Theme.of(context)
+                                                          .accentColor,
+                                                    )
+                                                  : Container(),
+                                            )
+                                          : Container(),
                                       Flexible(
                                         child: Text(
                                           widget._comment.data.author +

@@ -11,10 +11,8 @@ class PostControls extends StatefulWidget {
 }
 
 class _PostControlsState extends State<PostControls> {
-  bool likes;
   @override
   void initState() {
-    likes = widget.postData.likes;
     super.initState();
   }
 
@@ -137,47 +135,57 @@ class _PostControlsState extends State<PostControls> {
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
                     onPressed: () {
-                      if (likes == null) {
+                      if (widget.postData.likes == null) {
                         widget.postData.score++;
-                        widget.postData.likes = likes = true;
+                        widget.postData.likes = true;
                         model.vote(widget.postData.name, 1);
-                      } else if (likes == false) {
+                      } else if (widget.postData.likes == false) {
                         widget.postData.score += 2;
-                        widget.postData.likes = likes = true;
+                        widget.postData.likes = true;
                         model.vote(widget.postData.name, 1);
                       } else {
                         widget.postData.score--;
-                        widget.postData.likes = likes = null;
+                        widget.postData.likes = null;
                         model.vote(widget.postData.name, 0);
                       }
                     },
-                    color: likes == true ? Colors.orange : Colors.grey,
+                    color: widget.postData.likes == null ||
+                            widget.postData.likes == false
+                        ? Colors.grey
+                        : Colors.orange,
                     splashColor: Colors.orange,
                   ),
                   Text(
                     widget.postData.score.toString(),
                     textAlign: TextAlign.center,
-                    style: likes == null
+                    style: widget.postData.likes == null
                         ? Theme.of(context).textTheme.button
                         : Theme.of(context).textTheme.button.copyWith(
-                              color: likes ? Colors.orange : Colors.deepPurple,
+                              color: widget.postData.likes == null
+                                  ? Colors.grey
+                                  : widget.postData.likes == true
+                                      ? Colors.orange
+                                      : Colors.purple,
                             ),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_downward),
-                    color: likes == false ? Colors.deepPurple : Colors.grey,
+                    color: widget.postData.likes == null ||
+                            widget.postData.likes == true
+                        ? Colors.grey
+                        : Colors.purple,
                     onPressed: () {
-                      if (likes == null) {
+                      if (widget.postData.likes == null) {
                         widget.postData.score--;
-                        widget.postData.likes = likes = false;
+                        widget.postData.likes = false;
                         model.vote(widget.postData.name, -1);
-                      } else if (likes == true) {
+                      } else if (widget.postData.likes == true) {
                         widget.postData.score -= 2;
-                        widget.postData.likes = likes = false;
+                        widget.postData.likes = false;
                         model.vote(widget.postData.name, -1);
                       } else {
                         widget.postData.score++;
-                        widget.postData.likes = likes = null;
+                        widget.postData.likes = null;
                         model.vote(widget.postData.name, 0);
                       }
                     },

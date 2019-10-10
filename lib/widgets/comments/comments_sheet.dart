@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
@@ -45,9 +46,18 @@ class _CommentsSheetState extends State<CommentsSheet> {
                           SizedBox(
                             height: 8.0,
                           ),
-                          widget.item.isSelf
-                              ? FeedCardSelfText(widget.item, true)
-                              : FeedCardImage(widget.item),
+                          InkWell(
+                            onTap: () {
+                              print('tap tap');
+                              if (widget.item.isSelf == false) {
+                                print(widget.item.url);
+                                _launchURL(context, widget.item.url);
+                              }
+                            },
+                            child: widget.item.isSelf
+                                ? FeedCardSelfText(widget.item, true)
+                                : FeedCardImage(widget.item),
+                          ),
                           SizedBox(
                             height: 32,
                           ),
@@ -99,6 +109,24 @@ class _CommentsSheetState extends State<CommentsSheet> {
         );
       },
     );
+  }
+
+  void _launchURL(BuildContext context, String url) async {
+    try {
+      await launch(
+        url,
+        option: new CustomTabsOption(
+          toolbarColor: Theme.of(context).primaryColor,
+          enableDefaultShare: true,
+          enableUrlBarHiding: true,
+          showPageTitle: true,
+          animation: new CustomTabsAnimation.slideIn(),
+        ),
+      );
+    } catch (e) {
+      // An exception is thrown if browser app is not installed on Android device.
+      debugPrint(e.toString());
+    }
   }
 }
 
