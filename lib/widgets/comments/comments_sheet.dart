@@ -17,6 +17,7 @@ class CommentsSheet extends StatefulWidget {
 class _CommentsSheetState extends State<CommentsSheet> {
   @override
   Widget build(BuildContext context) {
+    print("Post id is " + widget.item.name);
     return DraggableScrollableSheet(
       maxChildSize: 1,
       minChildSize: 0.4,
@@ -34,7 +35,8 @@ class _CommentsSheetState extends State<CommentsSheet> {
                     pinned: true,
                     floating: true,
                     delegate: _TranslucentSliverAppBarDelegate(
-                        MediaQuery.of(context).padding),
+                      MediaQuery.of(context).padding,
+                    ),
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
@@ -58,7 +60,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
                     ]),
                   ),
                   SliverList(
-                    delegate: model.state == ViewState.Busy
+                    delegate: model.commentsLoadingState == ViewState.Busy
                         ? SliverChildListDelegate(
                             <Widget>[
                               Center(
@@ -74,6 +76,8 @@ class _CommentsSheetState extends State<CommentsSheet> {
                               var item = model.commentsList.elementAt(index);
                               return CommentItem(
                                 item,
+                                widget.item.name,
+                                widget.item.id,
                               );
                             },
                             childCount: model.commentsList.length,
@@ -128,24 +132,20 @@ class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             child: SizedBox(
               height: 48,
               width: 48,
-              child: InkWell(
-                child: SizedBox(
-                  height: 48,
-                  width: 48,
-                  child: Material(
-                    borderRadius: BorderRadius.circular(100),
-                    elevation: 5,
-                    color: Theme.of(context).cardColor,
-                    child: Icon(
-                      Icons.close,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
+              child: Material(
+                type: MaterialType.button,
+                borderRadius: BorderRadius.circular(100),
+                elevation: 5,
+                color: Theme.of(context).cardColor,
+                child: InkWell(
+                  splashColor: Theme.of(context).accentColor,
+                  borderRadius: BorderRadius.circular(100),
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(
+                    Icons.close,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                 ),
-                borderRadius: BorderRadius.circular(100),
-                onTap: () {
-                  Navigator.pop(context);
-                },
               ),
             ),
           ),

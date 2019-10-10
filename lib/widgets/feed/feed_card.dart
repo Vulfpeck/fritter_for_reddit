@@ -99,7 +99,9 @@ class FeedCardSelfText extends StatelessWidget {
                   padding: const EdgeInsets.only(
                       top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
                   child: Text(
-                    _expandSelfText ? _data.selftext : selfText,
+                    _expandSelfText
+                        ? unescape.convert(_data.selftext)
+                        : selfText,
                     style: Theme.of(context).textTheme.body2,
                   ),
                 )

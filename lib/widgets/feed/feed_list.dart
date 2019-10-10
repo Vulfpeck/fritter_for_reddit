@@ -34,7 +34,6 @@ class _FeedListState extends State<FeedList> {
                 },
                 itemBuilder: (BuildContext context) {
                   return <String>[
-                    'Close',
                     'Best',
                     'Hot',
                     'New',
@@ -92,7 +91,10 @@ class _FeedListState extends State<FeedList> {
                                 .fetchComments(
                               subredditName: item.subreddit,
                               postId: item.id,
-                              sort: 'hot',
+                              sort: item.suggestedSort != null
+                                  ? ChangeCommentSortConvertToEnum[
+                                      item.suggestedSort]
+                                  : CommentSortTypes.Best,
                             );
                             showModalBottomSheet(
                               isScrollControlled: true,

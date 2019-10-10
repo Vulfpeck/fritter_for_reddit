@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
+import 'package:flutter_provider_app/providers/comments_provider.dart';
 
 class CommentsControlBar extends StatefulWidget {
   final PostsFeedDataChildrenData item;
+
   CommentsControlBar(this.item);
 
   @override
@@ -10,7 +13,19 @@ class CommentsControlBar extends StatefulWidget {
 }
 
 class _CommentsControlBarState extends State<CommentsControlBar> {
+  CommentSortTypes _selectedSort;
+
+  initState() {
+    if (widget.item.suggestedSort != null && widget.item.suggestedSort != "") {
+      _selectedSort = ChangeCommentSortConvertToEnum[widget.item.suggestedSort];
+    } else {
+      _selectedSort = CommentSortTypes.Best;
+    }
+    super.initState();
+  }
+
   GlobalKey key = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -20,61 +35,71 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
         FlatButton.icon(
           icon: Icon(Icons.refresh),
           label: Text('Refresh'),
-          onPressed: () {},
+          onPressed: () {
+            Provider.of<CommentsProvider>(context).fetchComments(
+              subredditName: widget.item.subreddit,
+              postId: widget.item.id,
+              sort: _selectedSort,
+            );
+          },
         ),
         Expanded(
           child: Container(),
         ),
-        Text('Sort By'),
-        PopupMenuButton<String>(
+        DropdownButton<String>(
+          underline: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Sort By',
+                style: Theme.of(context).textTheme.overline,
+              ),
+              Text(
+                capitalizeString(
+                  ChangeCommentSortConvertToString[_selectedSort],
+                ),
+              ),
+            ],
+          ),
           icon: Icon(
             Icons.sort,
+            color: Colors.grey,
           ),
-          onSelected: (value) {
-            print(value);
-            if (value == 'top') {
-              print(key.currentContext.findRenderObject().semanticBounds);
-              showMenu(
-                position: RelativeRect.fromRect(
-                  key.currentContext
-                      .findRenderObject()
-                      .paintBounds, // smaller rect, the touch area
-                  Offset.zero &
-                      key.currentContext
-                          .findRenderObject()
-                          .semanticBounds
-                          .size, // Bigger rect, the entire screen
-                ),
-                context: context,
-                items: ['Today', 'This Week', 'This Month'].map(
-                  (String value) {
-                    return PopupMenuItem<String>(
-                      child: Text(value),
-                    );
-                  },
-                ).toList(),
-              );
-            }
+          isExpanded: false,
+          isDense: false,
+          onChanged: (value) {
+            setState(() {
+              _selectedSort = ChangeCommentSortConvertToEnum[value];
+            });
+            Provider.of<CommentsProvider>(context).fetchComments(
+              subredditName: widget.item.subreddit,
+              postId: widget.item.id,
+              sort: _selectedSort,
+            );
           },
-          itemBuilder: (BuildContext context) {
-            return <String>[
-              'Close',
-              'Best',
-              'Hot',
-              'New',
-              'Controversial',
-              'top',
-              'Rising'
-            ].map((String value) {
-              return new PopupMenuItem<String>(
-                value: value,
-                child: new Text(value),
-              );
-            }).toList();
-          },
-          onCanceled: () {},
+          items: <String>[
+            ChangeCommentSortConvertToString[CommentSortTypes.Best],
+            ChangeCommentSortConvertToString[CommentSortTypes.Top],
+            ChangeCommentSortConvertToString[CommentSortTypes.New],
+            ChangeCommentSortConvertToString[CommentSortTypes.Controversial],
+            ChangeCommentSortConvertToString[CommentSortTypes.Old],
+            ChangeCommentSortConvertToString[CommentSortTypes.QA],
+          ].map((String value) {
+            return new DropdownMenuItem<String>(
+              value: value.toString(),
+              child: new Text(
+                capitalizeString(value),
+              ),
+            );
+          }).toList(),
         ),
+        SizedBox(width: 16.0),
       ],
     );
+  }
+
+  String capitalizeString(String input) {
+    return input.replaceFirst(input[0], input[0].toUpperCase());
   }
 }

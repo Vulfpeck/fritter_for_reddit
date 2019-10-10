@@ -39,17 +39,22 @@ class FeedProvider with ChangeNotifier {
     currentSubreddit = "",
     currentSort = "Hot",
   }) async {
-    print("** fetching posts");
+//    print("** fetching posts");
 
+    print("initialize storage");
+    await _storageHelper.init();
     _state = ViewState.Busy;
     notifyListeners();
-    _storageHelper.fetchData();
+    print("fetch signin status");
 
-    print(_storageHelper.signInStatus);
+    print(_storageHelper.debugPrint);
+    await _storageHelper.fetchData();
+
+//    print(_storageHelper.signInStatus);
     if (_storageHelper.signInStatus == false) {
       print("fetch Posts: not signed in ");
       sort = currentSort;
-      print("Is at frontpage");
+//      print("Is at frontpage");
       _currentPage = CurrentPage.FrontPage;
       final url =
           "https://www.reddit.com/${currentSort.toString().toLowerCase()}.json";
@@ -65,14 +70,14 @@ class FeedProvider with ChangeNotifier {
     }
 
     http.Response subredditResponse;
-    print("** Fetch posts user is authenticated");
+//    print("** Fetch posts user is authenticated");
 
     String token = await _storageHelper.authToken;
     String url;
-    print("fetch Posts: got token");
+//    print("fetch Posts: got token");
     sort = currentSort;
     if (currentSubreddit == "") {
-      print("Is at frontpage");
+//      print("Is at frontpage");
       _currentPage = CurrentPage.FrontPage;
       url =
           "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/?limit=100";
@@ -81,7 +86,9 @@ class FeedProvider with ChangeNotifier {
       url =
           "https://oauth.reddit.com/r/$currentSubreddit/${currentSort.toString().toLowerCase()}/?limit=100";
     }
-    print(url);
+
+    print("Feed fetch url is : " + url);
+//    print(url);
     subredditResponse = await http.get(
       url,
       headers: {
@@ -89,8 +96,8 @@ class FeedProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-    print("fetch posts list response code: " +
-        subredditResponse.statusCode.toString());
+//    print("fetch posts list response code: " +
+//        subredditResponse.statusCode.toString());
 
     if (subredditResponse.statusCode == 200)
       _postFeed =
@@ -112,21 +119,21 @@ class FeedProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-    print("sub infor response code: " + subInfoResponse.statusCode.toString());
+//    print("sub infor response code: " + subInfoResponse.statusCode.toString());
 
     if (subInfoResponse.statusCode == 200) {
       _subredditInformationEntity = new SubredditInformationEntity.fromJson(
           json.decode(subInfoResponse.body));
       this.sub = _subredditInformationEntity.data.displayName;
-      print(_subredditInformationEntity.toJson());
+//      print(_subredditInformationEntity.toJson());
     }
-    print("** subreddit information fetching complete");
+//    print("** subreddit information fetching complete");
   }
 
   /// action being true results in subscribing to a subreddit
   Future<void> unsubscribeFromSubreddit(String subId, bool action) async {
-    print(action);
-    print(subId);
+//    print(action);
+//    print(subId);
     _partialState = ViewState.Busy;
     notifyListeners();
 
@@ -142,7 +149,7 @@ class FeedProvider with ChangeNotifier {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       );
-      print("url" + url);
+//      print("url" + url);
     } else {
       subInfoResponse = subInfoResponse = await http.post(
         url + '?action=unsub&sr=$subId&X-Modhash=null',
@@ -152,10 +159,10 @@ class FeedProvider with ChangeNotifier {
         },
       );
 
-      print("url" + url);
+//      print("url" + url);
     }
 
-    print(json.decode(subInfoResponse.body));
+//    print(json.decode(subInfoResponse.body));
 
     _subredditInformationEntity.data.userIsSubscriber =
         !_subredditInformationEntity.data.userIsSubscriber;
@@ -178,10 +185,10 @@ class FeedProvider with ChangeNotifier {
 
     notifyListeners();
     if (voteResponse.statusCode == 200) {
-      print("Vote success : " + json.decode(voteResponse.body).toString());
+//      print("Vote success : " + json.decode(voteResponse.body).toString());
       return true;
     } else {
-      print("Vote failed : " + json.decode(voteResponse.body).toString());
+//      print("Vote failed : " + json.decode(voteResponse.body).toString());
       return false;
     }
   }

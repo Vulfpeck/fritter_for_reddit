@@ -105,7 +105,7 @@ class ChildData {
   String name;
   bool quarantine;
   String linkFlairTextColor;
-  double upvoteRatio;
+  dynamic upvoteRatio;
   String authorFlairBackgroundColor;
   String subredditType;
   int ups;
@@ -134,7 +134,7 @@ class ChildData {
   dynamic contentCategories;
   bool isSelf;
   dynamic modNote;
-  double created;
+  dynamic created;
   String linkFlairType;
   int wls;
   dynamic bannedBy;
@@ -353,9 +353,7 @@ class ChildData {
         linkFlairTextColor: json["link_flair_text_color"] == null
             ? null
             : json["link_flair_text_color"],
-        upvoteRatio: json["upvote_ratio"] == null
-            ? null
-            : json["upvote_ratio"].toDouble(),
+        upvoteRatio: json["upvote_ratio"] == null ? null : json["upvote_ratio"],
         authorFlairBackgroundColor:
             json["author_flair_background_color"] == null
                 ? null

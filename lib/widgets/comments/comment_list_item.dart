@@ -2,12 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/models/comment_chain/comment.dart'
     as CommentPojo;
+import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:html_unescape/html_unescape.dart';
+
+import '../../exports.dart';
 
 class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
+  final String name;
+  final String id;
 
-  CommentItem(this._comment);
+  CommentItem(this._comment, this.name, this.id);
 
   @override
   _CommentItemState createState() => _CommentItemState();
@@ -45,62 +50,116 @@ class _CommentItemState extends State<CommentItem> {
                               width: widget._comment.data.depth == 0 ? 1 : 0,
                             )),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(
-                              height: 12.0,
-                            ),
-                            Row(
+                      child: widget._comment.kind == CommentPojo.Kind.MORE
+                          ? Container(
+                              child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
-                                Flexible(
-                                  child: Text(
-                                    widget._comment.data.author +
-                                        " • " +
-                                        getTimePosted(
-                                          widget._comment.data.createdUtc,
-                                        ) +
-                                        " • ",
-                                    style: Theme.of(context).textTheme.caption,
-                                    softWrap: false,
-                                    overflow: TextOverflow.fade,
-                                    maxLines: 100,
-                                  ),
-                                ),
-                                Text(
-                                  widget._comment.data.score.toString() +
-                                      " points",
-                                  style: Theme.of(context).textTheme.caption,
-                                  softWrap: false,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 8.0,
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Flexible(
-                                  child: Text(
-                                    _unescape
-                                        .convert(widget._comment.data.body),
-                                    style: Theme.of(context).textTheme.body1,
-                                    softWrap: true,
-                                    maxLines: 100,
+                                GestureDetector(
+                                  onTap: () {
+                                    print(widget._comment.data.children);
+                                    print(widget.name);
+                                    Provider.of<CommentsProvider>(context)
+                                        .fetchChildren(
+                                      children: widget._comment.data.children,
+                                      id: widget.name,
+                                      moreParentId: widget._comment.data.id,
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'More',
+                                      style: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
+                            ))
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 12.0,
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: widget._comment.data.isSubmitter
+                                            ? Icon(
+                                                Icons.person,
+                                                size: 16,
+                                                color: Theme.of(context)
+                                                    .accentColor,
+                                              )
+                                            : Container(),
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          widget._comment.data.author +
+                                              " • " +
+                                              getTimePosted(
+                                                widget._comment.data.createdUtc,
+                                              ) +
+                                              " • ",
+                                          style:
+                                              widget._comment.data.isSubmitter
+                                                  ? Theme.of(context)
+                                                      .textTheme
+                                                      .caption
+                                                      .copyWith(
+                                                        color: Theme.of(context)
+                                                            .accentColor,
+                                                      )
+                                                  : Theme.of(context)
+                                                      .textTheme
+                                                      .caption,
+                                          softWrap: false,
+                                          overflow: TextOverflow.fade,
+                                          maxLines: 100,
+                                        ),
+                                      ),
+                                      Text(
+                                        widget._comment.data.score.toString() +
+                                            " points",
+                                        style:
+                                            Theme.of(context).textTheme.caption,
+                                        softWrap: false,
+                                        maxLines: 1,
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 8.0,
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Flexible(
+                                        child: Text(
+                                          _unescape.convert(
+                                              widget._comment.data.body),
+                                          style:
+                                              Theme.of(context).textTheme.body1,
+                                          softWrap: true,
+                                          maxLines: 100,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 12.0,
+                                  )
+                                ],
+                              ),
                             ),
-                            SizedBox(
-                              height: 12.0,
-                            )
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ],

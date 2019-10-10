@@ -7,14 +7,14 @@ import '../secrets.dart';
 
 class SecureStorageHelper {
   final _storage = new FlutterSecureStorage();
-  Map<String, dynamic> map = new Map<String, dynamic>();
+  Map<String, dynamic> map;
 
-  SecureStorageHelper() {
-    fetchData();
+  SecureStorageHelper();
+  Future<void> init() async {
+    await fetchData();
   }
 
   Future<String> get authToken async {
-    await fetchData();
     return map['authToken'];
   }
 
@@ -31,6 +31,8 @@ class SecureStorageHelper {
   }
 
   bool get signInStatus {
+    print(
+        "signin status: map key check" + map.containsKey('signIn').toString());
     if (map != null)
       return (map.containsKey('signedIn') && map['signedIn'] == "true");
     else {
@@ -42,6 +44,7 @@ class SecureStorageHelper {
     Duration time =
         (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
     print("Time since last token refresh: " + time.inMinutes.toString());
+    print(await authToken);
     if (time.inMinutes > 30) {
       return true;
     } else {
@@ -49,8 +52,12 @@ class SecureStorageHelper {
     }
   }
 
-  Future<void> updateCredentials(String authToken, String refreshToken,
-      String lastTokenRefresh, bool signedIn) async {
+  Future<void> updateCredentials(
+    String authToken,
+    String refreshToken,
+    String lastTokenRefresh,
+    bool signedIn,
+  ) async {
     await _storage.write(key: "authToken", value: authToken);
     await _storage.write(key: "refreshToken", value: refreshToken);
     await _storage.write(key: "signedIn", value: signedIn.toString());
@@ -66,15 +73,17 @@ class SecureStorageHelper {
     map['authToken'] = accessToken;
     await _storage.write(key: 'authToken', value: accessToken);
     await _storage.write(
-        key: 'lastTokenRefresh', value: DateTime.now().toIso8601String());
+      key: 'lastTokenRefresh',
+      value: DateTime.now().toIso8601String(),
+    );
+    await _storage.write(
+      key: 'signedIn',
+      value: true.toString(),
+    );
   }
 
   Future<void> fetchData() async {
     map = await _storage.readAll();
-  }
-
-  bool getSignInStatus() {
-    return map.containsKey('signedIn') && map['signedIn'] == "true";
   }
 
   Future<void> clearStorage() async {
