@@ -35,6 +35,17 @@ class FeedProvider with ChangeNotifier {
     fetchPostsListing();
   }
 
+  FeedProvider.openFromName(String currentSubreddit) {
+    _currentPage = CurrentPage.Other;
+    try {
+      fetchPostsListing(currentSubreddit: currentSubreddit);
+    } catch (e) {
+      print('failed to load posts');
+      _state = ViewState.Idle;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchPostsListing({
     currentSubreddit = "",
     currentSort = "Hot",
@@ -131,7 +142,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   /// action being true results in subscribing to a subreddit
-  Future<void> unsubscribeFromSubreddit(String subId, bool action) async {
+  Future<void> changeSubscriptionStatus(String subId, bool action) async {
 //    print(action);
 //    print(subId);
     _partialState = ViewState.Busy;

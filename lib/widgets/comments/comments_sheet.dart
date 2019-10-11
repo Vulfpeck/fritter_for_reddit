@@ -21,7 +21,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
     print("Post id is " + widget.item.name);
     return DraggableScrollableSheet(
       maxChildSize: 1,
-      minChildSize: 0.4,
+      minChildSize: 0.2,
       initialChildSize: 0.7,
       expand: false,
       builder: (BuildContext context, ScrollController controller) {
@@ -120,7 +120,12 @@ class _CommentsSheetState extends State<CommentsSheet> {
           enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: true,
-          animation: new CustomTabsAnimation.slideIn(),
+          animation: new CustomTabsAnimation(
+            startEnter: 'slide_up',
+            startExit: 'android:anim/fade_out',
+            endEnter: 'android:anim/fade_in',
+            endExit: 'slide_down',
+          ),
         ),
       );
     } catch (e) {

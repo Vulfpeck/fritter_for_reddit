@@ -66,7 +66,7 @@ class _FeedListState extends State<FeedList> {
             brightness: MediaQuery.of(context).platformBrightness,
             backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
-              background: model.partialState == ViewState.Busy
+              background: model.state == ViewState.Busy
                   ? Center(
                       child: CircularProgressIndicator(),
                     )
@@ -95,7 +95,7 @@ class _FeedListState extends State<FeedList> {
                           vertical: 4.0,
                         ),
                         child: GestureDetector(
-                          onLongPress: () {
+                          onDoubleTap: () {
                             if (item.isSelf == false) {
                               _launchURL(context, item.url);
                             }
@@ -152,7 +152,10 @@ class _FeedListState extends State<FeedList> {
           enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: true,
-          animation: new CustomTabsAnimation.slideIn(),
+          animation: new CustomTabsAnimation(
+            startEnter: 'slide_up',
+            endExit: 'slide_down',
+          ),
         ),
       );
     } catch (e) {
