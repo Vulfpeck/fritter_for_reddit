@@ -20,8 +20,13 @@ class FeedCardImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
-    final ratio = (mq.width - 16) / _data.preview.images.first.source.width;
-    final url = _htmlUnescape.convert(_data.preview.images.first.source.url);
+    double ratio;
+    String url;
+    if (_data.preview != null) {
+      ratio = (mq.width - 16) / _data.preview.images.first.source.width;
+      url = _htmlUnescape.convert(_data.preview.images.first.source.url);
+    }
+
     return Consumer(builder: (BuildContext context, FeedProvider model, _) {
       return Card(
         elevation: 10,
@@ -42,19 +47,22 @@ class FeedCardImage extends StatelessWidget {
                 ],
               ),
             ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Image(
-                  image: CachedNetworkImageProvider(
-                    url,
-                  ),
-                  fit: BoxFit.fitWidth,
-                  height: _data.preview.images.first.source.height.toDouble() *
-                      ratio,
-                ),
-              ),
-            ),
+            _data.preview != null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Image(
+                        image: CachedNetworkImageProvider(
+                          url,
+                        ),
+                        fit: BoxFit.fitWidth,
+                        height: _data.preview.images.first.source.height
+                                .toDouble() *
+                            ratio,
+                      ),
+                    ),
+                  )
+                : Container(),
             PostControls(_data),
           ],
         ),

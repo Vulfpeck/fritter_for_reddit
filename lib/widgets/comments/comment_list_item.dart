@@ -29,7 +29,7 @@ class _CommentItemState extends State<CommentItem> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             SizedBox(
-              width: 16 * widget._comment.data.depth.toDouble(),
+              width: 16.0 * widget._comment.data.depth,
             ),
             Expanded(
               child: Column(

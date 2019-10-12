@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/secrets.dart';
@@ -51,13 +49,8 @@ class _WebViewSignInState extends State<WebViewSignIn> {
                   child: WebView(
                     initialUrl: url,
                     javascriptMode: JavascriptMode.unrestricted,
-                    debuggingEnabled: true,
-                    userAgent: 'userAgent',
-                    gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
-                      Factory<OneSequenceGestureRecognizer>(
-                        () => EagerGestureRecognizer(),
-                      ),
-                    ].toSet(),
+                    debuggingEnabled: false,
+                    userAgent: 'Fritter by /u/sexusmexus',
                   ),
                 );
         },

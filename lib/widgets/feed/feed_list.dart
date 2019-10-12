@@ -17,7 +17,16 @@ class _FeedListState extends State<FeedList> {
   @override
   void initState() {
     _controller = new ScrollController();
+    _controller.addListener(_scrollListener);
     super.initState();
+  }
+
+  void _scrollListener() {
+    if (_controller.position.maxScrollExtent - _controller.offset <= 100 &&
+        Provider.of<FeedProvider>(context).loadMorePostsState !=
+            ViewState.Busy) {
+      Provider.of<FeedProvider>(context).loadMorePosts();
+    }
   }
 
   @override
@@ -88,6 +97,14 @@ class _FeedListState extends State<FeedList> {
                         ViewState.Idle
                 ? SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
+                      if (index == model.postFeed.data.children.length) {
+                        return model.loadMorePostsState == ViewState.Busy
+                            ? ListTile(
+                                title:
+                                    Center(child: CircularProgressIndicator()),
+                              )
+                            : Container();
+                      }
                       var item = model.postFeed.data.children[index].data;
                       return Padding(
                         padding: const EdgeInsets.symmetric(
@@ -124,7 +141,7 @@ class _FeedListState extends State<FeedList> {
                         ),
                       );
                     },
-                    childCount: model.postFeed.data.children.length,
+                    childCount: model.postFeed.data.children.length + 1,
                   )
                 : SliverChildBuilderDelegate(
                     (BuildContext context, int index) {

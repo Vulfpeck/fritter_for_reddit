@@ -44,45 +44,93 @@ class CommentsProvider with ChangeNotifier {
     String postId,
     CommentSortTypes sort,
   }) async {
+    //TODO: Change URL in case the user is not signed in
     await _storageHelper.init();
     String authToken = await _storageHelper.authToken;
     _commentsLoadingState = ViewState.Busy;
     notifyListeners();
     String sortString = ChangeCommentSortConvertToString[sort];
-
+    String url;
     this.sort = sort;
-    final url =
-        'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
-    final response = await http.get(
-      url,
-      headers: {
-        'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-        'Authorization': 'bearer ' + authToken,
-      },
-    );
-    print(url);
-    if (response.statusCode == 200) {
-      _commentsList = new List<CommentPojo.Child>();
+    if (_storageHelper.signInStatus) {
+      url =
+          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+      try {
+        final response = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+            'Authorization': 'bearer ' + authToken,
+          },
+        );
+        print(url);
+        print(response.statusCode.toString() + "••••••••••••••");
+        if (response.statusCode == 200) {
+          _commentsList = new List<CommentPojo.Child>();
 //      print(json.decode(response.body));
-      final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
+          final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
 
-      Queue<CommentPojo.Child> q = Queue.from(c.data.children);
-      List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
-      while (q.isNotEmpty) {
-        var x = q.removeFirst();
-        if (x.kind == CommentPojo.Kind.T1 || x.kind == CommentPojo.Kind.MORE) {
+          Queue<CommentPojo.Child> q = Queue.from(c.data.children);
+          List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
+          while (q.isNotEmpty) {
+            var x = q.removeFirst();
+            if (x.kind == CommentPojo.Kind.T1 ||
+                x.kind == CommentPojo.Kind.MORE) {
 //          print(" | " * x.data.depth + "-" + x.data.author)
-          finalList.add(x);
-          if (x.kind == CommentPojo.Kind.MORE) {
+              finalList.add(x);
+              if (x.kind == CommentPojo.Kind.MORE) {
 //            print(x.data.children);
+              }
+            }
           }
-        }
-      }
 
-      _commentsList = finalList;
+          _commentsList = finalList;
+        } else {
+          print(response.statusCode);
+          print('fetch failed');
+        }
+      } catch (e) {
+        print('Exceptions ${e.toString()}');
+      }
     } else {
-      print(response.statusCode);
-      print('fetch failed');
+      url =
+          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+      try {
+        final response = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+          },
+        );
+        print(url);
+        print(response.statusCode.toString() + "••••••••••••••");
+        if (response.statusCode == 200) {
+          _commentsList = new List<CommentPojo.Child>();
+//      print(json.decode(response.body));
+          final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
+
+          Queue<CommentPojo.Child> q = Queue.from(c.data.children);
+          List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
+          while (q.isNotEmpty) {
+            var x = q.removeFirst();
+            if (x.kind == CommentPojo.Kind.T1 ||
+                x.kind == CommentPojo.Kind.MORE) {
+//          print(" | " * x.data.depth + "-" + x.data.author)
+              finalList.add(x);
+              if (x.kind == CommentPojo.Kind.MORE) {
+//            print(x.data.children);
+              }
+            }
+          }
+
+          _commentsList = finalList;
+        } else {
+          print(response.statusCode);
+          print('fetch failed');
+        }
+      } catch (e) {
+        print('Exceptions ${e.toString()}');
+      }
     }
     _commentsLoadingState = ViewState.Idle;
     notifyListeners();
@@ -96,6 +144,7 @@ class CommentsProvider with ChangeNotifier {
     _commentsMoreLoadingState = ViewState.Busy;
     moreParentLoadingId = moreParentId;
     notifyListeners();
+
     String childrenString = "";
     if (children != null)
       for (String child in children) {
@@ -107,55 +156,101 @@ class CommentsProvider with ChangeNotifier {
     if (childrenString != "") {
       childrenString = childrenString.substring(0, childrenString.length - 2);
     }
-    String authToken = await _storageHelper.authToken;
-    print(childrenString);
-    print("more id : " + moreParentId);
-    final url =
-        'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}';
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-          'Authorization': 'bearer ' + authToken,
-        },
-      );
 
-//      print(response.statusCode);
-//      print(json.decode(response.body));
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final CommentMoreEntity _moreComments = new CommentMoreEntity.fromJson(
-          json.decode(response.body),
+    if (_storageHelper.signInStatus) {
+      String authToken = await _storageHelper.authToken;
+      final url =
+          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}';
+      try {
+        final response = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+            'Authorization': 'bearer ' + authToken,
+          },
         );
-        print("comments saved in the entity");
-        CommentPojo.Child parent = _commentsList.firstWhere((ele) {
-          print(ele.data.id);
-          if (ele.data.id.compareTo(moreParentId) == 0) {
-            return true;
-          } else {
-            return false;
-          }
-        });
-        int parentIndex = _commentsList.indexOf(parent);
-        print(parent.kind);
-        print(parent.data.children);
-        print(parentIndex);
-        _commentsList.remove(parent);
-        for (var x in _moreComments.json.data.things) {
-          _commentsList.insert(
-            parentIndex++,
-            new CommentPojo.Child.fromMap(
-              x.toJson(),
-            ),
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final CommentMoreEntity _moreComments =
+              new CommentMoreEntity.fromJson(
+            json.decode(response.body),
           );
-        }
+          print("comments saved in the entity");
+          CommentPojo.Child parent = _commentsList.firstWhere((ele) {
+            print(ele.data.id);
+            if (ele.data.id.compareTo(moreParentId) == 0) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          int parentIndex = _commentsList.indexOf(parent);
+          print(parent.kind);
+          print(parent.data.children);
+          print(parentIndex);
+          _commentsList.remove(parent);
+          for (var x in _moreComments.json.data.things) {
+            _commentsList.insert(
+              parentIndex++,
+              new CommentPojo.Child.fromMap(
+                x.toJson(),
+              ),
+            );
+          }
 //        print(_moreComments.json);
-      } else {
-        print("there was an error fetching the comments");
+        } else {
+          print("there was an error fetching the comments");
+        }
+      } catch (e) {
+        print(e.toString());
       }
-    } catch (e) {
-      print(e.toString());
+    } else {
+      final url =
+          'https://api.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}';
+      try {
+        final response = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final CommentMoreEntity _moreComments =
+              new CommentMoreEntity.fromJson(
+            json.decode(response.body),
+          );
+          print("comments saved in the entity");
+          CommentPojo.Child parent = _commentsList.firstWhere((ele) {
+            print(ele.data.id);
+            if (ele.data.id.compareTo(moreParentId) == 0) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          int parentIndex = _commentsList.indexOf(parent);
+          print(parent.kind);
+          print(parent.data.children);
+          print(parentIndex);
+          _commentsList.remove(parent);
+          for (var x in _moreComments.json.data.things) {
+            _commentsList.insert(
+              parentIndex++,
+              new CommentPojo.Child.fromMap(
+                x.toJson(),
+              ),
+            );
+          }
+//        print(_moreComments.json);
+        } else {
+          print("there was an error fetching the comments");
+        }
+      } catch (e) {
+        print(e.toString());
+      }
     }
+
     moreParentLoadingId = "";
     _commentsMoreLoadingState = ViewState.Idle;
     notifyListeners();

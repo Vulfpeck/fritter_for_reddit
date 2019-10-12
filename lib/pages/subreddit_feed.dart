@@ -18,10 +18,11 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ChangeNotifierProvider(
-        builder: (context) => FeedProvider.openFromName(widget.subreddit),
-        child: FeedList(),
+    print("New scaffold from " + widget.subreddit);
+    return ChangeNotifierProvider(
+      builder: (context) => FeedProvider.openFromName(widget.subreddit),
+      child: Scaffold(
+        body: FeedList(),
       ),
     );
   }

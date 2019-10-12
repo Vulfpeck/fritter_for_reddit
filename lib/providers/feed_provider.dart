@@ -8,27 +8,26 @@ import 'package:http/http.dart' as http;
 
 class FeedProvider with ChangeNotifier {
   final SecureStorageHelper _storageHelper = new SecureStorageHelper();
-  String subName = "FrontPage";
+
+  PostsFeedEntity _postFeed;
+  SubredditInformationEntity _subredditInformationEntity;
+
   String sub = "";
   String sort = "Hot";
 
   ViewState _state;
-
   ViewState _partialState;
-
-  ViewState get partialState => _partialState;
+  ViewState _loadMorePostsState = ViewState.Idle;
   CurrentPage _currentPage;
 
+  ViewState get partialState => _partialState;
   ViewState get state => _state;
-
-  CurrentPage get currentPage => _currentPage;
-  PostsFeedEntity _postFeed;
+  ViewState get loadMorePostsState => _loadMorePostsState;
 
   PostsFeedEntity get postFeed => _postFeed;
-  SubredditInformationEntity _subredditInformationEntity;
-
   SubredditInformationEntity get subredditInformationEntity =>
       _subredditInformationEntity;
+  CurrentPage get currentPage => _currentPage;
 
   FeedProvider() {
     _currentPage = CurrentPage.FrontPage;
@@ -50,27 +49,57 @@ class FeedProvider with ChangeNotifier {
     currentSubreddit = "",
     currentSort = "Hot",
   }) async {
-//    print("** fetching posts");
-
-    print("initialize storage");
     await _storageHelper.init();
     _state = ViewState.Busy;
     notifyListeners();
-    print("fetch signin status");
 
     print(_storageHelper.debugPrint);
     await _storageHelper.fetchData();
 
-//    print(_storageHelper.signInStatus);
+    this.sub = currentSubreddit;
+    this.sort = currentSort;
+
     if (_storageHelper.signInStatus == false) {
       print("fetch Posts: not signed in ");
-      sort = currentSort;
-//      print("Is at frontpage");
-      _currentPage = CurrentPage.FrontPage;
-      final url =
-          "https://www.reddit.com/${currentSort.toString().toLowerCase()}.json";
-      final response = await http.get(url);
-      _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
+      String url = "";
+      if (this.sub != "") {
+        _currentPage = CurrentPage.Other;
+        url =
+            "https://www.reddit.com/r/${sub.toLowerCase()}/${currentSort.toString().toLowerCase()}.json";
+      } else {
+        _currentPage = CurrentPage.FrontPage;
+        url =
+            "https://www.reddit.com/${currentSort.toString().toLowerCase()}.json";
+      }
+
+      http.Response response;
+      try {
+        response = await http.get(url);
+
+        if (response.statusCode == 200) {
+          _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
+          print(_postFeed.toJson());
+
+          final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
+          final subInfoResponse = await http.get(
+            infoUrl,
+            headers: {
+              'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+            },
+          );
+          if (subInfoResponse.statusCode == 200) {
+            _subredditInformationEntity =
+                new SubredditInformationEntity.fromJson(
+                    json.decode(subInfoResponse.body));
+            this.sub = _subredditInformationEntity.data.displayName;
+          }
+        } else {
+          print("****************");
+          print(response.statusCode);
+        }
+      } catch (e) {
+        print(e.toString());
+      }
       _state = ViewState.Idle;
       notifyListeners();
       return;
@@ -81,25 +110,20 @@ class FeedProvider with ChangeNotifier {
     }
 
     http.Response subredditResponse;
-//    print("** Fetch posts user is authenticated");
 
     String token = await _storageHelper.authToken;
     String url;
-//    print("fetch Posts: got token");
-    sort = currentSort;
     if (currentSubreddit == "") {
-//      print("Is at frontpage");
       _currentPage = CurrentPage.FrontPage;
       url =
-          "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/?limit=100";
+          "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/?limit=10";
     } else {
       _currentPage = CurrentPage.Other;
       url =
-          "https://oauth.reddit.com/r/$currentSubreddit/${currentSort.toString().toLowerCase()}/?limit=100";
+          "https://oauth.reddit.com/r/$currentSubreddit/${currentSort.toString().toLowerCase()}/?limit=10";
     }
 
     print("Feed fetch url is : " + url);
-//    print(url);
     subredditResponse = await http.get(
       url,
       headers: {
@@ -107,8 +131,6 @@ class FeedProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-//    print("fetch posts list response code: " +
-//        subredditResponse.statusCode.toString());
 
     if (subredditResponse.statusCode == 200)
       _postFeed =
@@ -121,7 +143,9 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<void> fetchSubRedditInformation(
-      String token, String currentSubreddit) async {
+    String token,
+    String currentSubreddit,
+  ) async {
     final url = "https://oauth.reddit.com/r/$currentSubreddit/about";
     final subInfoResponse = await http.get(
       url,
@@ -130,21 +154,16 @@ class FeedProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-//    print("sub infor response code: " + subInfoResponse.statusCode.toString());
 
     if (subInfoResponse.statusCode == 200) {
       _subredditInformationEntity = new SubredditInformationEntity.fromJson(
           json.decode(subInfoResponse.body));
       this.sub = _subredditInformationEntity.data.displayName;
-//      print(_subredditInformationEntity.toJson());
     }
-//    print("** subreddit information fetching complete");
   }
 
   /// action being true results in subscribing to a subreddit
   Future<void> changeSubscriptionStatus(String subId, bool action) async {
-//    print(action);
-//    print(subId);
     _partialState = ViewState.Busy;
     notifyListeners();
 
@@ -160,21 +179,15 @@ class FeedProvider with ChangeNotifier {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       );
-//      print("url" + url);
     } else {
-      subInfoResponse = subInfoResponse = await http.post(
+      subInfoResponse = await http.post(
         url + '?action=unsub&sr=$subId&X-Modhash=null',
         headers: {
           'Authorization': 'bearer ' + authToken,
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       );
-
-//      print("url" + url);
     }
-
-//    print(json.decode(subInfoResponse.body));
-
     _subredditInformationEntity.data.userIsSubscriber =
         !_subredditInformationEntity.data.userIsSubscriber;
     _partialState = ViewState.Idle;
@@ -196,11 +209,87 @@ class FeedProvider with ChangeNotifier {
 
     notifyListeners();
     if (voteResponse.statusCode == 200) {
-//      print("Vote success : " + json.decode(voteResponse.body).toString());
       return true;
     } else {
-//      print("Vote failed : " + json.decode(voteResponse.body).toString());
       return false;
     }
+  }
+
+  Future<void> loadMorePosts() async {
+    _loadMorePostsState = ViewState.Busy;
+    notifyListeners();
+
+    await _storageHelper.init();
+    String url = "";
+
+    print(_storageHelper.signInStatus);
+    try {
+      if (_storageHelper.signInStatus) {
+        if (await _storageHelper.needsTokenRefresh()) {
+          await _storageHelper.performTokenRefresh();
+        }
+        if (sub != "") {
+          url =
+              "https://oauth.reddit.com/r/$sub/${sort.toString().toLowerCase()}/?limit=10&after=${postFeed.data.after}";
+        } else {
+          url = url =
+              "https://oauth.reddit.com/${sort.toString().toLowerCase()}/?limit=10&after=${postFeed.data.after}";
+        }
+        print(url);
+        String token = await _storageHelper.authToken;
+        http.Response subredditResponse = await http.get(
+          url,
+          headers: {
+            'Authorization': 'bearer ' + token,
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+          },
+        );
+        print(subredditResponse.statusCode.toString() +
+            subredditResponse.reasonPhrase);
+        final PostsFeedEntity newData =
+            new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+        _postFeed.data.children.addAll(newData.data.children);
+        print("previous after: " + _postFeed.data.after);
+        print("new after : " + newData.data.after);
+        _postFeed.data.after = newData.data.after;
+      } else {
+        url = "http://www.reddit.com";
+        if (sub != "") {
+          url =
+              "https://www.reddit.com/r/$sub/${sort.toString().toLowerCase()}.json?limit=10&after=${postFeed.data.after}";
+        } else {
+          url = url =
+              "https://www.reddit.com/${sort.toString().toLowerCase()}.json?limit=10&after=${postFeed.data.after}";
+        }
+        print(url);
+        http.Response subredditResponse = await http.get(
+          url,
+          headers: {
+            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+          },
+        );
+        print(subredditResponse.statusCode.toString() +
+            subredditResponse.reasonPhrase);
+        final PostsFeedEntity newData =
+            new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+        _postFeed.data.children.addAll(newData.data.children);
+        print("previous after: " + _postFeed.data.after);
+        print("new after : " + newData.data.after);
+        _postFeed.data.after = newData.data.after;
+      }
+    } catch (e) {
+      print("EXCEPTION : " + e.toString());
+    }
+    _loadMorePostsState = ViewState.Idle;
+    notifyListeners();
+  }
+
+  Future<void> signOutUser() async {
+    _state = ViewState.Busy;
+    notifyListeners();
+    await _storageHelper.clearStorage();
+    await fetchPostsListing();
+    _state = ViewState.Idle;
+    notifyListeners();
   }
 }
