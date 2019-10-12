@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/models/comment_chain/comment.dart'
     as CommentPojo;
+import 'package:flutter_provider_app/pages/subreddit_feed.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:html_unescape/html_unescape.dart';
 
@@ -179,26 +181,47 @@ class _CommentItemState extends State<CommentItem> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
-                                    height: 8.0,
-                                  ),
                                   Row(
                                     children: <Widget>[
                                       Flexible(
-                                        child: Text(
-                                          _unescape.convert(
-                                              widget._comment.data.body),
-                                          style:
-                                              Theme.of(context).textTheme.body1,
-                                          softWrap: true,
-                                          maxLines: 100,
+                                        child: Html(
+                                          padding: EdgeInsets.all(2),
+                                          data:
+                                              """${_unescape.convert(widget._comment.data.bodyHtml)}""",
+                                          renderNewlines: true,
+                                          useRichText: true,
+                                          showImages: true,
+                                          onLinkTap: (url) {
+                                            if (url.startsWith("/r/") ||
+                                                url.startsWith("r/")) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return SubredditFeedPage(
+                                                        subreddit: url
+                                                                .startsWith(
+                                                                    "/r/")
+                                                            ? url.replaceFirst(
+                                                                "/r/", "")
+                                                            : url.replaceFirst(
+                                                                "r/", ""));
+                                                  },
+                                                ),
+                                              );
+                                            } else if (url.startsWith("/u/") ||
+                                                url.startsWith("u/")) {
+                                            } else {
+                                              print("launching web view");
+
+                                              launchURL(context, url);
+                                            }
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
-                                    height: 12.0,
-                                  )
                                 ],
                               ),
                             ),
@@ -238,5 +261,10 @@ class _CommentItemState extends State<CommentItem> {
           (difference.inDays == 1 ? " day" : " days") +
           " ago";
     }
+  }
+
+  String getValidHtml(String bodyHtml) {
+    bodyHtml = bodyHtml.replaceFirst('<div class="md">', "");
+    return bodyHtml;
   }
 }

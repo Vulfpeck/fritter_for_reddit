@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
-
-import '../../exports.dart';
 
 class FeedCardImage extends StatelessWidget {
   final PostsFeedDataChildrenData _data;
@@ -81,13 +80,6 @@ class FeedCardSelfText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LineSplitter ls = new LineSplitter();
-    List<String> lines = ls.convert(_data.selftext);
-
-    String selfText = "";
-    for (int i = 0; i < 5 && i < lines.length; i++) {
-      selfText += lines.elementAt(i);
-    }
     return Card(
       elevation: 10,
       child: Column(
@@ -106,11 +98,30 @@ class FeedCardSelfText extends StatelessWidget {
               ? Padding(
                   padding: const EdgeInsets.only(
                       top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
-                  child: Text(
-                    _expandSelfText
-                        ? unescape.convert(_data.selftext)
-                        : selfText,
-                    style: Theme.of(context).textTheme.body2,
+                  child: Html(
+                    data: """${unescape.convert(_data.selftextHtml)}""",
+                    useRichText: true,
+                    onLinkTap: (url) {
+                      if (url.startsWith("/r/") || url.startsWith("r/")) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return SubredditFeedPage(
+                                  subreddit: url.startsWith("/r/")
+                                      ? url.replaceFirst("/r/", "")
+                                      : url.replaceFirst("r/", ""));
+                            },
+                          ),
+                        );
+                      } else if (url.startsWith("/u/") ||
+                          url.startsWith("u/")) {
+                      } else {
+                        print("launching web view");
+
+                        launchURL(context, url);
+                      }
+                    },
                   ),
                 )
               : Container(),

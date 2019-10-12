@@ -37,7 +37,10 @@ class _LeftDrawerState extends State<LeftDrawer> {
                         children: <Widget>[
                           Text(
                             model.userInformation.name,
-                            style: Theme.of(context).textTheme.headline,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline
+                                .copyWith(fontWeight: FontWeight.w500),
                           ),
                           Text(
                             (model.userInformation.linkKarma +

@@ -46,7 +46,10 @@ class _TranslucentAppBarBackgroundState
                                 children: <Widget>[
                                   Text(
                                     'Front Page',
-                                    style: Theme.of(context).textTheme.headline,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline
+                                        .copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -125,12 +128,13 @@ class _TranslucentAppBarBackgroundState
                                                         : 'Join'),
                                                 onPressed: () {
                                                   prov.changeSubscriptionStatus(
-                                                      prov.subredditInformationEntity
-                                                          .data.name,
-                                                      !prov
-                                                          .subredditInformationEntity
-                                                          .data
-                                                          .userIsSubscriber);
+                                                    prov.subredditInformationEntity
+                                                        .data.name,
+                                                    !prov
+                                                        .subredditInformationEntity
+                                                        .data
+                                                        .userIsSubscriber,
+                                                  );
                                                 },
                                               )
                                             : Container(),
@@ -151,7 +155,10 @@ class _TranslucentAppBarBackgroundState
                                                   .data.displayNamePrefixed,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headline,
+                                                  .headline
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                               overflow: TextOverflow.fade,
                                               softWrap: false,
                                             ),
@@ -190,7 +197,10 @@ class _TranslucentAppBarBackgroundState
                         children: <Widget>[
                           Text(
                             'Front Page',
-                            style: Theme.of(context).textTheme.headline,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline
+                                .copyWith(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

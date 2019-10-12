@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
@@ -114,7 +113,7 @@ class _FeedListState extends State<FeedList> {
                         child: GestureDetector(
                           onDoubleTap: () {
                             if (item.isSelf == false) {
-                              _launchURL(context, item.url);
+                              launchURL(context, item.url);
                             }
                           },
                           onTap: () {
@@ -158,26 +157,5 @@ class _FeedListState extends State<FeedList> {
         ],
       );
     });
-  }
-
-  void _launchURL(BuildContext context, String url) async {
-    try {
-      await launch(
-        url,
-        option: new CustomTabsOption(
-          toolbarColor: Theme.of(context).primaryColor,
-          enableDefaultShare: true,
-          enableUrlBarHiding: true,
-          showPageTitle: true,
-          animation: new CustomTabsAnimation(
-            startEnter: 'slide_up',
-            endExit: 'slide_down',
-          ),
-        ),
-      );
-    } catch (e) {
-      // An exception is thrown if browser app is not installed on Android device.
-      debugPrint(e.toString());
-    }
   }
 }
