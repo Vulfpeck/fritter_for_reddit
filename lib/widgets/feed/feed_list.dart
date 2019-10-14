@@ -11,8 +11,11 @@ class FeedList extends StatefulWidget {
   _FeedListState createState() => _FeedListState();
 }
 
+// TODO : implement posting to subreddits
 class _FeedListState extends State<FeedList> {
   ScrollController _controller;
+  String sortSelectorValue = "Best";
+  GlobalKey key = GlobalKey();
   @override
   void initState() {
     _controller = new ScrollController();
@@ -40,19 +43,49 @@ class _FeedListState extends State<FeedList> {
             iconTheme: Theme.of(context).iconTheme,
             actions: <Widget>[
               PopupMenuButton<String>(
+                key: key,
                 icon: Icon(
                   Icons.sort,
                 ),
+                //TODO : implement top sorting functionality
                 onSelected: (value) {
-                  if (value == 'Close') {
-                  } else
+                  final RenderBox box = key.currentContext.findRenderObject();
+                  final positionDropDown = box.localToGlobal(Offset.zero);
+                  print('position of dropdown: ' + positionDropDown.toString());
+                  if (value == "Top") {
+                    showMenu(
+                      position: RelativeRect.fromLTRB(
+                        positionDropDown.dx,
+                        positionDropDown.dy,
+                        0,
+                        0,
+                      ),
+                      context: context,
+                      items: <String>[
+                        'Today',
+                        'Week',
+                        'Month',
+                        'Year',
+                        'All TIme'
+                      ].map((value) {
+                        return PopupMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    );
+                  } else if (value == 'Close' || value == sortSelectorValue) {
+                  } else {
+                    sortSelectorValue = value;
                     Provider.of<FeedProvider>(context).fetchPostsListing(
                         currentSort: value, currentSubreddit: model.sub);
+                  }
                 },
                 itemBuilder: (BuildContext context) {
                   return <String>[
                     'Best',
                     'Hot',
+                    'Top',
                     'New',
                     'Controversial',
                     'Rising'
@@ -64,6 +97,7 @@ class _FeedListState extends State<FeedList> {
                   }).toList();
                 },
                 onCanceled: () {},
+                initialValue: sortSelectorValue,
               ),
             ],
             pinned: false,
@@ -74,11 +108,27 @@ class _FeedListState extends State<FeedList> {
             brightness: MediaQuery.of(context).platformBrightness,
             backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
-              background: model.state == ViewState.Busy
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : TranslucentAppBarBackground(),
+              background: Stack(
+                children: <Widget>[
+                  Container(
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.light
+                        ? Color.fromARGB(150, 255, 255, 255)
+                        : Color.fromARGB(150, 0, 0, 0),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: model.state == ViewState.Busy
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : TranslucentAppBarBackground(),
+                  ),
+                ],
+              ),
             ),
             expandedHeight:
                 model.currentPage == CurrentPage.FrontPage ? 150 : 200,

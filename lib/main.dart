@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/pages/app_home.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:provider/provider.dart';
-
-import 'exports.dart';
 
 void main() {
   runApp(MultiProvider(

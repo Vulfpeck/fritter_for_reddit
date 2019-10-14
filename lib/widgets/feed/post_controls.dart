@@ -54,6 +54,16 @@ class _PostControlsState extends State<PostControls> {
                   Expanded(
                     child: Container(),
                   ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.link,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      // TODO: implement this
+                      print('copy link to clipboard');
+                    },
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[

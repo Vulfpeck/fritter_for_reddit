@@ -99,6 +99,12 @@ class FeedCardSelfText extends StatelessWidget {
                   padding: const EdgeInsets.only(
                       top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
                   child: Html(
+                    defaultTextStyle: Theme.of(context).textTheme.body1,
+                    linkStyle: Theme.of(context)
+                        .textTheme
+                        .body1
+                        .copyWith(color: Theme.of(context).accentColor),
+                    padding: EdgeInsets.all(0),
                     data: """${unescape.convert(_data.selftextHtml)}""",
                     useRichText: true,
                     onLinkTap: (url) {

@@ -9,6 +9,7 @@ import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
 
+// TODO: implement comment voting
 class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
   final String name;
@@ -53,178 +54,8 @@ class _CommentItemState extends State<CommentItem> {
                             )),
                       ),
                       child: widget._comment.kind == CommentPojo.Kind.MORE
-                          ? Consumer(
-                              builder: (BuildContext context,
-                                  CommentsProvider model, _) {
-                                return model.commentsMoreLoadingState ==
-                                            ViewState.Busy &&
-                                        model.moreParentLoadingId != "" &&
-                                        model.moreParentLoadingId ==
-                                            widget._comment.data.id
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Container(
-                                            width: 32,
-                                            height: 32,
-                                            padding: EdgeInsets.all(4.0),
-                                            child: CircularProgressIndicator(),
-                                          )
-                                        ],
-                                      )
-                                    : Container(
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Material(
-                                                child: InkWell(
-                                                  enableFeedback: true,
-                                                  splashColor: Theme.of(context)
-                                                      .accentColor,
-                                                  onTap: () {
-                                                    print(widget._comment.data
-                                                        .children);
-                                                    print(widget.name);
-                                                    Provider.of<CommentsProvider>(
-                                                            context)
-                                                        .fetchChildren(
-                                                      children: widget._comment
-                                                          .data.children,
-                                                      id: widget.name,
-                                                      moreParentId: widget
-                                                          ._comment.data.id,
-                                                    );
-                                                  },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      'More',
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .accentColor,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                type: MaterialType.card,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                              },
-                            )
-                          : Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12.0),
-                              child: Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 12.0,
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      widget._comment.data.isSubmitter
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 8.0),
-                                              child: widget
-                                                      ._comment.data.isSubmitter
-                                                  ? Icon(
-                                                      Icons.person,
-                                                      size: 16,
-                                                      color: Theme.of(context)
-                                                          .accentColor,
-                                                    )
-                                                  : Container(),
-                                            )
-                                          : Container(),
-                                      Flexible(
-                                        child: Text(
-                                          widget._comment.data.author +
-                                              " • " +
-                                              getTimePosted(
-                                                widget._comment.data.createdUtc,
-                                              ) +
-                                              " • ",
-                                          style:
-                                              widget._comment.data.isSubmitter
-                                                  ? Theme.of(context)
-                                                      .textTheme
-                                                      .caption
-                                                      .copyWith(
-                                                        color: Theme.of(context)
-                                                            .accentColor,
-                                                      )
-                                                  : Theme.of(context)
-                                                      .textTheme
-                                                      .caption,
-                                          softWrap: false,
-                                          overflow: TextOverflow.fade,
-                                          maxLines: 100,
-                                        ),
-                                      ),
-                                      Text(
-                                        widget._comment.data.score.toString() +
-                                            " points",
-                                        style:
-                                            Theme.of(context).textTheme.caption,
-                                        softWrap: false,
-                                        maxLines: 1,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Flexible(
-                                        child: Html(
-                                          padding: EdgeInsets.all(2),
-                                          data:
-                                              """${_unescape.convert(widget._comment.data.bodyHtml)}""",
-                                          renderNewlines: true,
-                                          useRichText: true,
-                                          showImages: true,
-                                          onLinkTap: (url) {
-                                            if (url.startsWith("/r/") ||
-                                                url.startsWith("r/")) {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return SubredditFeedPage(
-                                                        subreddit: url
-                                                                .startsWith(
-                                                                    "/r/")
-                                                            ? url.replaceFirst(
-                                                                "/r/", "")
-                                                            : url.replaceFirst(
-                                                                "r/", ""));
-                                                  },
-                                                ),
-                                              );
-                                            } else if (url.startsWith("/u/") ||
-                                                url.startsWith("u/")) {
-                                            } else {
-                                              print("launching web view");
-
-                                              launchURL(context, url);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                          ? buildMoreKindWidget(context)
+                          : buildNormalCommentWidget(context),
                     ),
                   ),
                 ],
@@ -266,5 +97,173 @@ class _CommentItemState extends State<CommentItem> {
   String getValidHtml(String bodyHtml) {
     bodyHtml = bodyHtml.replaceFirst('<div class="md">', "");
     return bodyHtml;
+  }
+
+  Widget buildMoreKindWidget(BuildContext context) {
+    return Consumer(
+      builder: (BuildContext context, CommentsProvider model, _) {
+        return Container(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                child: Material(
+                  child: InkWell(
+                    enableFeedback: true,
+                    splashColor: Theme.of(context).accentColor,
+                    onTap: () {
+                      print(widget._comment.data.children);
+                      print(widget.name);
+                      Provider.of<CommentsProvider>(context).fetchChildren(
+                        children: widget._comment.data.children,
+                        id: widget.name,
+                        moreParentId: widget._comment.data.id,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 32,
+                          ),
+                          model.commentsMoreLoadingState == ViewState.Busy &&
+                                  model.moreParentLoadingId != "" &&
+                                  model.moreParentLoadingId ==
+                                      widget._comment.data.id
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      padding: EdgeInsets.all(4.0),
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    SizedBox(
+                                      width: 16,
+                                    ),
+                                  ],
+                                )
+                              : Container(),
+                          Text(
+                            'More',
+                            style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  type: MaterialType.card,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildNormalCommentWidget(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 12.0,
+          ),
+          buildAuthorRow(context),
+          buildCommentBody(context),
+        ],
+      ),
+    );
+  }
+
+  Widget buildAuthorRow(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        widget._comment.data.isSubmitter
+            ? Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: widget._comment.data.isSubmitter
+                    ? Icon(
+                        Icons.person,
+                        size: 16,
+                        color: Theme.of(context).accentColor,
+                      )
+                    : Container(),
+              )
+            : Container(),
+        Flexible(
+          child: Text(
+            widget._comment.data.author +
+                " • " +
+                getTimePosted(
+                  widget._comment.data.createdUtc,
+                ) +
+                " • ",
+            style: widget._comment.data.isSubmitter
+                ? Theme.of(context).textTheme.caption.copyWith(
+                      color: Theme.of(context).accentColor,
+                    )
+                : Theme.of(context).textTheme.caption,
+            softWrap: false,
+            overflow: TextOverflow.fade,
+            maxLines: 100,
+          ),
+        ),
+        Text(
+          widget._comment.data.score.toString() + " points",
+          style: Theme.of(context).textTheme.caption,
+          softWrap: false,
+          maxLines: 1,
+          textAlign: TextAlign.left,
+        ),
+      ],
+    );
+  }
+
+  Widget buildCommentBody(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Flexible(
+          child: Html(
+            linkStyle: Theme.of(context).textTheme.body1.copyWith(
+                  color: Theme.of(context).accentColor,
+                ),
+            defaultTextStyle: Theme.of(context).textTheme.body1,
+            padding: EdgeInsets.all(0),
+            data: """${_unescape.convert(widget._comment.data.bodyHtml)}""",
+            renderNewlines: true,
+            useRichText: true,
+            showImages: true,
+            onLinkTap: (url) {
+              if (url.startsWith("/r/") || url.startsWith("r/")) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) {
+                      return SubredditFeedPage(
+                          subreddit: url.startsWith("/r/")
+                              ? url.replaceFirst("/r/", "")
+                              : url.replaceFirst("r/", ""));
+                    },
+                  ),
+                );
+              } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+              } else {
+                print("launching web view");
+
+                launchURL(context, url);
+              }
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

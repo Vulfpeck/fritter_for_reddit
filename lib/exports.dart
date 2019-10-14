@@ -10,4 +10,5 @@ export 'helpers/web_view_launch_helper.dart';
 export 'models/subreddits/child.dart';
 export 'models/subreddits/subreddits_subscribed.dart';
 export 'pages/subreddit_feed.dart';
+export 'providers/comments_provider.dart';
 export 'providers/feed_provider.dart';
