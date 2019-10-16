@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/subreddit_feed.dart';
+import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 
 class PostControls extends StatefulWidget {
   final PostsFeedDataChildrenData postData;
@@ -115,7 +116,7 @@ class _PostControlsState extends State<PostControls> {
                             builder: (context, controller) {
                               return CustomScrollView(
                                 controller: controller,
-                                physics: BouncingScrollPhysics(),
+                                physics: CustomBouncingScrollPhysics(),
                                 slivers: <Widget>[
                                   SliverList(
                                     delegate: SliverChildListDelegate(<Widget>[

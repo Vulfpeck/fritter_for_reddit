@@ -48,17 +48,14 @@ class FeedCardImage extends StatelessWidget {
             ),
             _data.preview != null
                 ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Image(
-                        image: CachedNetworkImageProvider(
-                          url,
-                        ),
-                        fit: BoxFit.fitWidth,
-                        height: _data.preview.images.first.source.height
-                                .toDouble() *
-                            ratio,
+                    child: Image(
+                      image: CachedNetworkImageProvider(
+                        url,
                       ),
+                      fit: BoxFit.fitWidth,
+                      height:
+                          _data.preview.images.first.source.height.toDouble() *
+                              ratio,
                     ),
                   )
                 : Container(),
@@ -74,9 +71,8 @@ class FeedCardImage extends StatelessWidget {
 
 class FeedCardSelfText extends StatelessWidget {
   final PostsFeedDataChildrenData _data;
-  final _expandSelfText;
   final HtmlUnescape unescape = new HtmlUnescape();
-  FeedCardSelfText(this._data, this._expandSelfText);
+  FeedCardSelfText(this._data);
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +93,11 @@ class FeedCardSelfText extends StatelessWidget {
           _data.selftext != ""
               ? Padding(
                   padding: const EdgeInsets.only(
-                      top: 8.0, bottom: 4.0, left: 16.0, right: 16.0),
+                    top: 8.0,
+                    bottom: 4.0,
+                    left: 16.0,
+                    right: 16.0,
+                  ),
                   child: Html(
                     defaultTextStyle: Theme.of(context).textTheme.body1,
                     linkStyle: Theme.of(context)

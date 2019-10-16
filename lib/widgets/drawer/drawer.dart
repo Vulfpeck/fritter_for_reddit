@@ -3,6 +3,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/hex_color.dart';
 import 'package:flutter_provider_app/pages/web_view_sign_in.dart';
 import 'package:flutter_provider_app/providers/feed_provider.dart';
+import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
           return Center(child: CircularProgressIndicator());
         } else if (model.state == ViewState.Idle) {
           return CustomScrollView(
-            physics: BouncingScrollPhysics(),
+            physics: CustomBouncingScrollPhysics(),
             slivers: <Widget>[
               SliverAppBar(
                 backgroundColor: Colors.black12,

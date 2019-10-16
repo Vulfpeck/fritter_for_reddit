@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
+import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
 
@@ -36,8 +37,8 @@ class _FeedListState extends State<FeedList> {
     return Consumer<FeedProvider>(
         builder: (BuildContext context, FeedProvider model, _) {
       return CustomScrollView(
+        physics: CustomBouncingScrollPhysics(),
         controller: _controller,
-        physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
             iconTheme: Theme.of(context).iconTheme,
@@ -186,7 +187,7 @@ class _FeedListState extends State<FeedList> {
                           },
                           child: item.isSelf == false && item.preview != null
                               ? FeedCardImage(item)
-                              : FeedCardSelfText(item, false),
+                              : FeedCardSelfText(item),
                         ),
                       );
                     },

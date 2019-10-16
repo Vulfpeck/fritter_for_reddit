@@ -5,6 +5,7 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comment_list_item.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
+import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
 
 class CommentsSheet extends StatefulWidget {
@@ -29,7 +30,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
           builder: (BuildContext context, CommentsProvider model, _) {
             return Scaffold(
               body: CustomScrollView(
-                physics: BouncingScrollPhysics(),
+                physics: CustomBouncingScrollPhysics(),
                 controller: controller,
                 slivers: <Widget>[
                   SliverPersistentHeader(
@@ -55,7 +56,7 @@ class _CommentsSheetState extends State<CommentsSheet> {
                               }
                             },
                             child: widget.item.isSelf
-                                ? FeedCardSelfText(widget.item, true)
+                                ? FeedCardSelfText(widget.item)
                                 : FeedCardImage(widget.item),
                           ),
                           SizedBox(
