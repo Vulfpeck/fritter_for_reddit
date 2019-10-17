@@ -160,7 +160,7 @@ class CommentsProvider with ChangeNotifier {
     if (_storageHelper.signInStatus) {
       String authToken = await _storageHelper.authToken;
       final url =
-          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}';
+          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}&depth=2';
       try {
         final response = await http.get(
           url,
