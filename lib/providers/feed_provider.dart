@@ -221,8 +221,6 @@ class FeedProvider with ChangeNotifier {
 
     await _storageHelper.init();
     String url = "";
-
-    print(_storageHelper.signInStatus);
     try {
       if (_storageHelper.signInStatus) {
         if (await _storageHelper.needsTokenRefresh()) {

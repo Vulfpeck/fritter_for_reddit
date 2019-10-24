@@ -48,7 +48,6 @@ class _FeedListState extends State<FeedList> {
                 icon: Icon(
                   Icons.sort,
                 ),
-                //TODO : implement top sorting functionality
                 onSelected: (value) {
                   final RenderBox box = key.currentContext.findRenderObject();
                   final positionDropDown = box.localToGlobal(Offset.zero);
