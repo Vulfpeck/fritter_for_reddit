@@ -22,8 +22,8 @@ class _CommentsSheetState extends State<CommentsSheet> {
     print("Post id is " + widget.item.name);
     return DraggableScrollableSheet(
       maxChildSize: 1,
-      minChildSize: 0.2,
-      initialChildSize: 0.7,
+      minChildSize: 0.9,
+      initialChildSize: 1.0,
       expand: false,
       builder: (BuildContext context, ScrollController controller) {
         return Consumer(

@@ -39,26 +39,18 @@ class CommentItem extends StatelessWidget {
                     top: BorderSide(
                       color: _comment.data.depth == 0
                           ? Theme.of(context).dividerColor
-                          : Colors.transparent,
-                      width: _comment.data.depth == 0 ? 1 : 0,
+                          : Theme.of(context).dividerColor,
+                      width: _comment.data.depth == 0 ? 2 : 1,
                     )),
               ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: 12.0,
-                  right: 12.0,
-                  top: 16.0,
-                  bottom: 6.0,
-                ),
-                child: _comment.kind == CommentPojo.Kind.MORE
-                    ? MoreCommentKind(
-                        comment: _comment,
-                        name: name,
-                      )
-                    : CommentBody(
-                        comment: _comment,
-                      ),
-              ),
+              child: _comment.kind == CommentPojo.Kind.MORE
+                  ? MoreCommentKind(
+                      comment: _comment,
+                      name: name,
+                    )
+                  : CommentBody(
+                      comment: _comment,
+                    ),
             ),
           ),
         ),
@@ -75,81 +67,84 @@ class CommentBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            comment.data.isSubmitter
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: comment.data.isSubmitter
-                        ? Icon(
-                            Icons.person,
-                            size: 16,
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              comment.data.isSubmitter
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: comment.data.isSubmitter
+                          ? Icon(
+                              Icons.person,
+                              size: 16,
+                              color: Theme.of(context).accentColor,
+                            )
+                          : Container(),
+                    )
+                  : Container(),
+              Flexible(
+                child: Text(
+                  comment.data.author +
+                      " • " +
+                      getTimePosted(
+                        comment.data.createdUtc,
+                      ) +
+                      " • ",
+                  style: comment.data.isSubmitter
+                      ? Theme.of(context).textTheme.caption.copyWith(
                             color: Theme.of(context).accentColor,
                           )
-                        : Container(),
-                  )
-                : Container(),
-            Flexible(
-              child: Text(
-                comment.data.author +
-                    " • " +
-                    getTimePosted(
-                      comment.data.createdUtc,
-                    ) +
-                    " • ",
-                style: comment.data.isSubmitter
-                    ? Theme.of(context).textTheme.caption.copyWith(
-                          color: Theme.of(context).accentColor,
-                        )
-                    : Theme.of(context).textTheme.caption,
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                maxLines: 100,
-              ),
-            ),
-            Text(
-              comment.data.score.toString() + " points",
-              style: Theme.of(context).textTheme.caption,
-              softWrap: false,
-              maxLines: 1,
-              textAlign: TextAlign.left,
-            ),
-          ],
-        ),
-        Html(
-          linkStyle: Theme.of(context).textTheme.body1.copyWith(
-                color: Theme.of(context).accentColor,
-              ),
-          defaultTextStyle: Theme.of(context).textTheme.body1,
-          padding: EdgeInsets.all(0),
-          data: """${_unescape.convert(comment.data.bodyHtml)}""",
-          useRichText: true,
-          showImages: false,
-          onLinkTap: (url) {
-            if (url.startsWith("/r/") || url.startsWith("r/")) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return SubredditFeedPage(
-                        subreddit: url.startsWith("/r/")
-                            ? url.replaceFirst("/r/", "")
-                            : url.replaceFirst("r/", ""));
-                  },
+                      : Theme.of(context).textTheme.caption,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  maxLines: 100,
                 ),
-              );
-            } else if (url.startsWith("/u/") || url.startsWith("u/")) {
-            } else {
-              print("launching web view");
+              ),
+              Text(
+                comment.data.score.toString() + " points",
+                style: Theme.of(context).textTheme.caption,
+                softWrap: false,
+                maxLines: 1,
+                textAlign: TextAlign.left,
+              ),
+            ],
+          ),
+          Html(
+            linkStyle: Theme.of(context).textTheme.body1.copyWith(
+                  color: Theme.of(context).accentColor,
+                ),
+            defaultTextStyle: Theme.of(context).textTheme.body1,
+            padding: EdgeInsets.all(0),
+            data: """${_unescape.convert(comment.data.bodyHtml)}""",
+            useRichText: true,
+            showImages: false,
+            onLinkTap: (url) {
+              if (url.startsWith("/r/") || url.startsWith("r/")) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) {
+                      return SubredditFeedPage(
+                          subreddit: url.startsWith("/r/")
+                              ? url.replaceFirst("/r/", "")
+                              : url.replaceFirst("r/", ""));
+                    },
+                  ),
+                );
+              } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+              } else {
+                print("launching web view");
 
-              launchURL(context, url);
-            }
-          },
-        ),
-      ],
+                launchURL(context, url);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -185,6 +180,17 @@ class _MoreCommentKindState extends State<MoreCommentKind> {
                   },
                   child: Row(
                     children: <Widget>[
+                      // only change the state of the widget to loading only if
+                      // this comment matches the id to the loading comment
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          'More',
+                          style: TextStyle(
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                      ),
                       model.commentsMoreLoadingState == ViewState.Busy &&
                               model.moreParentLoadingId != "" &&
                               model.moreParentLoadingId ==
@@ -196,7 +202,6 @@ class _MoreCommentKindState extends State<MoreCommentKind> {
                                 Container(
                                   width: 24,
                                   height: 24,
-                                  padding: EdgeInsets.all(4.0),
                                   child: CircularProgressIndicator(),
                                 ),
                                 SizedBox(
@@ -205,12 +210,6 @@ class _MoreCommentKindState extends State<MoreCommentKind> {
                               ],
                             )
                           : Container(),
-                      Text(
-                        'More',
-                        style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
                     ],
                   ),
                 ),

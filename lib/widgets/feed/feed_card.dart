@@ -9,21 +9,27 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-class FeedCardImage extends StatelessWidget {
+class FeedCardImage extends StatefulWidget {
   final PostsFeedDataChildrenData _data;
 
   FeedCardImage(this._data);
 
+  @override
+  _FeedCardImageState createState() => _FeedCardImageState();
+}
+
+class _FeedCardImageState extends State<FeedCardImage> {
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
 
   @override
   Widget build(BuildContext context) {
+    print("Build Image Feed Card");
     final mq = MediaQuery.of(context).size;
     double ratio;
     String url;
-    if (_data.preview != null) {
-      ratio = (mq.width - 16) / _data.preview.images.first.source.width;
-      url = _htmlUnescape.convert(_data.preview.images.first.source.url);
+    if (widget._data.preview != null) {
+      ratio = (mq.width - 16) / widget._data.preview.images.first.source.width;
+      url = _htmlUnescape.convert(widget._data.preview.images.first.source.url);
     }
 
     return Consumer(builder: (BuildContext context, FeedProvider model, _) {
@@ -32,7 +38,7 @@ class FeedCardImage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            StickyTag(_data.stickied),
+            StickyTag(widget._data.stickied),
             Padding(
               padding:
                   const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
@@ -40,26 +46,26 @@ class FeedCardImage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    _htmlUnescape.convert(_data.title),
+                    _htmlUnescape.convert(widget._data.title),
                     style: Theme.of(context).textTheme.title,
                   ),
                 ],
               ),
             ),
-            _data.preview != null
+            widget._data.preview != null
                 ? Center(
                     child: Image(
                       image: CachedNetworkImageProvider(
                         url,
                       ),
                       fit: BoxFit.fitWidth,
-                      height:
-                          _data.preview.images.first.source.height.toDouble() *
-                              ratio,
+                      height: widget._data.preview.images.first.source.height
+                              .toDouble() *
+                          ratio,
                     ),
                   )
                 : Container(),
-            PostControls(_data),
+            PostControls(widget._data),
           ],
         ),
         clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -69,10 +75,17 @@ class FeedCardImage extends StatelessWidget {
   }
 }
 
-class FeedCardSelfText extends StatelessWidget {
+class FeedCardSelfText extends StatefulWidget {
   final PostsFeedDataChildrenData _data;
-  final HtmlUnescape unescape = new HtmlUnescape();
+
   FeedCardSelfText(this._data);
+
+  @override
+  _FeedCardSelfTextState createState() => _FeedCardSelfTextState();
+}
+
+class _FeedCardSelfTextState extends State<FeedCardSelfText> {
+  final HtmlUnescape unescape = new HtmlUnescape();
 
   @override
   Widget build(BuildContext context) {
@@ -81,16 +94,16 @@ class FeedCardSelfText extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StickyTag(_data.stickied),
+          StickyTag(widget._data.stickied),
           Padding(
             padding: const EdgeInsets.only(
                 top: 0.0, left: 16.0, right: 16.0, bottom: 8.0),
             child: Text(
-              unescape.convert(_data.title),
+              unescape.convert(widget._data.title),
               style: Theme.of(context).textTheme.title,
             ),
           ),
-          _data.selftext != ""
+          widget._data.selftext != ""
               ? Padding(
                   padding: const EdgeInsets.only(
                     top: 8.0,
@@ -105,7 +118,7 @@ class FeedCardSelfText extends StatelessWidget {
                         .body1
                         .copyWith(color: Theme.of(context).accentColor),
                     padding: EdgeInsets.all(0),
-                    data: """${unescape.convert(_data.selftextHtml)}""",
+                    data: """${unescape.convert(widget._data.selftextHtml)}""",
                     useRichText: true,
                     onLinkTap: (url) {
                       if (url.startsWith("/r/") || url.startsWith("r/")) {
@@ -131,7 +144,7 @@ class FeedCardSelfText extends StatelessWidget {
                   ),
                 )
               : Container(),
-          PostControls(_data),
+          PostControls(widget._data),
         ],
       ),
       clipBehavior: Clip.antiAlias,

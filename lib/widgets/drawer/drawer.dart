@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/hex_color.dart';
@@ -129,13 +130,17 @@ class _LeftDrawerState extends State<LeftDrawer> {
                         backgroundImage: model.userSubreddits.data
                                     .children[index].community_icon !=
                                 ""
-                            ? NetworkImage(model.userSubreddits.data
-                                .children[index].community_icon)
+                            ? CachedNetworkImageProvider(
+                                model.userSubreddits.data.children[index]
+                                    .community_icon,
+                              )
                             : model.userSubreddits.data.children[index]
                                         .icon_img !=
                                     ""
-                                ? NetworkImage(model.userSubreddits.data
-                                    .children[index].icon_img)
+                                ? CachedNetworkImageProvider(
+                                    model.userSubreddits.data.children[index]
+                                        .icon_img,
+                                  )
                                 : AssetImage('assets/default_icon.png'),
                         backgroundColor: model.userSubreddits.data
                                     .children[index].primary_color ==
