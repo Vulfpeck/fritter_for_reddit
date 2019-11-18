@@ -5,8 +5,7 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comment_list_item.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
-import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
+import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 
 class CommentsSheet extends StatefulWidget {
   final PostsFeedDataChildrenData item;
@@ -21,16 +20,15 @@ class _CommentsSheetState extends State<CommentsSheet> {
   Widget build(BuildContext context) {
     print("Post id is " + widget.item.name);
     return DraggableScrollableSheet(
-      maxChildSize: 1,
+      maxChildSize: 1.0,
       minChildSize: 0.9,
-      initialChildSize: 1.0,
+      initialChildSize: 1,
       expand: false,
       builder: (BuildContext context, ScrollController controller) {
         return Consumer(
           builder: (BuildContext context, CommentsProvider model, _) {
             return Scaffold(
               body: CustomScrollView(
-                physics: CustomBouncingScrollPhysics(),
                 controller: controller,
                 slivers: <Widget>[
                   SliverPersistentHeader(
@@ -48,17 +46,14 @@ class _CommentsSheetState extends State<CommentsSheet> {
                             height: 8.0,
                           ),
                           InkWell(
-                            onTap: () {
-                              print('tap tap');
-                              if (widget.item.isSelf == false) {
-                                print(widget.item.url);
-                                _launchURL(context, widget.item.url);
-                              }
-                            },
-                            child: widget.item.isSelf
-                                ? FeedCardSelfText(widget.item)
-                                : FeedCardImage(widget.item),
-                          ),
+                              onTap: () {
+                                print('tap tap');
+                                if (widget.item.isSelf == false) {
+                                  print(widget.item.url);
+                                  _launchURL(context, widget.item.url);
+                                }
+                              },
+                              child: FeedCard(widget.item)),
                           SizedBox(
                             height: 32,
                           ),
@@ -146,7 +141,7 @@ class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => safeAreaPadding.top;
 
   @override
-  double get maxExtent => minExtent + 100;
+  double get maxExtent => minExtent + 72;
 
   @override
   Widget build(
@@ -164,8 +159,8 @@ class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             bottom: 0,
             right: 16,
             child: SizedBox(
-              height: 48,
-              width: 48,
+              height: 56,
+              width: 56,
               child: Material(
                 type: MaterialType.button,
                 borderRadius: BorderRadius.circular(100),

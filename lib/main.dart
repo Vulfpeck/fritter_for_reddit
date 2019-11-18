@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/hex_color.dart';
 import 'package:flutter_provider_app/pages/app_home.dart';
 
 void main() {
@@ -25,12 +26,14 @@ class MyTestApp extends StatelessWidget {
     return MaterialApp(
       home: HomePage(),
       theme: ThemeData(
+        canvasColor: HexColor("#ffffff"),
         brightness: Brightness.light,
         iconTheme: IconThemeData(
           color: Colors.black,
         ),
       ),
       darkTheme: ThemeData(
+        dividerColor: Colors.white24,
         brightness: Brightness.dark,
         iconTheme: IconThemeData(
           color: Colors.white,

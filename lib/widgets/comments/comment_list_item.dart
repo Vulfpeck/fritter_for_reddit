@@ -11,7 +11,7 @@ import 'package:html_unescape/html_unescape.dart';
 import '../../exports.dart';
 
 // TODO: implement comment voting
-class CommentItem extends StatelessWidget {
+class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
   final String name;
   final String id;
@@ -19,42 +19,94 @@ class CommentItem extends StatelessWidget {
   CommentItem(this._comment, this.name, this.id);
 
   @override
+  _CommentItemState createState() => _CommentItemState();
+}
+
+class _CommentItemState extends State<CommentItem>
+    with TickerProviderStateMixin {
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         SizedBox(
-          width: 16.0 * _comment.data.depth,
+          width: 16.0 * widget._comment.data.depth,
         ),
         Expanded(
           child: Container(
-            color: Theme.of(context).cardColor,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border(
-                    left: BorderSide(
-                      color: Theme.of(context).dividerColor,
-                      width: _comment.data.depth == 0 ? 0 : 2,
-                    ),
-                    top: BorderSide(
-                      color: _comment.data.depth == 0
-                          ? Theme.of(context).dividerColor
-                          : Theme.of(context).dividerColor,
-                      width: _comment.data.depth == 0 ? 2 : 1,
-                    )),
+                  left: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: widget._comment.data.depth == 0 ? 0 : 1,
+                  ),
+                ),
               ),
-              child: _comment.kind == CommentPojo.Kind.MORE
-                  ? MoreCommentKind(
-                      comment: _comment,
-                      name: name,
-                    )
-                  : CommentBody(
-                      comment: _comment,
-                    ),
+              child: AnimatedSize(
+                vsync: this,
+                child: widget._comment.data.collapseParent == true
+                    ? CollapsedCommentParent(comment: widget._comment)
+                    : widget._comment.data.collapse == true
+                        ? Container()
+                        : widget._comment.kind == CommentPojo.Kind.MORE
+                            ? MoreCommentKind(
+                                comment: widget._comment,
+                                name: widget.name,
+                              )
+                            : CommentBody(
+                                comment: widget._comment,
+                              ),
+                duration: Duration(
+                  milliseconds: 400,
+                ),
+                curve: Curves.linearToEaseOut,
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class CollapsedCommentParent extends StatelessWidget {
+  final CommentPojo.Child comment;
+  CollapsedCommentParent({@required this.comment});
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (BuildContext context, CommentsProvider model, _) {
+        return Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6.0),
+              color: Theme.of(context).dividerColor,
+            ),
+            child: ListTile(
+              dense: true,
+              onTap: () {
+                collapse(comment, context);
+              },
+              title: Text('Comment collapsed'),
+              subtitle: Text(
+                model.collapsedChildrenCount[comment.data.id].toString() +
+                    " more comments",
+              ),
+              trailing: Icon(Icons.expand_more),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void collapse(CommentPojo.Child comment, BuildContext context) {
+    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
+      comment: comment,
+      collapse: false,
     );
   }
 }
@@ -67,83 +119,86 @@ class CommentBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              comment.data.isSubmitter
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: comment.data.isSubmitter
-                          ? Icon(
-                              Icons.person,
-                              size: 16,
+    return InkWell(
+      onLongPress: () {
+        Provider.of<CommentsProvider>(context)
+            .collapseUncollapseComment(comment: comment, collapse: true);
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                comment.data.isSubmitter
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: comment.data.isSubmitter
+                            ? Icon(
+                                Icons.person,
+                                size: 16,
+                                color: Theme.of(context).accentColor,
+                              )
+                            : Container(),
+                      )
+                    : Container(),
+                Flexible(
+                  flex: 10,
+                  child: Text(
+                    comment.data.author +
+                        " • " +
+                        comment.data.score.toString() +
+                        " points" +
+                        " • " +
+                        getTimePosted(comment.data.createdUtc),
+                    style: comment.data.isSubmitter
+                        ? Theme.of(context).textTheme.caption.copyWith(
                               color: Theme.of(context).accentColor,
+                              fontWeight: FontWeight.bold,
                             )
-                          : Container(),
-                    )
-                  : Container(),
-              Flexible(
-                child: Text(
-                  comment.data.author +
-                      " • " +
-                      getTimePosted(
-                        comment.data.createdUtc,
-                      ) +
-                      " • ",
-                  style: comment.data.isSubmitter
-                      ? Theme.of(context).textTheme.caption.copyWith(
-                            color: Theme.of(context).accentColor,
-                          )
-                      : Theme.of(context).textTheme.caption,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  maxLines: 100,
-                ),
-              ),
-              Text(
-                comment.data.score.toString() + " points",
-                style: Theme.of(context).textTheme.caption,
-                softWrap: false,
-                maxLines: 1,
-                textAlign: TextAlign.left,
-              ),
-            ],
-          ),
-          Html(
-            linkStyle: Theme.of(context).textTheme.body1.copyWith(
-                  color: Theme.of(context).accentColor,
-                ),
-            defaultTextStyle: Theme.of(context).textTheme.body1,
-            padding: EdgeInsets.all(0),
-            data: """${_unescape.convert(comment.data.bodyHtml)}""",
-            useRichText: true,
-            showImages: false,
-            onLinkTap: (url) {
-              if (url.startsWith("/r/") || url.startsWith("r/")) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return SubredditFeedPage(
-                          subreddit: url.startsWith("/r/")
-                              ? url.replaceFirst("/r/", "")
-                              : url.replaceFirst("r/", ""));
-                    },
+                        : Theme.of(context).textTheme.caption.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    maxLines: 100,
                   ),
-                );
-              } else if (url.startsWith("/u/") || url.startsWith("u/")) {
-              } else {
-                print("launching web view");
+                ),
+              ],
+            ),
+            Html(
+              linkStyle: Theme.of(context).textTheme.body1.copyWith(
+                    color: Theme.of(context).accentColor,
+                  ),
+              defaultTextStyle: Theme.of(context).textTheme.body1,
+              padding: EdgeInsets.all(0),
+              data: """${_unescape.convert(comment.data.bodyHtml)}""",
+              useRichText: true,
+              showImages: false,
+              onLinkTap: (url) {
+                if (url.startsWith("/r/") || url.startsWith("r/")) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return SubredditFeedPage(
+                            subreddit: url.startsWith("/r/")
+                                ? url.replaceFirst("/r/", "")
+                                : url.replaceFirst("r/", ""));
+                      },
+                    ),
+                  );
+                } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+                } else {
+                  print("launching web view");
 
-                launchURL(context, url);
-              }
-            },
-          ),
-        ],
+                  launchURL(context, url);
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -214,6 +269,7 @@ class _MoreCommentKindState extends State<MoreCommentKind> {
                   ),
                 ),
                 type: MaterialType.card,
+                color: Colors.transparent,
               ),
             ),
           ],

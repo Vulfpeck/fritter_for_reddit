@@ -32,6 +32,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
       key: key,
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
+        SizedBox(width: 16),
         FlatButton.icon(
           icon: Icon(Icons.refresh),
           label: Text('Refresh'),
@@ -53,7 +54,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
             children: <Widget>[
               Text(
                 'Sort By',
-                style: Theme.of(context).textTheme.overline,
+                style: Theme.of(context).textTheme.caption,
               ),
               Text(
                 capitalizeString(

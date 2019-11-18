@@ -93,6 +93,8 @@ class ChildData {
   int gilded;
   bool clicked;
   String title;
+  bool collapse = false;
+  bool collapseParent = false;
   List<dynamic> linkFlairRichtext;
   String subredditNamePrefixed;
   bool hidden;

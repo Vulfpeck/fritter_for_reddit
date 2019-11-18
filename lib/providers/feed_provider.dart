@@ -194,8 +194,27 @@ class FeedProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> vote(String id, int dir) async {
+  Future<bool> votePost({@required String id, @required int dir}) async {
+    PostsFeedDatachild item = _postFeed.data.children.firstWhere((v) {
+      return v.data.id.compareTo(id) == 0 ? true : false;
+    });
     notifyListeners();
+    if (item.data.likes == true) {
+      item.data.score--;
+    } else if (item.data.likes == false) {
+      item.data.score++;
+    }
+    if (dir == 1) {
+      item.data.score++;
+      item.data.likes = true;
+    } else if (dir == -1) {
+      item.data.score--;
+      item.data.likes = false;
+    } else if (dir == 0) {
+      item.data.score =
+          item.data.likes == true ? item.data.score-- : item.data.score++;
+      item.data.likes = null;
+    }
     String url = "https://oauth.reddit.com/api/vote";
     final String authToken = await _storageHelper.authToken;
     http.Response voteResponse;

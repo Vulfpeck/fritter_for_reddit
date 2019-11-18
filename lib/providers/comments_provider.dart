@@ -17,6 +17,8 @@ class CommentsProvider with ChangeNotifier {
   ViewState get commentsLoadingState => _commentsLoadingState;
   ViewState get commentsMoreLoadingState => _commentsMoreLoadingState;
 
+  var collapsedChildrenCount = new Map();
+
   List<CommentPojo.Child> _commentsList;
   List<CommentPojo.Child> get commentsList => _commentsList;
 
@@ -177,7 +179,6 @@ class CommentsProvider with ChangeNotifier {
           );
           print("comments saved in the entity");
           CommentPojo.Child parent = _commentsList.firstWhere((ele) {
-            print(ele.data.id);
             if (ele.data.id.compareTo(moreParentId) == 0) {
               return true;
             } else {
@@ -254,5 +255,33 @@ class CommentsProvider with ChangeNotifier {
     moreParentLoadingId = "";
     _commentsMoreLoadingState = ViewState.Idle;
     notifyListeners();
+  }
+
+  int collapseUncollapseComment(
+      {@required CommentPojo.Child comment, @required bool collapse}) {
+    int index = _commentsList.indexWhere((ele) {
+      return ele.data.id == comment.data.id;
+    });
+    comment.data.collapse = collapse;
+    comment.data.collapseParent = collapse;
+    index++;
+    int count = 0;
+    while (index < _commentsList.length) {
+      if (_commentsList.elementAt(index).data.depth <= comment.data.depth) {
+        break;
+      } else {
+        _commentsList.elementAt(index).data.collapse = collapse;
+        _commentsList.elementAt(index).data.collapseParent = false;
+      }
+      index++;
+      count++;
+    }
+    if (collapse) {
+      collapsedChildrenCount[comment.data.id] = count;
+    } else {
+      collapsedChildrenCount.remove(comment.data.id);
+    }
+    notifyListeners();
+    return count;
   }
 }

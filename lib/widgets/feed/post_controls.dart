@@ -27,10 +27,6 @@ class _PostControlsState extends State<PostControls> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Divider(),
-              SizedBox(
-                height: 4.0,
-              ),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
@@ -156,18 +152,10 @@ class _PostControlsState extends State<PostControls> {
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
                     onPressed: () {
-                      if (widget.postData.likes == null) {
-                        widget.postData.score++;
-                        widget.postData.likes = true;
-                        model.vote(widget.postData.name, 1);
-                      } else if (widget.postData.likes == false) {
-                        widget.postData.score += 2;
-                        widget.postData.likes = true;
-                        model.vote(widget.postData.name, 1);
+                      if (widget.postData.likes == true) {
+                        model.votePost(id: widget.postData.id, dir: 0);
                       } else {
-                        widget.postData.score--;
-                        widget.postData.likes = null;
-                        model.vote(widget.postData.name, 0);
+                        model.votePost(id: widget.postData.id, dir: 1);
                       }
                     },
                     color: widget.postData.likes == null ||
@@ -196,18 +184,10 @@ class _PostControlsState extends State<PostControls> {
                         ? Colors.grey
                         : Colors.purple,
                     onPressed: () {
-                      if (widget.postData.likes == null) {
-                        widget.postData.score--;
-                        widget.postData.likes = false;
-                        model.vote(widget.postData.name, -1);
-                      } else if (widget.postData.likes == true) {
-                        widget.postData.score -= 2;
-                        widget.postData.likes = false;
-                        model.vote(widget.postData.name, -1);
+                      if (widget.postData.likes == false) {
+                        model.votePost(id: widget.postData.id, dir: 0);
                       } else {
-                        widget.postData.score++;
-                        widget.postData.likes = null;
-                        model.vote(widget.postData.name, 0);
+                        model.votePost(id: widget.postData.id, dir: -1);
                       }
                     },
                     splashColor: Colors.deepPurple,

@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
+import 'package:flutter_provider_app/helpers/custom_animated_route.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
-import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_card.dart';
+import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 
 class FeedList extends StatefulWidget {
   @override
@@ -13,7 +12,7 @@ class FeedList extends StatefulWidget {
 }
 
 // TODO : implement posting to subreddits
-class _FeedListState extends State<FeedList> {
+class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
   ScrollController _controller;
   String sortSelectorValue = "Best";
   GlobalKey key = GlobalKey();
@@ -37,7 +36,6 @@ class _FeedListState extends State<FeedList> {
     return Consumer<FeedProvider>(
         builder: (BuildContext context, FeedProvider model, _) {
       return CustomScrollView(
-        physics: CustomBouncingScrollPhysics(),
         controller: _controller,
         slivers: <Widget>[
           SliverAppBar(
@@ -100,7 +98,7 @@ class _FeedListState extends State<FeedList> {
                 initialValue: sortSelectorValue,
               ),
             ],
-            pinned: false,
+            pinned: true,
             snap: true,
             floating: true,
             primary: true,
@@ -160,7 +158,8 @@ class _FeedListState extends State<FeedList> {
                           horizontal: 0.0,
                           vertical: 4.0,
                         ),
-                        child: GestureDetector(
+                        child: InkWell(
+                          enableFeedback: true,
                           onDoubleTap: () {
                             if (item.isSelf == false) {
                               launchURL(context, item.url);
@@ -176,17 +175,23 @@ class _FeedListState extends State<FeedList> {
                                       item.suggestedSort]
                                   : CommentSortTypes.Best,
                             );
-                            showModalBottomSheet(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CommentsSheet(item);
-                              },
+                            Navigator.of(context).push(
+                              SlideUpRoute(
+                                page: BottomSheet(
+                                  enableDrag: false,
+                                  builder: (BuildContext context) {
+                                    return CommentsSheet(item);
+                                  },
+                                  onClosing: () {
+                                    if (Navigator.of(context).canPop()) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                ),
+                              ),
                             );
                           },
-                          child: item.isSelf == false && item.preview != null
-                              ? FeedCardImage(item)
-                              : FeedCardSelfText(item),
+                          child: FeedCard(item),
                         ),
                       );
                     },

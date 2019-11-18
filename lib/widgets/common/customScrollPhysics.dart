@@ -22,7 +22,7 @@ class CustomBouncingScrollPhysics extends ScrollPhysics {
   /// as more of the area past the edge is dragged in (represented by an increasing
   /// `overscrollFraction` which starts at 0 when there is no overscroll).
   double frictionFactor(double overscrollFraction) =>
-      0.52 * math.pow(1 - overscrollFraction, 2);
+      0.1 * math.pow(1 - overscrollFraction, 2);
 
   @override
   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
@@ -75,7 +75,7 @@ class CustomBouncingScrollPhysics extends ScrollPhysics {
         spring: spring,
         position: position.pixels,
         velocity: velocity *
-            0.95, // TODO(abarth): We should move this constant closer to the drag end.
+            0.99, // TODO(abarth): We should move this constant closer to the drag end.
         leadingExtent: position.minScrollExtent,
         trailingExtent: position.maxScrollExtent,
         tolerance: tolerance,

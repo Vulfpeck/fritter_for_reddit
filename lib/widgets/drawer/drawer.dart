@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/hex_color.dart';
-import 'package:flutter_provider_app/pages/web_view_sign_in.dart';
 import 'package:flutter_provider_app/providers/feed_provider.dart';
+import 'package:flutter_provider_app/secrets.dart';
 import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 
 class LeftDrawer extends StatefulWidget {
@@ -191,19 +191,18 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   Future<void> authenticateUser(
       UserInformationProvider model, BuildContext context) async {
-    bool res = true;
-    Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return WebViewSignIn();
-    })).then((val) {
-      res = val;
-      print("Auth Navigator result: " + res.toString());
-    });
-    res = await model.performAuthentication() && res;
+    launchURL(
+        context,
+        "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
+            CLIENT_ID +
+            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+    bool res = await model.performAuthentication();
     print("final res: " + res.toString());
-    Navigator.pop(context);
     if (res) {
       await Provider.of<FeedProvider>(context).fetchPostsListing();
-      Navigator.pop(context);
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     } else {
       showDialog(
         context: context,

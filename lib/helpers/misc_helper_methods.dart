@@ -9,18 +9,12 @@ String getTimePosted(double orig) {
       if (difference.inMinutes <= 0) {
         return "Few Moments Ago";
       } else {
-        return difference.inMinutes.toString() +
-            (difference.inMinutes == 1 ? " minute" : " minutes") +
-            " ago";
+        return difference.inMinutes.toString() + "m";
       }
     } else {
-      return difference.inHours.toString() +
-          (difference.inHours == 1 ? " hour" : " hours") +
-          " ago";
+      return difference.inHours.toString() + "h";
     }
   } else {
-    return difference.inDays.toString() +
-        (difference.inDays == 1 ? " day" : " days") +
-        " ago";
+    return difference.inDays.toString() + "d";
   }
 }
