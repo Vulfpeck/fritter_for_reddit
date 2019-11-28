@@ -12,6 +12,8 @@ class FeedProvider with ChangeNotifier {
   PostsFeedEntity _postFeed;
   SubredditInformationEntity _subredditInformationEntity;
 
+  bool _subLoadingError = false;
+
   String sub = "";
   String sort = "Hot";
 
@@ -29,6 +31,8 @@ class FeedProvider with ChangeNotifier {
       _subredditInformationEntity;
   CurrentPage get currentPage => _currentPage;
 
+  bool get subLoadingError => _subLoadingError;
+
   FeedProvider() {
     _currentPage = CurrentPage.FrontPage;
     fetchPostsListing();
@@ -36,13 +40,9 @@ class FeedProvider with ChangeNotifier {
 
   FeedProvider.openFromName(String currentSubreddit) {
     _currentPage = CurrentPage.Other;
-    try {
-      fetchPostsListing(currentSubreddit: currentSubreddit);
-    } catch (e) {
-      print('failed to load posts');
-      _state = ViewState.Idle;
-      notifyListeners();
-    }
+    _subLoadingError = false;
+
+    fetchPostsListing(currentSubreddit: currentSubreddit);
   }
 
   Future<void> fetchPostsListing({
@@ -50,6 +50,7 @@ class FeedProvider with ChangeNotifier {
     currentSort = "Hot",
   }) async {
     await _storageHelper.init();
+    print("getting listing");
     _state = ViewState.Busy;
     notifyListeners();
 
@@ -75,11 +76,8 @@ class FeedProvider with ChangeNotifier {
       http.Response response;
       try {
         response = await http.get(url);
-
         if (response.statusCode == 200) {
           _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
-          print(_postFeed.toJson());
-
           final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
           final subInfoResponse = await http.get(
             infoUrl,
@@ -92,7 +90,7 @@ class FeedProvider with ChangeNotifier {
                 new SubredditInformationEntity.fromJson(
                     json.decode(subInfoResponse.body));
             this.sub = _subredditInformationEntity.data.displayName;
-          }
+          } else {}
         } else {
           print("****************");
           print(response.statusCode);
@@ -135,14 +133,17 @@ class FeedProvider with ChangeNotifier {
     if (subredditResponse.statusCode == 200)
       _postFeed =
           new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+    else
+      throw new Exception(
+          "Failed to load data: " + subredditResponse.reasonPhrase);
 
     if (_currentPage != CurrentPage.FrontPage)
-      await fetchSubRedditInformation(token, currentSubreddit);
+      await fetchSubredditInformation(token, currentSubreddit);
     _state = ViewState.Idle;
     notifyListeners();
   }
 
-  Future<void> fetchSubRedditInformation(
+  Future<void> fetchSubredditInformation(
     String token,
     String currentSubreddit,
   ) async {
@@ -195,6 +196,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<bool> votePost({@required String id, @required int dir}) async {
+    await _storageHelper.init();
     PostsFeedDatachild item = _postFeed.data.children.firstWhere((v) {
       return v.data.id.compareTo(id) == 0 ? true : false;
     });

@@ -3,5 +3,5 @@
 # Light Mode
 ![](/images/img_light.svg)
 
-* # Dark Mode
+# Dark Mode
 ![](/images/img_dark.svg)

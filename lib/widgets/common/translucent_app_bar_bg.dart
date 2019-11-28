@@ -28,7 +28,7 @@ class _TranslucentAppBarBackgroundState
         }
         return ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: Container(
               // Don't wrap this in any SafeArea widgets, use padding instead
               padding: EdgeInsets.only(top: 0),
@@ -110,6 +110,10 @@ class _TranslucentAppBarBackgroundState
                                                     .userIsSubscriber !=
                                                 null
                                             ? OutlineButton(
+                                                textColor: Theme.of(context)
+                                                    .textTheme
+                                                    .body1
+                                                    .color,
                                                 child: prov.partialState ==
                                                         ViewState.Busy
                                                     ? Container(

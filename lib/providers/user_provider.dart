@@ -42,7 +42,7 @@ class UserInformationProvider with ChangeNotifier {
     _state = ViewState.Busy;
     notifyListeners();
 
-    if (await _storageHelper.signInStatus) {
+    if (_storageHelper.signInStatus) {
       await _storageHelper.performTokenRefresh();
       await loadUserInformation();
     } else {

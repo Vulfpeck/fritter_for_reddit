@@ -33,36 +33,24 @@ class _CommentItemState extends State<CommentItem>
           width: 16.0 * widget._comment.data.depth,
         ),
         Expanded(
-          child: Container(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border(
-                  left: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                    width: widget._comment.data.depth == 0 ? 0 : 1,
-                  ),
-                ),
-              ),
-              child: AnimatedSize(
-                vsync: this,
-                child: widget._comment.data.collapseParent == true
-                    ? CollapsedCommentParent(comment: widget._comment)
-                    : widget._comment.data.collapse == true
-                        ? Container()
-                        : widget._comment.kind == CommentPojo.Kind.MORE
-                            ? MoreCommentKind(
-                                comment: widget._comment,
-                                name: widget.name,
-                              )
-                            : CommentBody(
-                                comment: widget._comment,
-                              ),
-                duration: Duration(
-                  milliseconds: 400,
-                ),
-                curve: Curves.linearToEaseOut,
-              ),
+          child: AnimatedSize(
+            vsync: this,
+            child: widget._comment.data.collapseParent == true
+                ? CollapsedCommentParent(comment: widget._comment)
+                : widget._comment.data.collapse == true
+                    ? Container()
+                    : widget._comment.kind == CommentPojo.Kind.MORE
+                        ? MoreCommentKind(
+                            comment: widget._comment,
+                            name: widget.name,
+                          )
+                        : CommentBody(
+                            comment: widget._comment,
+                          ),
+            duration: Duration(
+              milliseconds: 250,
             ),
+            curve: Curves.linearToEaseOut,
           ),
         ),
       ],
@@ -77,13 +65,14 @@ class CollapsedCommentParent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, CommentsProvider model, _) {
-        return Padding(
-          padding: EdgeInsets.all(8.0),
+        return Material(
+          color: Theme.of(context).cardColor,
           child: Container(
+            margin: EdgeInsets.all(8.0),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6.0),
-              color: Theme.of(context).dividerColor,
+              color: Theme.of(context).colorScheme.surface,
             ),
             child: ListTile(
               dense: true,
@@ -103,104 +92,225 @@ class CollapsedCommentParent extends StatelessWidget {
     );
   }
 
-  void collapse(CommentPojo.Child comment, BuildContext context) {
-    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
+  void collapse(CommentPojo.Child comment, BuildContext context) async {
+    await Provider.of<CommentsProvider>(context).collapseUncollapseComment(
       comment: comment,
       collapse: false,
     );
   }
 }
 
-class CommentBody extends StatelessWidget {
-  final HtmlUnescape _unescape = new HtmlUnescape();
+class CommentBody extends StatefulWidget {
   final CommentPojo.Child comment;
 
   CommentBody({this.comment});
 
   @override
+  _CommentBodyState createState() => _CommentBodyState();
+}
+
+class _CommentBodyState extends State<CommentBody>
+    with TickerProviderStateMixin {
+  final HtmlUnescape _unescape = new HtmlUnescape();
+  bool isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onLongPress: () {
-        Provider.of<CommentsProvider>(context)
-            .collapseUncollapseComment(comment: comment, collapse: true);
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 4.0),
+    return Material(
+      color: Theme.of(context).cardColor,
+      child: InkWell(
+        onLongPress: isExpanded
+            ? null
+            : () {
+                collapse(widget.comment, context);
+              },
+        onTap: () {
+          setState(() {
+            isExpanded = !isExpanded;
+          });
+        },
         child: Column(
           children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                comment.data.isSubmitter
-                    ? Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: comment.data.isSubmitter
-                            ? Icon(
-                                Icons.person,
-                                size: 16,
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 12.0, top: 16.0, right: 12.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  widget.comment.data.isSubmitter
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: widget.comment.data.isSubmitter
+                              ? Icon(
+                                  Icons.person,
+                                  size: 16,
+                                  color: Theme.of(context).accentColor,
+                                )
+                              : Container(),
+                        )
+                      : Container(),
+                  Flexible(
+                    flex: 10,
+                    child: Text(
+                      widget.comment.data.author,
+                      style: widget.comment.data.isSubmitter
+                          ? Theme.of(context).textTheme.caption.copyWith(
                                 color: Theme.of(context).accentColor,
+                                fontWeight: FontWeight.w500,
                               )
-                            : Container(),
-                      )
-                    : Container(),
-                Flexible(
-                  flex: 10,
-                  child: Text(
-                    comment.data.author +
-                        " • " +
-                        comment.data.score.toString() +
-                        " points" +
-                        " • " +
-                        getTimePosted(comment.data.createdUtc),
-                    style: comment.data.isSubmitter
-                        ? Theme.of(context).textTheme.caption.copyWith(
-                              color: Theme.of(context).accentColor,
-                              fontWeight: FontWeight.bold,
-                            )
-                        : Theme.of(context).textTheme.caption.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    maxLines: 100,
-                  ),
-                ),
-              ],
-            ),
-            Html(
-              linkStyle: Theme.of(context).textTheme.body1.copyWith(
-                    color: Theme.of(context).accentColor,
-                  ),
-              defaultTextStyle: Theme.of(context).textTheme.body1,
-              padding: EdgeInsets.all(0),
-              data: """${_unescape.convert(comment.data.bodyHtml)}""",
-              useRichText: true,
-              showImages: false,
-              onLinkTap: (url) {
-                if (url.startsWith("/r/") || url.startsWith("r/")) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) {
-                        return SubredditFeedPage(
-                            subreddit: url.startsWith("/r/")
-                                ? url.replaceFirst("/r/", "")
-                                : url.replaceFirst("r/", ""));
-                      },
+                          : Theme.of(context).textTheme.caption.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).accentColor,
+                              ),
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      maxLines: 100,
                     ),
-                  );
-                } else if (url.startsWith("/u/") || url.startsWith("u/")) {
-                } else {
-                  print("launching web view");
-
-                  launchURL(context, url);
-                }
-              },
+                  ),
+                  Flexible(
+                    flex: 10,
+                    child: Text(
+                      " • " +
+                          (widget.comment.data.scoreHidden
+                              ? "[?]"
+                              : widget.comment.data.score.toString()) +
+                          " points",
+                      style: widget.comment.data.likes != null
+                          ? widget.comment.data.likes == true
+                              ? Theme.of(context).textTheme.caption.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.orange,
+                                  )
+                              : Theme.of(context).textTheme.caption.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.deepPurple,
+                                  )
+                          : Theme.of(context).textTheme.caption.copyWith(
+                                fontWeight: FontWeight.w400,
+                              ),
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      maxLines: 100,
+                    ),
+                  ),
+                  Flexible(
+                    flex: 10,
+                    child: Text(
+                      " • " + getTimePosted(widget.comment.data.createdUtc),
+                      style: Theme.of(context).textTheme.caption.copyWith(
+                            fontWeight: FontWeight.w400,
+                          ),
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      maxLines: 100,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0),
+              child: Html(
+                linkStyle: Theme.of(context).textTheme.body1.copyWith(
+                      color: Theme.of(context).accentColor,
+                    ),
+                defaultTextStyle: Theme.of(context).textTheme.body1,
+                padding: EdgeInsets.all(0),
+                data: """${_unescape.convert(widget.comment.data.bodyHtml)}""",
+                useRichText: true,
+                showImages: false,
+                onLinkTap: (url) {
+                  if (url.startsWith("/r/") || url.startsWith("r/")) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return SubredditFeedPage(
+                              subreddit: url.startsWith("/r/")
+                                  ? url.replaceFirst("/r/", "")
+                                  : url.replaceFirst("r/", ""));
+                        },
+                      ),
+                    );
+                  } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+                  } else {
+                    print("launching web view");
+                    launchURL(context, url);
+                  }
+                },
+              ),
+            ),
+            isExpanded
+                ? Container(
+                    color: Theme.of(context).accentColor.withOpacity(0.2),
+                    child: Row(
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.arrow_upward),
+                          onPressed: () {
+                            if (Provider.of<UserInformationProvider>(context)
+                                .signedIn) {
+                              if (widget.comment.data.likes == true) {
+                                Provider.of<CommentsProvider>(context)
+                                    .voteComment(
+                                        id: widget.comment.data.id, dir: 0);
+                              } else {
+                                Provider.of<CommentsProvider>(context)
+                                    .voteComment(
+                                        id: widget.comment.data.id, dir: 1);
+                              }
+                            } else {
+                              buildSnackBar(context);
+                            }
+                          },
+                          color: widget.comment.data.likes == null ||
+                                  widget.comment.data.likes == false
+                              ? Colors.grey
+                              : Colors.orange,
+                          splashColor: Colors.orange,
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.arrow_downward),
+                          color: widget.comment.data.likes == null ||
+                                  widget.comment.data.likes == true
+                              ? Colors.grey
+                              : Colors.purple,
+                          onPressed: () {
+                            if (Provider.of<UserInformationProvider>(context)
+                                .signedIn) {
+                              if (widget.comment.data.likes == false) {
+                                Provider.of<CommentsProvider>(context)
+                                    .voteComment(
+                                        id: widget.comment.data.id, dir: 0);
+                              } else {
+                                Provider.of<CommentsProvider>(context)
+                                    .voteComment(
+                                        id: widget.comment.data.id, dir: -1);
+                              }
+                            } else {
+                              buildSnackBar(context);
+                            }
+                          },
+                          splashColor: Colors.deepPurple,
+                        ),
+                        IconButton(
+                            icon: Icon(Icons.account_circle),
+                            onPressed: () {},
+                            color: Theme.of(context).dividerColor)
+                      ],
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),
     );
+  }
+
+  void collapse(CommentPojo.Child comment, BuildContext context) async {
+    await Provider.of<CommentsProvider>(context)
+        .collapseUncollapseComment(comment: comment, collapse: true);
   }
 }
 
@@ -269,7 +379,7 @@ class _MoreCommentKindState extends State<MoreCommentKind> {
                   ),
                 ),
                 type: MaterialType.card,
-                color: Colors.transparent,
+                color: Theme.of(context).cardColor,
               ),
             ),
           ],

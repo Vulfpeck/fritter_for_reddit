@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
@@ -19,115 +18,88 @@ class _CommentsSheetState extends State<CommentsSheet> {
   @override
   Widget build(BuildContext context) {
     print("Post id is " + widget.item.name);
-    return DraggableScrollableSheet(
-      maxChildSize: 1.0,
-      minChildSize: 0.9,
-      initialChildSize: 1,
-      expand: false,
-      builder: (BuildContext context, ScrollController controller) {
-        return Consumer(
-          builder: (BuildContext context, CommentsProvider model, _) {
-            return Scaffold(
-              body: CustomScrollView(
-                controller: controller,
-                slivers: <Widget>[
-                  SliverPersistentHeader(
-                    pinned: true,
-                    floating: true,
-                    delegate: _TranslucentSliverAppBarDelegate(
-                      MediaQuery.of(context).padding,
-                    ),
+    return Consumer(
+      builder: (BuildContext context, CommentsProvider model, _) {
+        return Scaffold(
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverPersistentHeader(
+                pinned: true,
+                floating: true,
+                delegate: _TranslucentSliverAppBarDelegate(
+                  MediaQuery.of(context).padding,
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      Material(
+                        elevation: 5,
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: InkWell(
+                            onTap: () {
+                              print('tap tap');
+                              if (widget.item.isSelf == false) {
+                                print(widget.item.url);
+                                launchURL(context, widget.item.url);
+                              }
+                            },
+                            child: FeedCard(widget.item)),
+                      ),
+                      SizedBox(
+                        height: 32,
+                      ),
+                      CommentsControlBar(widget.item),
+                      SizedBox(
+                        height: 32,
+                      ),
+                    ],
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 8.0,
+                ]),
+              ),
+              SliverList(
+                delegate: model.commentsLoadingState == ViewState.Busy
+                    ? SliverChildListDelegate(
+                        <Widget>[
+                          Center(
+                            child: CircularProgressIndicator(),
                           ),
-                          InkWell(
-                              onTap: () {
-                                print('tap tap');
-                                if (widget.item.isSelf == false) {
-                                  print(widget.item.url);
-                                  _launchURL(context, widget.item.url);
-                                }
-                              },
-                              child: FeedCard(widget.item)),
                           SizedBox(
-                            height: 32,
-                          ),
-                          CommentsControlBar(widget.item),
-                          SizedBox(
-                            height: 32,
+                            height: 32.0,
                           ),
                         ],
+                      )
+                    : SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          var item = model.commentsList.elementAt(index);
+                          return CommentItem(
+                            item,
+                            widget.item.name,
+                            widget.item.id,
+                          );
+                        },
+                        childCount: model.commentsList.length,
                       ),
-                    ]),
-                  ),
-                  SliverList(
-                    delegate: model.commentsLoadingState == ViewState.Busy
-                        ? SliverChildListDelegate(
-                            <Widget>[
-                              Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              SizedBox(
-                                height: 32.0,
-                              ),
-                            ],
-                          )
-                        : SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              var item = model.commentsList.elementAt(index);
-                              return CommentItem(
-                                item,
-                                widget.item.name,
-                                widget.item.id,
-                              );
-                            },
-                            childCount: model.commentsList.length,
-                          ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        SizedBox(
-                          height: 32,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
-            );
-          },
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    SizedBox(
+                      height: 32,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
-  }
-
-  void _launchURL(BuildContext context, String url) async {
-    try {
-      await launch(
-        url,
-        option: new CustomTabsOption(
-          toolbarColor: Theme.of(context).primaryColor,
-          enableDefaultShare: true,
-          enableUrlBarHiding: true,
-          showPageTitle: true,
-          animation: new CustomTabsAnimation(
-            startEnter: 'slide_up',
-            startExit: 'android:anim/fade_out',
-            endEnter: 'android:anim/fade_in',
-            endExit: 'slide_down',
-          ),
-        ),
-      );
-    } catch (e) {
-      // An exception is thrown if browser app is not installed on Android device.
-      debugPrint(e.toString());
-    }
   }
 }
 

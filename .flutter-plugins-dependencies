@@ -1,0 +1,1 @@
+{"dependencyGraph":[{"name":"flutter_custom_tabs","dependencies":["url_launcher"]},{"name":"flutter_secure_storage","dependencies":[]},{"name":"path_provider","dependencies":[]},{"name":"shared_preferences","dependencies":[]},{"name":"sqflite","dependencies":[]},{"name":"url_launcher","dependencies":[]},{"name":"webview_flutter","dependencies":[]}]}

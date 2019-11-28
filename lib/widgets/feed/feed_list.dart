@@ -111,8 +111,8 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
                   Container(
                     color: MediaQuery.of(context).platformBrightness ==
                             Brightness.light
-                        ? Color.fromARGB(150, 255, 255, 255)
-                        : Color.fromARGB(150, 0, 0, 0),
+                        ? Color.fromARGB(200, 255, 255, 255)
+                        : Color.fromARGB(100, 0, 0, 0),
                   ),
                   Positioned(
                     top: 0,
@@ -158,40 +158,47 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
                           horizontal: 0.0,
                           vertical: 4.0,
                         ),
-                        child: InkWell(
-                          enableFeedback: true,
-                          onDoubleTap: () {
-                            if (item.isSelf == false) {
-                              launchURL(context, item.url);
-                            }
-                          },
-                          onTap: () {
-                            Provider.of<CommentsProvider>(context)
-                                .fetchComments(
-                              subredditName: item.subreddit,
-                              postId: item.id,
-                              sort: item.suggestedSort != null
-                                  ? ChangeCommentSortConvertToEnum[
-                                      item.suggestedSort]
-                                  : CommentSortTypes.Best,
-                            );
-                            Navigator.of(context).push(
-                              SlideUpRoute(
-                                page: BottomSheet(
-                                  enableDrag: false,
-                                  builder: (BuildContext context) {
-                                    return CommentsSheet(item);
-                                  },
-                                  onClosing: () {
-                                    if (Navigator.of(context).canPop()) {
-                                      Navigator.pop(context);
-                                    }
-                                  },
+                        child: Material(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: Theme.of(context).cardColor,
+                          elevation: 5.0,
+                          child: InkWell(
+                            enableFeedback: false,
+                            onDoubleTap: () {
+                              if (item.isSelf == false) {
+                                launchURL(context, item.url);
+                              }
+                            },
+                            onTap: () {
+                              Provider.of<CommentsProvider>(context)
+                                  .fetchComments(
+                                subredditName: item.subreddit,
+                                postId: item.id,
+                                sort: item.suggestedSort != null
+                                    ? ChangeCommentSortConvertToEnum[
+                                        item.suggestedSort]
+                                    : CommentSortTypes.Best,
+                              );
+                              Navigator.of(context).push(
+                                SlideUpRoute(
+                                  page: BottomSheet(
+                                    enableDrag: false,
+                                    builder: (BuildContext context) {
+                                      return CommentsSheet(item);
+                                    },
+                                    onClosing: () {
+//                                    if (Navigator.of(context).canPop() &&
+//                                        !Navigator.of(context)
+//                                            .userGestureInProgress) {
+//                                      Navigator.pop(context);
+//                                    }
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          child: FeedCard(item),
+                              );
+                            },
+                            child: FeedCard(item),
+                          ),
                         ),
                       );
                     },

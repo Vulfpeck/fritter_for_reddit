@@ -16,7 +16,7 @@ class TransparentHexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {
-      hexColor = "50" + hexColor;
+      hexColor = "20" + hexColor;
     }
     return int.parse(hexColor, radix: 16);
   }

@@ -5,8 +5,9 @@ class SlideUpRoute extends PageRouteBuilder {
   final Widget page;
   SlideUpRoute({this.page})
       : super(
-          opaque: false,
-          barrierColor: Colors.black26,
+          opaque: true,
+          barrierColor: Colors.black54,
+          transitionDuration: Duration(milliseconds: 450),
           pageBuilder: (
             BuildContext context,
             Animation<double> animation,

@@ -7,7 +7,7 @@ import '../secrets.dart';
 
 class SecureStorageHelper {
   final _storage = new FlutterSecureStorage();
-  Map<String, dynamic> map;
+  Map<String, dynamic> map = new Map();
 
   SecureStorageHelper();
   Future<void> init() async {
@@ -31,11 +31,11 @@ class SecureStorageHelper {
   }
 
   bool get signInStatus {
-    print(
-        "signin status: map key check" + map.containsKey('signIn').toString());
-    if (map != null)
-      return (map.containsKey('signedIn') && map['signedIn'] == "true");
-    else {
+    print("storage helper: signin status: map key check" +
+        map.containsKey('signedIn').toString());
+    if (map.containsKey('signedIn') && map['signedIn'] == "true") {
+      return true;
+    } else {
       return false;
     }
   }
@@ -65,8 +65,9 @@ class SecureStorageHelper {
       key: "lastTokenRefresh",
       value: DateTime.now().toIso8601String(),
     );
-
+    print("Storage helper: Update Credentials : " + map.toString());
     await fetchData();
+    print("Storage helper: Update Credentials : " + map.toString());
   }
 
   Future<void> updateAuthToken(String accessToken) async {

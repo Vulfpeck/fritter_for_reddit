@@ -46,7 +46,6 @@ class CommentsProvider with ChangeNotifier {
     String postId,
     CommentSortTypes sort,
   }) async {
-    //TODO: Change URL in case the user is not signed in
     await _storageHelper.init();
     String authToken = await _storageHelper.authToken;
     _commentsLoadingState = ViewState.Busy;
@@ -56,7 +55,7 @@ class CommentsProvider with ChangeNotifier {
     this.sort = sort;
     if (_storageHelper.signInStatus) {
       url =
-          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false&depth=3';
       try {
         final response = await http.get(
           url,
@@ -77,12 +76,9 @@ class CommentsProvider with ChangeNotifier {
           while (q.isNotEmpty) {
             var x = q.removeFirst();
             if (x.kind == CommentPojo.Kind.T1 ||
-                x.kind == CommentPojo.Kind.MORE) {
-//          print(" | " * x.data.depth + "-" + x.data.author)
+                (x.kind == CommentPojo.Kind.MORE) &&
+                    x.data.children.length != 0) {
               finalList.add(x);
-              if (x.kind == CommentPojo.Kind.MORE) {
-//            print(x.data.children);
-              }
             }
           }
 
@@ -96,7 +92,7 @@ class CommentsProvider with ChangeNotifier {
       }
     } else {
       url =
-          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false&depth=3';
       try {
         final response = await http.get(
           url,
@@ -116,7 +112,8 @@ class CommentsProvider with ChangeNotifier {
           while (q.isNotEmpty) {
             var x = q.removeFirst();
             if (x.kind == CommentPojo.Kind.T1 ||
-                x.kind == CommentPojo.Kind.MORE) {
+                (x.kind == CommentPojo.Kind.MORE) &&
+                    x.data.children.length != 0) {
 //          print(" | " * x.data.depth + "-" + x.data.author)
               finalList.add(x);
               if (x.kind == CommentPojo.Kind.MORE) {
@@ -257,11 +254,13 @@ class CommentsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  int collapseUncollapseComment(
-      {@required CommentPojo.Child comment, @required bool collapse}) {
-    int index = _commentsList.indexWhere((ele) {
-      return ele.data.id == comment.data.id;
-    });
+  Future<int> collapseUncollapseComment(
+      {@required CommentPojo.Child comment, @required bool collapse}) async {
+    int index = _commentsList.indexWhere(
+      (ele) {
+        return ele.data.id == comment.data.id;
+      },
+    );
     comment.data.collapse = collapse;
     comment.data.collapseParent = collapse;
     index++;
@@ -283,5 +282,47 @@ class CommentsProvider with ChangeNotifier {
     }
     notifyListeners();
     return count;
+  }
+
+  Future<bool> voteComment({@required String id, @required int dir}) async {
+    await _storageHelper.fetchData();
+    CommentPojo.Child item = _commentsList.firstWhere((v) {
+      return v.data.id.compareTo(id) == 0 ? true : false;
+    });
+    notifyListeners();
+    if (item.data.likes == true) {
+      item.data.score--;
+    } else if (item.data.likes == false) {
+      item.data.score++;
+    }
+    if (dir == 1) {
+      item.data.score++;
+      item.data.likes = true;
+    } else if (dir == -1) {
+      item.data.score--;
+      item.data.likes = false;
+    } else if (dir == 0) {
+      item.data.score =
+          item.data.likes == true ? item.data.score-- : item.data.score++;
+      item.data.likes = null;
+    }
+    String url = "https://oauth.reddit.com/api/vote";
+    final String authToken = await _storageHelper.authToken;
+    print(authToken);
+    http.Response voteResponse;
+    voteResponse = await http.post(
+      url + '?dir=$dir&id=$id&rank=2',
+      headers: {
+        'Authorization': 'bearer ' + authToken,
+        'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+      },
+    );
+
+    notifyListeners();
+    if (voteResponse.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

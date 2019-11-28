@@ -16,177 +16,187 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(child: Consumer<UserInformationProvider>(
-        builder: (BuildContext context, UserInformationProvider model, _) {
-      if (model.signedIn) {
-        if (model.state == ViewState.Busy) {
-          return Center(child: CircularProgressIndicator());
-        } else if (model.state == ViewState.Idle) {
-          return CustomScrollView(
-            physics: CustomBouncingScrollPhysics(),
-            slivers: <Widget>[
-              SliverAppBar(
-                backgroundColor: Colors.black12,
-                automaticallyImplyLeading: false,
-                expandedHeight: 150,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            model.userInformation.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline
-                                .copyWith(fontWeight: FontWeight.w500),
+    return Drawer(
+        elevation: 60,
+        child: Consumer<UserInformationProvider>(
+            builder: (BuildContext context, UserInformationProvider model, _) {
+          if (model.signedIn) {
+            if (model.state == ViewState.Busy) {
+              return Center(child: CircularProgressIndicator());
+            } else if (model.state == ViewState.Idle) {
+              return Container(
+                color: Theme.of(context).cardColor,
+                child: CustomScrollView(
+                  physics: CustomBouncingScrollPhysics(),
+                  slivers: <Widget>[
+                    SliverAppBar(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      automaticallyImplyLeading: false,
+                      expandedHeight: 150,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  model.userInformation.name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline
+                                      .copyWith(fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  (model.userInformation.linkKarma +
+                                              model
+                                                  .userInformation.commentKarma)
+                                          .toString() +
+                                      " Karma",
+                                  style: Theme.of(context).textTheme.subhead,
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    IconButton(
+                                      icon: Icon(Icons.refresh),
+                                      onPressed: model.performTokenRefresh,
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.beach_access),
+                                      onPressed: () {
+                                        performSignout(context);
+                                      },
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                          Text(
-                            (model.userInformation.linkKarma +
-                                        model.userInformation.commentKarma)
-                                    .toString() +
-                                " Karma",
-                            style: Theme.of(context).textTheme.subhead,
-                          ),
-                          Row(
-                            children: <Widget>[
-                              IconButton(
-                                icon: Icon(Icons.refresh),
-                                onPressed: model.performTokenRefresh,
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.beach_access),
-                                onPressed: () {
-                                  performSignout(context);
-                                },
-                              ),
-                            ],
-                          )
-                        ],
+                        ),
                       ),
                     ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          index = index - 2;
+                          if (index == -2) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 20.0),
+                              child: ListTile(
+                                title: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Goto subreddit',
+                                    fillColor: Colors.black12,
+                                    filled: true,
+                                    border: InputBorder.none,
+                                  ),
+                                  controller: _subredditGoController,
+                                  onSubmitted: (value) {
+                                    loadNewSubreddit(context, value);
+                                  },
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.arrow_forward,
+                                  ),
+                                  onPressed: () {
+                                    loadNewSubreddit(
+                                        context, _subredditGoController.text);
+                                  },
+                                ),
+                              ),
+                            );
+                          }
+                          if (index == -1) {
+                            return ListTile(
+                              title: Text(
+                                'Frontpage',
+                                style: Theme.of(context).textTheme.subhead,
+                              ),
+                              leading: CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/default_icon.png'),
+                                backgroundColor: Theme.of(context).accentColor,
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Provider.of<FeedProvider>(context)
+                                    .fetchPostsListing();
+                              },
+                            );
+                          }
+                          return ListTile(
+                            title: Text(
+                              model.userSubreddits.data.children[index]
+                                  .display_name,
+                              style: Theme.of(context).textTheme.subhead,
+                            ),
+                            leading: CircleAvatar(
+                              backgroundImage: model.userSubreddits.data
+                                          .children[index].community_icon !=
+                                      ""
+                                  ? CachedNetworkImageProvider(
+                                      model.userSubreddits.data.children[index]
+                                          .community_icon,
+                                    )
+                                  : model.userSubreddits.data.children[index]
+                                              .icon_img !=
+                                          ""
+                                      ? CachedNetworkImageProvider(
+                                          model.userSubreddits.data
+                                              .children[index].icon_img,
+                                        )
+                                      : AssetImage('assets/default_icon.png'),
+                              backgroundColor: model.userSubreddits.data
+                                          .children[index].primary_color ==
+                                      ""
+                                  ? Theme.of(context).accentColor
+                                  : HexColor(
+                                      model.userSubreddits.data.children[index]
+                                          .primary_color,
+                                    ),
+                            ),
+                            onTap: () {
+                              print(model.userSubreddits.data.children[index]
+                                  .display_name);
+                              Provider.of<FeedProvider>(context)
+                                  .fetchPostsListing(
+                                      currentSubreddit: model.userSubreddits
+                                          .data.children[index].display_name);
+                              if (Scaffold.of(context).isDrawerOpen) {
+                                Navigator.pop(context);
+                              }
+                            },
+                          );
+                        },
+                        childCount:
+                            model.userSubreddits.data.children.length + 2,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          } else {
+            return SafeArea(
+              child: ListTile(
+                title: Text("Sign into reddit"),
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).accentColor,
+                  child: Icon(
+                    Icons.person_outline,
                   ),
                 ),
+                onTap: () {
+                  authenticateUser(model, context);
+                },
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    index = index - 2;
-                    if (index == -2) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20.0),
-                        child: ListTile(
-                          title: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Goto subreddit',
-                              fillColor: Colors.black12,
-                              filled: true,
-                              border: InputBorder.none,
-                            ),
-                            controller: _subredditGoController,
-                            onSubmitted: (value) {
-                              loadNewSubreddit(context, value);
-                            },
-                          ),
-                          trailing: IconButton(
-                            icon: Icon(
-                              Icons.arrow_forward,
-                            ),
-                            onPressed: () {
-                              loadNewSubreddit(
-                                  context, _subredditGoController.text);
-                            },
-                          ),
-                        ),
-                      );
-                    }
-                    if (index == -1) {
-                      return ListTile(
-                        title: Text(
-                          'Frontpage',
-                          style: Theme.of(context).textTheme.subhead,
-                        ),
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/default_icon.png'),
-                          backgroundColor: Theme.of(context).accentColor,
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          Provider.of<FeedProvider>(context)
-                              .fetchPostsListing();
-                        },
-                      );
-                    }
-                    return ListTile(
-                      title: Text(
-                        model.userSubreddits.data.children[index].display_name,
-                        style: Theme.of(context).textTheme.subhead,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundImage: model.userSubreddits.data
-                                    .children[index].community_icon !=
-                                ""
-                            ? CachedNetworkImageProvider(
-                                model.userSubreddits.data.children[index]
-                                    .community_icon,
-                              )
-                            : model.userSubreddits.data.children[index]
-                                        .icon_img !=
-                                    ""
-                                ? CachedNetworkImageProvider(
-                                    model.userSubreddits.data.children[index]
-                                        .icon_img,
-                                  )
-                                : AssetImage('assets/default_icon.png'),
-                        backgroundColor: model.userSubreddits.data
-                                    .children[index].primary_color ==
-                                ""
-                            ? Theme.of(context).accentColor
-                            : HexColor(
-                                model.userSubreddits.data.children[index]
-                                    .primary_color,
-                              ),
-                      ),
-                      onTap: () {
-                        print(model
-                            .userSubreddits.data.children[index].display_name);
-                        Provider.of<FeedProvider>(context).fetchPostsListing(
-                            currentSubreddit: model.userSubreddits.data
-                                .children[index].display_name);
-                        if (Scaffold.of(context).isDrawerOpen) {
-                          Navigator.pop(context);
-                        }
-                      },
-                    );
-                  },
-                  childCount: model.userSubreddits.data.children.length + 2,
-                ),
-              ),
-            ],
-          );
-        }
-      } else {
-        return SafeArea(
-          child: ListTile(
-            title: Text("Sign into reddit"),
-            leading: CircleAvatar(
-              backgroundColor: Theme.of(context).accentColor,
-              child: Icon(
-                Icons.person_outline,
-              ),
-            ),
-            onTap: () {
-              authenticateUser(model, context);
-            },
-          ),
-        );
-      }
-      return Container();
-    }));
+            );
+          }
+          return Container();
+        }));
   }
 
   Future<void> authenticateUser(
@@ -208,7 +218,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text('Authentication failed bitches'),
+            title: Text('Sign '),
             actions: <Widget>[
               FlatButton(
                 child: Text('Cancel'),

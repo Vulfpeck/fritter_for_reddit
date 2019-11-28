@@ -19,30 +19,30 @@ class FeedCard extends StatefulWidget {
 class _FeedCardState extends State<FeedCard> {
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 5,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          FeedCardTitle(
-            title: widget.data.title,
-            stickied: widget.data.stickied,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: widget.data.isSelf &&
-                    widget.data.preview == null &&
-                    widget.data.selftextHtml != null
-                ? FeedCardBodySelfText(selftextHtml: widget.data.selftextHtml)
-                : widget.data.preview != null
-                    ? FeedCardBodyImage(widget.data.preview.images)
-                    : Container(),
-          ),
-          PostControls(widget.data),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        FeedCardTitle(
+          title: widget.data.title,
+          stickied: widget.data.stickied,
+        ),
+        SizedBox(
+          height: 8.0,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: widget.data.isSelf &&
+                  widget.data.preview == null &&
+                  widget.data.selftextHtml != null
+              ? FeedCardBodySelfText(selftextHtml: widget.data.selftextHtml)
+              : widget.data.preview != null
+                  ? FeedCardBodyImage(widget.data.preview.images)
+                  : Container(),
+        ),
+        PostControls(widget.data),
+      ],
     );
   }
 }
@@ -170,9 +170,22 @@ class StickyTag extends StatelessWidget {
             child: Container(
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
-                child: Text('Stickied'),
+                child: Text(
+                  'Stickied',
+                  style: TextStyle(
+                    color: MediaQuery.of(context).platformBrightness ==
+                            Brightness.dark
+                        ? Colors.green.shade50
+                        : Colors.green.shade900,
+                  ),
+                ),
               ),
-              color: Colors.greenAccent,
+              decoration: BoxDecoration(
+                  color: MediaQuery.of(context).platformBrightness ==
+                          Brightness.dark
+                      ? Colors.green.shade900
+                      : Colors.green.shade100,
+                  borderRadius: BorderRadius.circular(4.0)),
             ),
           )
         : Padding(

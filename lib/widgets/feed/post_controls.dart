@@ -152,10 +152,15 @@ class _PostControlsState extends State<PostControls> {
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
                     onPressed: () {
-                      if (widget.postData.likes == true) {
-                        model.votePost(id: widget.postData.id, dir: 0);
+                      if (Provider.of<UserInformationProvider>(context)
+                          .signedIn) {
+                        if (widget.postData.likes == true) {
+                          model.votePost(id: widget.postData.id, dir: 0);
+                        } else {
+                          model.votePost(id: widget.postData.id, dir: 1);
+                        }
                       } else {
-                        model.votePost(id: widget.postData.id, dir: 1);
+                        buildSnackBar(context);
                       }
                     },
                     color: widget.postData.likes == null ||
@@ -184,10 +189,15 @@ class _PostControlsState extends State<PostControls> {
                         ? Colors.grey
                         : Colors.purple,
                     onPressed: () {
-                      if (widget.postData.likes == false) {
-                        model.votePost(id: widget.postData.id, dir: 0);
+                      if (Provider.of<UserInformationProvider>(context)
+                          .signedIn) {
+                        if (widget.postData.likes == false) {
+                          model.votePost(id: widget.postData.id, dir: 0);
+                        } else {
+                          model.votePost(id: widget.postData.id, dir: -1);
+                        }
                       } else {
-                        model.votePost(id: widget.postData.id, dir: -1);
+                        buildSnackBar(context);
                       }
                     },
                     splashColor: Colors.deepPurple,
