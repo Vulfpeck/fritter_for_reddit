@@ -9,15 +9,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FeedList(),
       drawer: LeftDrawer(),
+      drawerScrimColor: Theme.of(context).accentColor.withOpacity(0.2),
     );
   }
 }

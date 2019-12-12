@@ -17,7 +17,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
 
   initState() {
     if (widget.item.suggestedSort != null && widget.item.suggestedSort != "") {
-      _selectedSort = ChangeCommentSortConvertToEnum[widget.item.suggestedSort];
+      _selectedSort = changeCommentSortConvertToEnum[widget.item.suggestedSort];
     } else {
       _selectedSort = CommentSortTypes.Best;
     }
@@ -28,75 +28,82 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      key: key,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        SizedBox(width: 16),
-        FlatButton.icon(
-          icon: Icon(Icons.refresh),
-          label: Text('Refresh'),
-          onPressed: () {
-            Provider.of<CommentsProvider>(context).fetchComments(
-              subredditName: widget.item.subreddit,
-              postId: widget.item.id,
-              sort: _selectedSort,
-            );
-          },
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        DropdownButton<String>(
-          underline: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Sort By',
-                style: Theme.of(context).textTheme.caption,
+    return Material(
+      child: Container(
+        color: Theme.of(context).cardColor,
+        child: Row(
+          key: key,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            SizedBox(width: 16),
+            FlatButton.icon(
+              icon: Icon(Icons.refresh),
+              colorBrightness: MediaQuery.of(context).platformBrightness,
+              label: Text('Refresh'),
+              onPressed: () {
+                Provider.of<CommentsProvider>(context).fetchComments(
+                  subredditName: widget.item.subreddit,
+                  postId: widget.item.id,
+                  sort: _selectedSort,
+                );
+              },
+            ),
+            Expanded(
+              child: Container(),
+            ),
+            DropdownButton<String>(
+              underline: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Sort By',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  Text(
+                    capitalizeString(
+                      changeCommentSortConvertToString[_selectedSort],
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                capitalizeString(
-                  ChangeCommentSortConvertToString[_selectedSort],
-                ),
+              icon: Icon(
+                Icons.sort,
+                color: Colors.grey,
               ),
-            ],
-          ),
-          icon: Icon(
-            Icons.sort,
-            color: Colors.grey,
-          ),
-          isExpanded: false,
-          isDense: false,
-          onChanged: (value) {
-            setState(() {
-              _selectedSort = ChangeCommentSortConvertToEnum[value];
-            });
-            Provider.of<CommentsProvider>(context).fetchComments(
-              subredditName: widget.item.subreddit,
-              postId: widget.item.id,
-              sort: _selectedSort,
-            );
-          },
-          items: <String>[
-            ChangeCommentSortConvertToString[CommentSortTypes.Best],
-            ChangeCommentSortConvertToString[CommentSortTypes.Top],
-            ChangeCommentSortConvertToString[CommentSortTypes.New],
-            ChangeCommentSortConvertToString[CommentSortTypes.Controversial],
-            ChangeCommentSortConvertToString[CommentSortTypes.Old],
-            ChangeCommentSortConvertToString[CommentSortTypes.QA],
-          ].map((String value) {
-            return new DropdownMenuItem<String>(
-              value: value.toString(),
-              child: new Text(
-                capitalizeString(value),
-              ),
-            );
-          }).toList(),
+              isExpanded: false,
+              isDense: false,
+              onChanged: (value) {
+                setState(() {
+                  _selectedSort = changeCommentSortConvertToEnum[value];
+                });
+                Provider.of<CommentsProvider>(context).fetchComments(
+                  subredditName: widget.item.subreddit,
+                  postId: widget.item.id,
+                  sort: _selectedSort,
+                );
+              },
+              items: <String>[
+                changeCommentSortConvertToString[CommentSortTypes.Best],
+                changeCommentSortConvertToString[CommentSortTypes.Top],
+                changeCommentSortConvertToString[CommentSortTypes.New],
+                changeCommentSortConvertToString[
+                    CommentSortTypes.Controversial],
+                changeCommentSortConvertToString[CommentSortTypes.Old],
+                changeCommentSortConvertToString[CommentSortTypes.QA],
+              ].map((String value) {
+                return new DropdownMenuItem<String>(
+                  value: value.toString(),
+                  child: new Text(
+                    capitalizeString(value),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(width: 16.0),
+          ],
         ),
-        SizedBox(width: 16.0),
-      ],
+      ),
     );
   }
 

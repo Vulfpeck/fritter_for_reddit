@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_provider_app/helpers/misc_helper_methods.dart';
+import 'package:flutter_provider_app/helpers/comment_color_annotations/colors.dart';
+import 'package:flutter_provider_app/helpers/functions/relative_dart_conversion.dart';
 import 'package:flutter_provider_app/models/comment_chain/comment.dart'
     as CommentPojo;
 import 'package:flutter_provider_app/pages/subreddit_feed.dart';
@@ -26,34 +29,37 @@ class _CommentItemState extends State<CommentItem>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        SizedBox(
-          width: 16.0 * widget._comment.data.depth,
-        ),
-        Expanded(
-          child: AnimatedSize(
-            vsync: this,
-            child: widget._comment.data.collapseParent == true
-                ? CollapsedCommentParent(comment: widget._comment)
-                : widget._comment.data.collapse == true
-                    ? Container()
-                    : widget._comment.kind == CommentPojo.Kind.MORE
-                        ? MoreCommentKind(
-                            comment: widget._comment,
-                            name: widget.name,
-                          )
-                        : CommentBody(
-                            comment: widget._comment,
-                          ),
-            duration: Duration(
-              milliseconds: 250,
-            ),
-            curve: Curves.linearToEaseOut,
+    return Container(
+      color: Theme.of(context).cardColor,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          SizedBox(
+            width: 16.0 * widget._comment.data.depth,
           ),
-        ),
-      ],
+          Expanded(
+            child: AnimatedSize(
+              vsync: this,
+              child: widget._comment.data.collapseParent == true
+                  ? CollapsedCommentParent(comment: widget._comment)
+                  : widget._comment.data.collapse == true
+                      ? Container()
+                      : widget._comment.kind == CommentPojo.Kind.MORE
+                          ? MoreCommentKind(
+                              comment: widget._comment,
+                              name: widget.name,
+                            )
+                          : CommentBody(
+                              comment: widget._comment,
+                            ),
+              duration: Duration(
+                milliseconds: 250,
+              ),
+              curve: Curves.linearToEaseOut,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -79,10 +85,10 @@ class CollapsedCommentParent extends StatelessWidget {
               onTap: () {
                 collapse(comment, context);
               },
-              title: Text('Comment collapsed'),
+              title: Text('Comment Collapsed'),
               subtitle: Text(
                 model.collapsedChildrenCount[comment.data.id].toString() +
-                    " more comments",
+                    " children",
               ),
               trailing: Icon(Icons.expand_more),
             ),
@@ -116,8 +122,15 @@ class _CommentBodyState extends State<CommentBody>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).cardColor,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: colorsRainbow.elementAt(widget.comment.data.depth % 6),
+            width: widget.comment.data.depth != 0 ? 2 : 0,
+          ),
+        ),
+      ),
       child: InkWell(
         onLongPress: isExpanded
             ? null

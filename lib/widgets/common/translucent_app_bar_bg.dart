@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/hex_color.dart';
+import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 
 class TranslucentAppBarBackground extends StatefulWidget {
   @override
@@ -18,7 +18,7 @@ class _TranslucentAppBarBackgroundState
     var prov = Provider.of<FeedProvider>(context);
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
-        var headerColor = TransparentHexColor("#ffffff");
+        var headerColor = TransparentHexColor("#000000");
 
         if (prov.subredditInformationEntity != null &&
             prov.subredditInformationEntity.data.bannerBackgroundColor != "") {

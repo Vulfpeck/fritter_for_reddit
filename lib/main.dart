@@ -45,12 +45,12 @@ class MyTestApp extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        accentColor: Colors.orange.shade200,
+        accentColor: Colors.lightBlueAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
-              surface: Colors.brown.shade900,
-              onSurface: Colors.yellow.shade100,
-              secondary: Colors.grey.shade800,
+              surface: Colors.lightBlue.shade900,
+              onSurface: Colors.lightBlue.shade100,
+              secondary: Colors.lightBlue.shade800,
             ),
       ),
     );

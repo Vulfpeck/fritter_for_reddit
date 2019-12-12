@@ -10,7 +10,7 @@ enum CommentSortTypes {
   Best,
 }
 
-Map<CommentSortTypes, String> ChangeCommentSortConvertToString = {
+Map<CommentSortTypes, String> changeCommentSortConvertToString = {
   CommentSortTypes.Confidence: 'confidence',
   CommentSortTypes.Top: 'top',
   CommentSortTypes.New: 'new',
@@ -22,7 +22,7 @@ Map<CommentSortTypes, String> ChangeCommentSortConvertToString = {
   CommentSortTypes.Best: 'best',
 };
 
-Map<String, CommentSortTypes> ChangeCommentSortConvertToEnum = {
+Map<String, CommentSortTypes> changeCommentSortConvertToEnum = {
   'confidence': CommentSortTypes.Confidence,
   'top': CommentSortTypes.Top,
   'new': CommentSortTypes.New,

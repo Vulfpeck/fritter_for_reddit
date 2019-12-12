@@ -14,91 +14,137 @@ class CommentsSheet extends StatefulWidget {
   _CommentsSheetState createState() => _CommentsSheetState();
 }
 
-class _CommentsSheetState extends State<CommentsSheet> {
+class _CommentsSheetState extends State<CommentsSheet>
+    with TickerProviderStateMixin {
+  ScrollController _scrollController;
+  double _scaffoldScale = 1.0;
+  @override
+  void initState() {
+    _scrollController = new ScrollController()
+      ..addListener(() {
+//        if (_scrollController.position.atEdge) {
+//          _scrollController.position.activity
+//              .dispatchOverscrollNotification(metrics, context, overscroll);
+//        }
+      });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     print("Post id is " + widget.item.name);
-    return Consumer(
-      builder: (BuildContext context, CommentsProvider model, _) {
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: <Widget>[
-              SliverPersistentHeader(
-                pinned: true,
-                floating: true,
-                delegate: _TranslucentSliverAppBarDelegate(
-                  MediaQuery.of(context).padding,
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 8.0,
+    return Transform.scale(
+      scale: _scaffoldScale,
+      child: Consumer(
+        builder: (BuildContext context, CommentsProvider model, _) {
+          return Scaffold(
+            body: Hero(
+              tag: widget.item.id,
+              child: Material(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: <Widget>[
+                    SliverPersistentHeader(
+                      pinned: true,
+                      floating: true,
+                      delegate: _TranslucentSliverAppBarDelegate(
+                        MediaQuery.of(context).padding,
                       ),
-                      Material(
-                        elevation: 5,
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: InkWell(
-                            onTap: () {
-                              print('tap tap');
-                              if (widget.item.isSelf == false) {
-                                print(widget.item.url);
-                                launchURL(context, widget.item.url);
-                              }
-                            },
-                            child: FeedCard(widget.item)),
-                      ),
-                      SizedBox(
-                        height: 32,
-                      ),
-                      CommentsControlBar(widget.item),
-                      SizedBox(
-                        height: 32,
-                      ),
-                    ],
-                  ),
-                ]),
-              ),
-              SliverList(
-                delegate: model.commentsLoadingState == ViewState.Busy
-                    ? SliverChildListDelegate(
-                        <Widget>[
-                          Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate([
+                        Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 16.0,
+                            ),
+                            Material(
+                              color: Theme.of(context).cardColor,
+                              child: InkWell(
+                                onTap: () {
+                                  print('tap tap');
+                                  if (widget.item.isSelf == false) {
+                                    print(widget.item.url);
+                                    launchURL(context, widget.item.url);
+                                  }
+                                },
+                                child: FeedCard(widget.item),
+                              ),
+                            ),
+                            CommentsControlBar(widget.item),
+                          ],
+                        ),
+                      ]),
+                    ),
+                    SliverList(
+                      delegate: model.commentsLoadingState == ViewState.Busy
+                          ? SliverChildListDelegate(
+                              <Widget>[
+                                SizedBox(
+                                  height: 64.0,
+                                ),
+                                Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                SizedBox(
+                                  height: 32.0,
+                                ),
+                              ],
+                            )
+                          : model.commentsList == null ||
+                                  model.commentsList.length == 0
+                              ? SliverChildListDelegate(
+                                  <Widget>[
+                                    SizedBox(
+                                      height: 64.0,
+                                    ),
+                                    Center(
+                                      child: Icon(Icons.info_outline),
+                                    ),
+                                    Center(
+                                      child: Text("No Comments"),
+                                    ),
+                                    SizedBox(
+                                      height: 32.0,
+                                    ),
+                                  ],
+                                )
+                              : SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    var item =
+                                        model.commentsList.elementAt(index);
+                                    return CommentItem(
+                                      item,
+                                      widget.item.name,
+                                      widget.item.id,
+                                    );
+                                  },
+                                  childCount: model.commentsList.length,
+                                ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
                           SizedBox(
-                            height: 32.0,
+                            height: 32,
                           ),
                         ],
-                      )
-                    : SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          var item = model.commentsList.elementAt(index);
-                          return CommentItem(
-                            item,
-                            widget.item.name,
-                            widget.item.id,
-                          );
-                        },
-                        childCount: model.commentsList.length,
                       ),
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    SizedBox(
-                      height: 32,
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }

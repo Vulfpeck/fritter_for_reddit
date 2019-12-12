@@ -19,30 +19,33 @@ class FeedCard extends StatefulWidget {
 class _FeedCardState extends State<FeedCard> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        FeedCardTitle(
-          title: widget.data.title,
-          stickied: widget.data.stickied,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          child: widget.data.isSelf &&
-                  widget.data.preview == null &&
-                  widget.data.selftextHtml != null
-              ? FeedCardBodySelfText(selftextHtml: widget.data.selftextHtml)
-              : widget.data.preview != null
-                  ? FeedCardBodyImage(widget.data.preview.images)
-                  : Container(),
-        ),
-        PostControls(widget.data),
-      ],
+    return Material(
+      color: Theme.of(context).cardColor,
+      elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          FeedCardTitle(
+            title: widget.data.title,
+            stickied: widget.data.stickied,
+          ),
+          Container(
+            child: widget.data.isSelf &&
+                    widget.data.preview == null &&
+                    widget.data.selftextHtml != null
+                ? FeedCardBodySelfText(selftextHtml: widget.data.selftextHtml)
+                : widget.data.preview != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0, top: 20.0),
+                        child: FeedCardBodyImage(widget.data.preview.images),
+                      )
+                    : Container(),
+          ),
+          PostControls(widget.data),
+        ],
+      ),
     );
   }
 }
@@ -72,10 +75,10 @@ class _FeedCardTitleState extends State<FeedCardTitle> {
             children: <Widget>[
               Text(
                 _htmlUnescape.convert(widget.title),
-                style: Theme.of(context)
-                    .textTheme
-                    .title
-                    .copyWith(fontWeight: FontWeight.w500),
+                style: Theme.of(context).textTheme.subhead.copyWith(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18.0,
+                    ),
               ),
             ],
           ),

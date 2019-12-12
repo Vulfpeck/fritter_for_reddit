@@ -46,11 +46,11 @@ class CommentsProvider with ChangeNotifier {
     String postId,
     CommentSortTypes sort,
   }) async {
-    await _storageHelper.init();
-    String authToken = await _storageHelper.authToken;
     _commentsLoadingState = ViewState.Busy;
     notifyListeners();
-    String sortString = ChangeCommentSortConvertToString[sort];
+    await _storageHelper.init();
+    String authToken = await _storageHelper.authToken;
+    String sortString = changeCommentSortConvertToString[sort];
     String url;
     this.sort = sort;
     if (_storageHelper.signInStatus) {
@@ -159,7 +159,7 @@ class CommentsProvider with ChangeNotifier {
     if (_storageHelper.signInStatus) {
       String authToken = await _storageHelper.authToken;
       final url =
-          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}&depth=2';
+          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}&depth=2';
       try {
         final response = await http.get(
           url,
@@ -204,7 +204,7 @@ class CommentsProvider with ChangeNotifier {
       }
     } else {
       final url =
-          'https://api.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$ChangeCommentSortConvertToString[this.sort]}';
+          'https://api.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}';
       try {
         final response = await http.get(
           url,

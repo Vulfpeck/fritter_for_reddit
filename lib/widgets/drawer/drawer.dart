@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/hex_color.dart';
+import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/providers/feed_provider.dart';
 import 'package:flutter_provider_app/secrets.dart';
 import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';

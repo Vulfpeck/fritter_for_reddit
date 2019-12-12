@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/custom_animated_route.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
@@ -99,37 +98,43 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
               ),
             ],
             pinned: true,
-            snap: true,
-            floating: true,
+            snap: false,
+            floating: false,
             primary: true,
             elevation: 0,
             brightness: MediaQuery.of(context).platformBrightness,
             backgroundColor: Colors.transparent,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: <Widget>[
-                  Container(
-                    color: MediaQuery.of(context).platformBrightness ==
-                            Brightness.light
-                        ? Color.fromARGB(200, 255, 255, 255)
-                        : Color.fromARGB(100, 0, 0, 0),
+            flexibleSpace: model.subredditInformationError
+                ? FlexibleSpaceBar(
+                    background: Container(
+                      color: Theme.of(context).accentColor.withOpacity(0.2),
+                    ),
+                  )
+                : FlexibleSpaceBar(
+                    background: Stack(
+                      children: <Widget>[
+                        Container(
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.light
+                              ? Color.fromARGB(200, 255, 255, 255)
+                              : Color.fromARGB(100, 0, 0, 0),
+                        ),
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: model.state == ViewState.Busy
+                              ? Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : TranslucentAppBarBackground(),
+                        ),
+                      ],
+                    ),
                   ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: model.state == ViewState.Busy
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : TranslucentAppBarBackground(),
-                  ),
-                ],
-              ),
-            ),
             expandedHeight:
-                model.currentPage == CurrentPage.FrontPage ? 150 : 200,
+                model.currentPage == CurrentPage.FrontPage ? 144 : 200,
           ),
 //          SliverPersistentHeader(
 //            delegate:
@@ -139,82 +144,88 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
 //          ),
 
           SliverList(
-            delegate: model.state == ViewState.Idle &&
-                    Provider.of<UserInformationProvider>(context).state ==
-                        ViewState.Idle
-                ? SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      if (index == model.postFeed.data.children.length) {
-                        return model.loadMorePostsState == ViewState.Busy
-                            ? ListTile(
-                                title:
-                                    Center(child: CircularProgressIndicator()),
-                              )
-                            : Container();
-                      }
-                      var item = model.postFeed.data.children[index].data;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 0.0,
-                          vertical: 4.0,
-                        ),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(8.0),
-                          color: Theme.of(context).cardColor,
-                          elevation: 5.0,
-                          child: InkWell(
-                            enableFeedback: false,
-                            onDoubleTap: () {
-                              if (item.isSelf == false) {
-                                launchURL(context, item.url);
-                              }
-                            },
-                            onTap: () {
-                              Provider.of<CommentsProvider>(context)
-                                  .fetchComments(
-                                subredditName: item.subreddit,
-                                postId: item.id,
-                                sort: item.suggestedSort != null
-                                    ? ChangeCommentSortConvertToEnum[
-                                        item.suggestedSort]
-                                    : CommentSortTypes.Best,
-                              );
-                              Navigator.of(context).push(
-                                SlideUpRoute(
-                                  page: BottomSheet(
-                                    enableDrag: false,
-                                    builder: (BuildContext context) {
-                                      return CommentsSheet(item);
-                                    },
-                                    onClosing: () {
-//                                    if (Navigator.of(context).canPop() &&
-//                                        !Navigator.of(context)
-//                                            .userGestureInProgress) {
-//                                      Navigator.pop(context);
-//                                    }
-                                    },
-                                  ),
+            delegate: (model.subredditInformationError ||
+                    model.feedInformationError)
+                ? SliverChildListDelegate([
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Icon(Icons.error_outline),
+                        Text("Couldn't Load subreddit")
+                      ],
+                    )
+                  ])
+                : model.state == ViewState.Idle &&
+                        Provider.of<UserInformationProvider>(context).state ==
+                            ViewState.Idle
+                    ? SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          if (index == model.postFeed.data.children.length) {
+                            return model.loadMorePostsState == ViewState.Busy
+                                ? ListTile(
+                                    title: Center(
+                                        child: CircularProgressIndicator()),
+                                  )
+                                : Container();
+                          }
+                          var item = model.postFeed.data.children[index].data;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 0.0,
+                              vertical: 8.0,
+                            ),
+                            child: Material(
+                              borderRadius: BorderRadius.circular(0.0),
+                              color: Theme.of(context).cardColor,
+                              child: InkWell(
+                                enableFeedback: false,
+                                onDoubleTap: () {
+                                  if (item.isSelf == false) {
+                                    launchURL(context, item.url);
+                                  }
+                                },
+                                onTap: () {
+                                  Provider.of<CommentsProvider>(context)
+                                      .fetchComments(
+                                    subredditName: item.subreddit,
+                                    postId: item.id,
+                                    sort: item.suggestedSort != null
+                                        ? changeCommentSortConvertToEnum[
+                                            item.suggestedSort]
+                                        : CommentSortTypes.Best,
+                                  );
+                                  Navigator.of(context).push(
+//                                    SlideUpRoute(
+//                                      page: CommentsSheet(item),
+//                                    ),
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                        return CommentsSheet(item);
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: Hero(
+                                  child: FeedCard(item),
+                                  tag: item.id,
                                 ),
-                              );
-                            },
-                            child: FeedCard(item),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: model.postFeed.data.children.length + 1,
-                  )
-                : SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Container(
-                        height: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                    childCount: 1,
-                  ),
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: model.postFeed.data.children.length + 1,
+                      )
+                    : SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return Container(
+                            height: MediaQuery.of(context).size.width,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        childCount: 1,
+                      ),
           )
         ],
       );
