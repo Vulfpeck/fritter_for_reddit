@@ -6,6 +6,7 @@
 3. Create a string 
 
 ```String CLIENT_ID="Your application ID here";```
+
 4. Build and run!
 
 ### Images
