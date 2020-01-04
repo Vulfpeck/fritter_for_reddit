@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
@@ -6,50 +9,59 @@ import 'package:flutter_provider_app/widgets/comments/comment_list_item.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 
-class CommentsSheet extends StatefulWidget {
+class CommentsSheet extends StatelessWidget {
   final PostsFeedDataChildrenData item;
   CommentsSheet(this.item);
 
   @override
-  _CommentsSheetState createState() => _CommentsSheetState();
-}
-
-class _CommentsSheetState extends State<CommentsSheet>
-    with TickerProviderStateMixin {
-  ScrollController _scrollController;
-  double _scaffoldScale = 1.0;
-  @override
-  void initState() {
-    _scrollController = new ScrollController()
-      ..addListener(() {
-//        if (_scrollController.position.atEdge) {
-//          _scrollController.position.activity
-//              .dispatchOverscrollNotification(metrics, context, overscroll);
-//        }
-      });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print("Post id is " + widget.item.name);
-    return Transform.scale(
-      scale: _scaffoldScale,
+    print("Post id is " + item.name);
+    return Dismissible(
+      direction: DismissDirection.startToEnd,
+      movementDuration: Duration(milliseconds: 150),
+      background: Stack(
+        children: <Widget>[
+          Positioned(
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  alignment: Alignment.centerLeft,
+                  child: Material(
+                    color: Colors.black.withOpacity(0.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(48),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Icon(
+                        Icons.arrow_back,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      onDismissed: (direction) {
+        Navigator.pop(context);
+      },
+      key: Key("test"),
       child: Consumer(
         builder: (BuildContext context, CommentsProvider model, _) {
           return Scaffold(
             body: Hero(
-              tag: widget.item.id,
+              tag: item.id,
               child: Material(
-                color: Theme.of(context).scaffoldBackgroundColor,
+                color: Colors.transparent,
                 child: CustomScrollView(
-                  controller: _scrollController,
                   slivers: <Widget>[
                     SliverPersistentHeader(
                       pinned: true,
@@ -70,15 +82,17 @@ class _CommentsSheetState extends State<CommentsSheet>
                               child: InkWell(
                                 onTap: () {
                                   print('tap tap');
-                                  if (widget.item.isSelf == false) {
-                                    print(widget.item.url);
-                                    launchURL(context, widget.item.url);
+                                  if (item.isSelf == false) {
+                                    print(item.url);
+                                    launchURL(context, item.url);
                                   }
                                 },
-                                child: FeedCard(widget.item),
+                                child: FeedCard(item),
                               ),
                             ),
-                            CommentsControlBar(widget.item),
+                            Divider(),
+                            CommentsControlBar(item),
+                            Divider(),
                           ],
                         ),
                       ]),
@@ -119,11 +133,11 @@ class _CommentsSheetState extends State<CommentsSheet>
                               : SliverChildBuilderDelegate(
                                   (BuildContext context, int index) {
                                     var item =
-                                        model.commentsList.elementAt(index);
+                                        model.commentsList.elementAt((index));
                                     return CommentItem(
                                       item,
-                                      widget.item.name,
-                                      widget.item.id,
+                                      item.data.name,
+                                      item.data.id,
                                     );
                                   },
                                   childCount: model.commentsList.length,

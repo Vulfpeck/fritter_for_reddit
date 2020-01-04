@@ -4,7 +4,6 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/providers/feed_provider.dart';
 import 'package:flutter_provider_app/secrets.dart';
-import 'package:flutter_provider_app/widgets/common/customScrollPhysics.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -27,7 +26,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
               return Container(
                 color: Theme.of(context).cardColor,
                 child: CustomScrollView(
-                  physics: CustomBouncingScrollPhysics(),
                   slivers: <Widget>[
                     SliverAppBar(
                       backgroundColor: Theme.of(context).colorScheme.secondary,

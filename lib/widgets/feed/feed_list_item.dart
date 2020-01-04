@@ -6,59 +6,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
+import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-class FeedCard extends StatefulWidget {
+class FeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
   FeedCard(this.data);
-  @override
-  _FeedCardState createState() => _FeedCardState();
-}
 
-class _FeedCardState extends State<FeedCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).cardColor,
-      elevation: 0,
+      color: Colors.transparent,
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          FeedCardTitle(
-            title: widget.data.title,
-            stickied: widget.data.stickied,
+          Material(
+            color: Colors.transparent,
+            child: FeedCardTitle(
+              title: data.title,
+              stickied: data.stickied,
+            ),
           ),
-          Container(
-            child: widget.data.isSelf &&
-                    widget.data.preview == null &&
-                    widget.data.selftextHtml != null
-                ? FeedCardBodySelfText(selftextHtml: widget.data.selftextHtml)
-                : widget.data.preview != null
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0, top: 20.0),
-                        child: FeedCardBodyImage(widget.data.preview.images),
-                      )
-                    : Container(),
+          Material(
+            color: Colors.transparent,
+            child: Container(
+              child: data.isSelf &&
+                      data.preview == null &&
+                      data.selftextHtml != null
+                  ? FeedCardBodySelfText(selftextHtml: data.selftextHtml)
+                  : data.preview != null
+                      ? Padding(
+                          padding:
+                              const EdgeInsets.only(bottom: 16.0, top: 16.0),
+                          child: FeedCardBodyImage(data.preview.images),
+                        )
+                      : Container(),
+            ),
           ),
-          PostControls(widget.data),
+          PostControls(data),
         ],
       ),
     );
   }
 }
 
-class FeedCardTitle extends StatefulWidget {
+class FeedCardTitle extends StatelessWidget {
   final String title;
   final bool stickied;
   FeedCardTitle({this.title, this.stickied});
-  @override
-  _FeedCardTitleState createState() => _FeedCardTitleState();
-}
 
-class _FeedCardTitleState extends State<FeedCardTitle> {
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
   @override
   Widget build(BuildContext context) {
@@ -67,20 +66,20 @@ class _FeedCardTitleState extends State<FeedCardTitle> {
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        StickyTag(widget.stickied),
+        StickyTag(stickied),
         Padding(
-          padding: const EdgeInsets.only(bottom: 0.0, left: 16.0, right: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                _htmlUnescape.convert(widget.title),
-                style: Theme.of(context).textTheme.subhead.copyWith(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18.0,
-                    ),
-              ),
-            ],
+          padding: const EdgeInsets.only(
+            bottom: 8.0,
+            left: 16.0,
+            right: 16.0,
+            top: 4.0,
+          ),
+          child: Text(
+            _htmlUnescape.convert(title),
+            style: Theme.of(context).textTheme.subhead.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17.0,
+                ),
           ),
         ),
       ],
@@ -102,39 +101,44 @@ class FeedCardBodyImage extends StatelessWidget {
 
     return Consumer(builder: (BuildContext context, FeedProvider model, _) {
       return Center(
-        child: Image(
-          image: CachedNetworkImageProvider(
-            url,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {return PhotoViewerScreen(imageUrl: url);}));
+            },
+            child: Image(
+              image: CachedNetworkImageProvider(
+                url,
+              ),
+              fit: BoxFit.fitWidth,
+              height: images.first.source.height.toDouble() * ratio,
+            ),
           ),
-          fit: BoxFit.fitWidth,
-          height: images.first.source.height.toDouble() * ratio,
         ),
       );
     });
   }
 }
 
-class FeedCardBodySelfText extends StatefulWidget {
+class FeedCardBodySelfText extends StatelessWidget {
   final String selftextHtml;
   FeedCardBodySelfText({this.selftextHtml});
-
-  @override
-  _FeedCardBodySelfTextState createState() => _FeedCardBodySelfTextState();
-}
-
-class _FeedCardBodySelfTextState extends State<FeedCardBodySelfText> {
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
 
   @override
   Widget build(BuildContext context) {
     return Html(
       renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.body1,
-      linkStyle: Theme.of(context).textTheme.body1.copyWith(
-            color: Theme.of(context).accentColor,
-          ),
+      defaultTextStyle: Theme.of(context).textTheme.body1.copyWith(
+          fontSize: 16,
+          color: Theme.of(context).textTheme.body1.color.withOpacity(0.95)),
+      linkStyle: Theme.of(context)
+          .textTheme
+          .body1
+          .copyWith(color: Theme.of(context).accentColor, fontSize: 16),
       padding: EdgeInsets.all(16),
-      data: """${_htmlUnescape.convert(widget.selftextHtml)}""",
+      data: """${_htmlUnescape.convert(selftextHtml)}""",
       useRichText: true,
       onLinkTap: (url) {
         if (url.startsWith("/r/") || url.startsWith("r/")) {
@@ -184,15 +188,18 @@ class StickyTag extends StatelessWidget {
                 ),
               ),
               decoration: BoxDecoration(
-                  color: MediaQuery.of(context).platformBrightness ==
-                          Brightness.dark
-                      ? Colors.green.shade900
-                      : Colors.green.shade100,
-                  borderRadius: BorderRadius.circular(4.0)),
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                        ? Colors.green.shade900
+                        : Colors.green.shade100,
+                borderRadius: BorderRadius.circular(
+                  4.0,
+                ),
+              ),
             ),
           )
         : Padding(
-            padding: EdgeInsets.only(top: 24.0),
+            padding: EdgeInsets.only(top: 16.0),
           );
   }
 }

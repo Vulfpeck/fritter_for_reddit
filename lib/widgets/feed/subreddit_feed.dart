@@ -1,17 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 
-class FeedList extends StatefulWidget {
+class SubredditFeed extends StatefulWidget {
   @override
-  _FeedListState createState() => _FeedListState();
+  _SubredditFeedState createState() => _SubredditFeedState();
 }
 
 // TODO : implement posting to subreddits
-class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
+class _SubredditFeedState extends State<SubredditFeed>
+    with TickerProviderStateMixin {
   ScrollController _controller;
   String sortSelectorValue = "Best";
   GlobalKey key = GlobalKey();
@@ -23,7 +25,7 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
   }
 
   void _scrollListener() {
-    if (_controller.position.maxScrollExtent - _controller.offset <= 100 &&
+    if (_controller.position.maxScrollExtent - _controller.offset <= 200 &&
         Provider.of<FeedProvider>(context).loadMorePostsState !=
             ViewState.Busy) {
       Provider.of<FeedProvider>(context).loadMorePosts();
@@ -99,7 +101,7 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
             ],
             pinned: true,
             snap: false,
-            floating: false,
+            floating: true,
             primary: true,
             elevation: 0,
             brightness: MediaQuery.of(context).platformBrightness,
@@ -160,7 +162,8 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
                             ViewState.Idle
                     ? SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
-                          if (index == model.postFeed.data.children.length) {
+                          if (index ==
+                              model.postFeed.data.children.length * 2) {
                             return model.loadMorePostsState == ViewState.Busy
                                 ? ListTile(
                                     title: Center(
@@ -168,52 +171,36 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
                                   )
                                 : Container();
                           }
-                          var item = model.postFeed.data.children[index].data;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 0.0,
-                              vertical: 8.0,
-                            ),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(0.0),
-                              color: Theme.of(context).cardColor,
-                              child: InkWell(
-                                enableFeedback: false,
-                                onDoubleTap: () {
-                                  if (item.isSelf == false) {
-                                    launchURL(context, item.url);
-                                  }
-                                },
-                                onTap: () {
-                                  Provider.of<CommentsProvider>(context)
-                                      .fetchComments(
-                                    subredditName: item.subreddit,
-                                    postId: item.id,
-                                    sort: item.suggestedSort != null
-                                        ? changeCommentSortConvertToEnum[
-                                            item.suggestedSort]
-                                        : CommentSortTypes.Best,
-                                  );
-                                  Navigator.of(context).push(
-//                                    SlideUpRoute(
-//                                      page: CommentsSheet(item),
-//                                    ),
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) {
-                                        return CommentsSheet(item);
-                                      },
-                                    ),
-                                  );
-                                },
-                                child: Hero(
-                                  child: FeedCard(item),
-                                  tag: item.id,
+
+                          if (index % 2 == 1) {
+                            return Divider();
+                          }
+                          var item =
+                              model.postFeed.data.children[(index ~/ 2)].data;
+                          return Material(
+                            borderRadius: BorderRadius.circular(0.0),
+                            clipBehavior: Clip.antiAlias,
+                            color: Theme.of(context).cardColor,
+                            child: InkWell(
+                              enableFeedback: false,
+                              onDoubleTap: () {
+                                if (item.isSelf == false) {
+                                  launchURL(context, item.url);
+                                }
+                              },
+                              onTap: () => _openComments(item, context),
+                              child: Hero(
+                                child: SingleChildScrollView(
+                                  child: FeedCard(
+                                    item,
+                                  ),
                                 ),
+                                tag: item.id,
                               ),
                             ),
                           );
                         },
-                        childCount: model.postFeed.data.children.length + 1,
+                        childCount: model.postFeed.data.children.length * 2 + 1,
                       )
                     : SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
@@ -230,5 +217,38 @@ class _FeedListState extends State<FeedList> with TickerProviderStateMixin {
         ],
       );
     });
+  }
+
+  void _openComments(final item, BuildContext context) {
+    Provider.of<CommentsProvider>(context).fetchComments(
+      subredditName: item.subreddit,
+      postId: item.id,
+      sort: item.suggestedSort != null
+          ? changeCommentSortConvertToEnum[item.suggestedSort]
+          : CommentSortTypes.Best,
+    );
+    Navigator.of(context).push(PageRouteBuilder(
+      pageBuilder: (BuildContext context, _, __) {
+        return CommentsSheet(item);
+      },
+      fullscreenDialog: false,
+      opaque: false,
+      transitionsBuilder:
+          (context, primaryanimation, secondaryanimation, child) {
+        return FadeTransition(
+          opacity: primaryanimation,
+          child: child,
+        );
+      },
+      transitionDuration: Duration(
+        milliseconds: 300,
+      ),
+    )
+//      SlideUpRoute(
+//        builder: (BuildContext context) => CommentsSheet(
+//          item,
+//        ),
+//      ),
+        );
   }
 }

@@ -29,17 +29,28 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.transparent,
       child: Container(
-        color: Theme.of(context).cardColor,
+        padding: EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
           key: key,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            SizedBox(width: 16),
             FlatButton.icon(
-              icon: Icon(Icons.refresh),
+              icon: Icon(
+                Icons.refresh,
+                color: Theme.of(context).textTheme.body1.color.withOpacity(0.6),
+              ),
               colorBrightness: MediaQuery.of(context).platformBrightness,
-              label: Text('Refresh'),
+              label: Text(
+                'Refresh',
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .textTheme
+                        .body1
+                        .color
+                        .withOpacity(0.8)),
+              ),
               onPressed: () {
                 Provider.of<CommentsProvider>(context).fetchComments(
                   subredditName: widget.item.subreddit,

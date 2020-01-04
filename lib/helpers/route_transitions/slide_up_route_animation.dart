@@ -1,37 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SlideUpRoute extends PageRouteBuilder {
-  final Widget page;
-  SlideUpRoute({this.page})
-      : super(
-          opaque: true,
-          barrierColor: Colors.black54,
-          transitionDuration: Duration(milliseconds: 450),
-          pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) =>
-              page,
-          transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
-          ) =>
-              SlideTransition(
-            position: Tween<Offset>(
-              end: Offset.zero,
-              begin: Offset(0, 1),
-            ).animate(
-              CurvedAnimation(
-                curve: Curves.linearToEaseOut,
-                parent: animation,
-                reverseCurve: Curves.easeInToLinear,
-              ),
-            ),
-            child: page,
-          ),
+class SlideUpRoute<T> extends CupertinoPageRoute<T> {
+  SlideUpRoute({
+    WidgetBuilder builder,
+    RouteSettings settings,
+  }) : super(
+          builder: builder,
+          settings: settings,
+          fullscreenDialog: false,
         );
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    if (settings.isInitialRoute) return child;
+    // Fades between routes. (If you don't want any animation,
+    // just return child.)
+    return new FadeTransition(
+      opacity: animation,
+      child: child,
+    );
+  }
 }

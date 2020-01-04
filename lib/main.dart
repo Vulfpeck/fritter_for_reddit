@@ -3,20 +3,22 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/pages/app_home.dart';
 
 void main() {
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-        builder: (_) => UserInformationProvider(),
-      ),
-      ChangeNotifierProvider(
-        builder: (_) => FeedProvider(),
-      ),
-      ChangeNotifierProvider(
-        builder: (_) => CommentsProvider(),
-      )
-    ],
-    child: MyTestApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          builder: (_) => UserInformationProvider(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => FeedProvider(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => CommentsProvider(),
+        )
+      ],
+      child: MyTestApp(),
+    ),
+  );
 }
 
 class MyTestApp extends StatelessWidget {
@@ -25,7 +27,7 @@ class MyTestApp extends StatelessWidget {
     return MaterialApp(
       home: HomePage(),
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.blueGrey.shade50,
+        scaffoldBackgroundColor: Colors.white,
         brightness: Brightness.light,
         iconTheme: IconThemeData(
           color: Colors.black,
@@ -36,10 +38,11 @@ class MyTestApp extends StatelessWidget {
               onSurface: Colors.blueGrey,
               secondary: Colors.blueGrey.shade100,
             ),
+        cardColor: Colors.white,
       ),
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
-        cardColor: Colors.grey.shade900,
+        cardColor: Colors.black,
         dividerColor: Colors.white24,
         brightness: Brightness.dark,
         iconTheme: IconThemeData(

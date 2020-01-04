@@ -18,17 +18,18 @@ class _TranslucentAppBarBackgroundState
     var prov = Provider.of<FeedProvider>(context);
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
-        var headerColor = TransparentHexColor("#000000");
+        var headerColor = TransparentHexColor("#FFFFFF", "40");
 
         if (prov.subredditInformationEntity != null &&
             prov.subredditInformationEntity.data.bannerBackgroundColor != "") {
           headerColor = TransparentHexColor(
             prov.subredditInformationEntity.data.bannerBackgroundColor,
+            "40",
           );
         }
         return ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               // Don't wrap this in any SafeArea widgets, use padding instead
               padding: EdgeInsets.only(top: 0),

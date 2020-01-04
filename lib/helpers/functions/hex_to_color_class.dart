@@ -13,14 +13,14 @@ class HexColor extends Color {
 }
 
 class TransparentHexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
+  static int _getColorFromHex(String hexColor, String transparency) {
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {
-      hexColor = "20" + hexColor;
+      hexColor = transparency + hexColor;
     }
     return int.parse(hexColor, radix: 16);
   }
 
-  TransparentHexColor(final String hexColor)
-      : super(_getColorFromHex(hexColor));
+  TransparentHexColor(final String hexColor, final String transparency)
+      : super(_getColorFromHex(hexColor, transparency));
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_list.dart';
+import 'package:flutter_provider_app/widgets/feed/subreddit_feed.dart';
 
 class SubredditFeedPage extends StatefulWidget {
   final subreddit;
@@ -22,7 +22,7 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
     return ChangeNotifierProvider(
       builder: (context) => FeedProvider.openFromName(widget.subreddit),
       child: Scaffold(
-        body: FeedList(),
+        body: SubredditFeed(),
       ),
     );
   }
