@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-List colorsRainbow = [
-  Colors.red,
-  Colors.blue,
-  Colors.green,
-  Colors.deepPurple,
-  Colors.yellow,
-  Colors.teal,
-  Colors.purpleAccent
+final List colorsRainbow = [
+  Colors.blue.shade800,
+  Colors.blue.shade600,
+  Colors.blue.shade400,
+  Colors.blue.shade200,
+  Colors.blue.shade50,
 ];

@@ -18,7 +18,10 @@ class _TranslucentAppBarBackgroundState
     var prov = Provider.of<FeedProvider>(context);
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
-        var headerColor = TransparentHexColor("#FFFFFF", "40");
+        var headerColor =
+            MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? TransparentHexColor("#000000", "40")
+                : TransparentHexColor("#FFFFFF", "20");
 
         if (prov.subredditInformationEntity != null &&
             prov.subredditInformationEntity.data.bannerBackgroundColor != "") {

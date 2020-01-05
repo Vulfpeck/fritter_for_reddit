@@ -18,3 +18,11 @@ String getTimePosted(double orig) {
     return difference.inDays.toString() + "d";
   }
 }
+
+String getRoundedToThousand(int score) {
+  if (score > 1000) {
+    return (score / 1000).toStringAsPrecision(2) + "K";
+  } else {
+    return score.toString();
+  }
+}

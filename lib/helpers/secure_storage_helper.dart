@@ -109,13 +109,12 @@ class SecureStorageHelper {
     )
         .catchError((e) {
       this.clearStorage();
-      return;
     });
 
     print("Token refresh status code: " + response.statusCode.toString());
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
-      print(map);
+      print("Refreshed token: " + map.toString());
       await updateAuthToken(map['access_token']);
     } else {
       print("Failed to refresh token");

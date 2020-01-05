@@ -100,7 +100,7 @@ class _SubredditFeedState extends State<SubredditFeed>
               ),
             ],
             pinned: true,
-            snap: false,
+            snap: true,
             floating: true,
             primary: true,
             elevation: 0,

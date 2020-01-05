@@ -30,6 +30,45 @@ class FeedCard extends StatelessWidget {
               stickied: data.stickied,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(text: 'in '),
+                  TextSpan(
+                    text: "r/" + data.subreddit,
+                    style: Theme.of(context).textTheme.subtitle.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  TextSpan(text: " by "),
+                  TextSpan(
+                    text: "u/" + data.author + " ",
+                    style: Theme.of(context).textTheme.subtitle.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  data.authorFlairText != null
+                      ? TextSpan(
+                          text: " " + data.authorFlairText + " ",
+                          style: Theme.of(context).textTheme.subtitle.copyWith(
+                                decorationStyle: TextDecorationStyle.solid,
+                                decoration: TextDecoration.lineThrough,
+                                decorationThickness: 24,
+                                decorationColor: Theme.of(context)
+                                    .textTheme
+                                    .subtitle
+                                    .color
+                                    .withOpacity(0.1),
+                              ),
+                        )
+                      : TextSpan(),
+                ],
+                style: Theme.of(context).textTheme.subtitle,
+              ),
+            ),
+          ),
           Material(
             color: Colors.transparent,
             child: Container(
@@ -40,7 +79,7 @@ class FeedCard extends StatelessWidget {
                   : data.preview != null
                       ? Padding(
                           padding:
-                              const EdgeInsets.only(bottom: 16.0, top: 16.0),
+                              const EdgeInsets.only(bottom: 0.0, top: 16.0),
                           child: FeedCardBodyImage(data.preview.images),
                         )
                       : Container(),
@@ -76,10 +115,7 @@ class FeedCardTitle extends StatelessWidget {
           ),
           child: Text(
             _htmlUnescape.convert(title),
-            style: Theme.of(context).textTheme.subhead.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 17.0,
-                ),
+            style: Theme.of(context).textTheme.title,
           ),
         ),
       ],
@@ -105,7 +141,10 @@ class FeedCardBodyImage extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {return PhotoViewerScreen(imageUrl: url);}));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                return PhotoViewerScreen(imageUrl: url);
+              }));
             },
             child: Image(
               image: CachedNetworkImageProvider(
@@ -130,13 +169,10 @@ class FeedCardBodySelfText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.body1.copyWith(
-          fontSize: 16,
-          color: Theme.of(context).textTheme.body1.color.withOpacity(0.95)),
-      linkStyle: Theme.of(context)
-          .textTheme
-          .body1
-          .copyWith(color: Theme.of(context).accentColor, fontSize: 16),
+      defaultTextStyle: Theme.of(context).textTheme.body1,
+      linkStyle: Theme.of(context).textTheme.body1.copyWith(
+            color: Theme.of(context).accentColor,
+          ),
       padding: EdgeInsets.all(16),
       data: """${_htmlUnescape.convert(selftextHtml)}""",
       useRichText: true,

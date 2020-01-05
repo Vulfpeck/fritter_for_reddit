@@ -132,12 +132,12 @@ class CommentsSheet extends StatelessWidget {
                                 )
                               : SliverChildBuilderDelegate(
                                   (BuildContext context, int index) {
-                                    var item =
+                                    var commentItem =
                                         model.commentsList.elementAt((index));
                                     return CommentItem(
-                                      item,
-                                      item.data.name,
-                                      item.data.id,
+                                      commentItem,
+                                      item.name,
+                                      commentItem.data.id,
                                     );
                                   },
                                   childCount: model.commentsList.length,

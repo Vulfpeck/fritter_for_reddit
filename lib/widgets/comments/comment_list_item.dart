@@ -4,7 +4,9 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/helpers/comment_color_annotations/colors.dart';
-import 'package:flutter_provider_app/helpers/functions/relative_dart_conversion.dart';
+import 'package:flutter_provider_app/helpers/design_system/color_enums.dart';
+import 'package:flutter_provider_app/helpers/design_system/colors.dart';
+import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
 import 'package:flutter_provider_app/models/comment_chain/comment.dart'
     as CommentPojo;
 import 'package:flutter_provider_app/pages/subreddit_feed.dart';
@@ -47,6 +49,7 @@ class _CommentItemState extends State<CommentItem>
                             ? MoreCommentKind(
                                 comment: widget._comment,
                                 name: widget.name,
+                                id: widget.id,
                               )
                             : CommentBody(
                                 comment: widget._comment,
@@ -59,11 +62,18 @@ class _CommentItemState extends State<CommentItem>
             ),
           ],
         ),
-        widget._comment.data.collapse == false
-            ? Divider(
-                height: 16,
-              )
-            : Container(),
+        Row(
+          children: <Widget>[
+            SizedBox(
+              width: 16.0 * widget._comment.data.depth + 12,
+            ),
+            widget._comment.data.collapse == false
+                ? Expanded(
+                    child: Divider(),
+                  )
+                : Container(),
+          ],
+        ),
       ],
     );
   }
@@ -90,7 +100,10 @@ class CollapsedCommentParent extends StatelessWidget {
               onTap: () {
                 collapse(comment, context);
               },
-              title: Text('Comment Collapsed'),
+              title: Text(
+                'Comment Collapsed',
+                style: Theme.of(context).textTheme.caption,
+              ),
               subtitle: Text(
                 model.collapsedChildrenCount[comment.data.id].toString() +
                     " children",
@@ -103,8 +116,8 @@ class CollapsedCommentParent extends StatelessWidget {
     );
   }
 
-  void collapse(CommentPojo.Child comment, BuildContext context) async {
-    await Provider.of<CommentsProvider>(context).collapseUncollapseComment(
+  void collapse(CommentPojo.Child comment, BuildContext context) {
+    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
       comment: comment,
       collapse: false,
     );
@@ -123,9 +136,11 @@ class CommentBody extends StatefulWidget {
 class _CommentBodyState extends State<CommentBody> {
   final HtmlUnescape _unescape = new HtmlUnescape();
   bool isExpanded = false;
+  Brightness _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
+    _platformBrightness = MediaQuery.of(context).platformBrightness;
     return Container(
       padding: EdgeInsets.only(top: 4.0),
       decoration: BoxDecoration(
@@ -139,6 +154,8 @@ class _CommentBodyState extends State<CommentBody> {
         ),
       ),
       child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         onLongPress: isExpanded
             ? null
             : () {
@@ -153,6 +170,41 @@ class _CommentBodyState extends State<CommentBody> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            widget.comment.data.stickied
+                ? Container(
+                    margin: EdgeInsets.only(
+                      left: 8,
+                      right: 8.0,
+                      bottom: 4.0,
+                      top: 4.0,
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: getColor(
+                        _platformBrightness,
+                        ColorObjects.TagColor,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(
+                          Icons.label_outline,
+                          color: Theme.of(context).textTheme.subtitle.color,
+                          size: Theme.of(context).textTheme.subtitle.fontSize,
+                        ),
+                        SizedBox(
+                          width: 4.0,
+                        ),
+                        Text(
+                          "Pinned",
+                          style: Theme.of(context).textTheme.subtitle,
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(),
             Flexible(
               child: Padding(
                 padding:
@@ -162,7 +214,7 @@ class _CommentBodyState extends State<CommentBody> {
                   children: <Widget>[
                     widget.comment.data.isSubmitter
                         ? Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
+                            padding: const EdgeInsets.only(right: 4.0),
                             child: widget.comment.data.isSubmitter
                                 ? Icon(
                                     Icons.person,
@@ -172,26 +224,34 @@ class _CommentBodyState extends State<CommentBody> {
                                 : Container(),
                           )
                         : Container(),
-                    Text(
-                      widget.comment.data.author + " ",
-                      style: widget.comment.data.isSubmitter
-                          ? Theme.of(context).textTheme.caption.copyWith(
-                                color: Theme.of(context).accentColor,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              )
-                          : Theme.of(context).textTheme.body2.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .body2
-                                    .color
-                                    .withOpacity(0.8),
-                              ),
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      maxLines: 100,
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: widget.comment.data.author + " ",
+                            style: widget.comment.data.isSubmitter
+                                ? Theme.of(context).textTheme.caption.copyWith(
+                                      color: Theme.of(context).accentColor,
+                                    )
+                                : Theme.of(context).textTheme.caption,
+                          ),
+                          widget.comment.data.distinguished
+                                      .toString()
+                                      .compareTo("moderator") ==
+                                  0
+                              ? TextSpan(
+                                  text: "MOD",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle
+                                      .copyWith(
+                                        color: Theme.of(context).accentColor,
+                                        letterSpacing: 1,
+                                      ),
+                                )
+                              : TextSpan(),
+                        ],
+                      ),
                     ),
                     Row(
                       children: <Widget>[
@@ -199,76 +259,64 @@ class _CommentBodyState extends State<CommentBody> {
                           Icons.arrow_upward,
                           color: widget.comment.data.likes != null
                               ? widget.comment.data.likes == true
-                                  ? Colors.orange
-                                  : Colors.deepPurple
-                              : Theme.of(context)
-                                  .textTheme
-                                  .body2
-                                  .color
-                                  .withOpacity(0.6),
+                                  ? getColor(_platformBrightness,
+                                      ColorObjects.UpvoteColor)
+                                  : getColor(_platformBrightness,
+                                      ColorObjects.DownvoteColor)
+                              : Theme.of(context).textTheme.subtitle.color,
                           size: 14,
                         ),
                         Text(
                           (widget.comment.data.scoreHidden
-                              ? "[?]"
-                              : widget.comment.data.score.toString()),
+                              ? " [?]"
+                              : " " + widget.comment.data.score.toString()),
                           style: widget.comment.data.likes != null
                               ? widget.comment.data.likes == true
-                                  ? Theme.of(context).textTheme.body2.copyWith(
-                                        fontSize: 14,
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.w400,
+                                  ? Theme.of(context)
+                                      .textTheme
+                                      .subtitle
+                                      .copyWith(
+                                        color: getColor(_platformBrightness,
+                                            ColorObjects.UpvoteColor),
                                       )
-                                  : Theme.of(context).textTheme.body2.copyWith(
-                                        fontSize: 14,
-                                        color: Colors.deepPurple,
-                                        fontWeight: FontWeight.w400,
+                                  : Theme.of(context)
+                                      .textTheme
+                                      .subtitle
+                                      .copyWith(
+                                        color: getColor(_platformBrightness,
+                                            ColorObjects.DownvoteColor),
                                       )
-                              : Theme.of(context).textTheme.body2.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .body2
-                                        .color
-                                        .withOpacity(0.6),
-                                  ),
+                              : Theme.of(context).textTheme.subtitle,
                           softWrap: false,
                           overflow: TextOverflow.fade,
                           maxLines: 100,
                         ),
                       ],
                     ),
-                    Text(
-                      " • " + getTimePosted(widget.comment.data.createdUtc),
-                      style: Theme.of(context).textTheme.body2.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Theme.of(context)
-                                .textTheme
-                                .body2
-                                .color
-                                .withOpacity(0.6),
-                          ),
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      maxLines: 100,
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          " • " + getTimePosted(widget.comment.data.createdUtc),
+                          style: Theme.of(context).textTheme.subtitle,
+                          overflow: TextOverflow.fade,
+                          maxLines: 100,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 0),
+              padding: const EdgeInsets.only(
+                left: 12.0,
+                right: 12.0,
+              ),
               child: Html(
-                defaultTextStyle: Theme.of(context).textTheme.body1.copyWith(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                    ),
+                padding: EdgeInsets.all(0),
+                defaultTextStyle: Theme.of(context).textTheme.body1.copyWith(),
                 linkStyle: Theme.of(context).textTheme.body1.copyWith(
                       color: Theme.of(context).accentColor,
-                      fontSize: 15,
                     ),
                 data: """${_unescape.convert(widget.comment.data.bodyHtml)}""",
                 useRichText: true,
@@ -322,15 +370,18 @@ class _CommentBodyState extends State<CommentBody> {
                           color: widget.comment.data.likes == null ||
                                   widget.comment.data.likes == false
                               ? Theme.of(context).accentColor
-                              : Colors.orange,
-                          splashColor: Colors.orange,
+                              : getColor(_platformBrightness,
+                                  ColorObjects.UpvoteColor),
+                          splashColor: getColor(
+                              _platformBrightness, ColorObjects.UpvoteColor),
                         ),
                         IconButton(
                           icon: Icon(Icons.arrow_downward),
                           color: widget.comment.data.likes == null ||
                                   widget.comment.data.likes == true
                               ? Theme.of(context).accentColor
-                              : Colors.purple,
+                              : getColor(_platformBrightness,
+                                  ColorObjects.DownvoteColor),
                           onPressed: () {
                             if (Provider.of<UserInformationProvider>(context)
                                 .signedIn) {
@@ -347,7 +398,8 @@ class _CommentBodyState extends State<CommentBody> {
                               buildSnackBar(context);
                             }
                           },
-                          splashColor: Colors.deepPurple,
+                          splashColor: getColor(
+                              _platformBrightness, ColorObjects.DownvoteColor),
                         ),
                         IconButton(
                           icon: Icon(Icons.account_circle),
@@ -365,7 +417,7 @@ class _CommentBodyState extends State<CommentBody> {
   }
 
   void collapse(CommentPojo.Child comment, BuildContext context) async {
-    await Provider.of<CommentsProvider>(context)
+    Provider.of<CommentsProvider>(context)
         .collapseUncollapseComment(comment: comment, collapse: true);
   }
 }
@@ -373,8 +425,9 @@ class _CommentBodyState extends State<CommentBody> {
 class MoreCommentKind extends StatelessWidget {
   final CommentPojo.Child comment;
   final String name;
+  final String id;
 
-  MoreCommentKind({this.comment, this.name});
+  MoreCommentKind({this.comment, this.name, this.id});
   @override
   Widget build(BuildContext context) {
     return Consumer(

@@ -38,12 +38,37 @@ class MyTestApp extends StatelessWidget {
               onSurface: Colors.blueGrey,
               secondary: Colors.blueGrey.shade100,
             ),
+        dividerTheme: DividerThemeData(color: Colors.black.withOpacity(0.15)),
         cardColor: Colors.white,
+        textTheme: Theme.of(context).textTheme.copyWith(
+              title: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              body1: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade800,
+              ),
+              caption: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade900,
+              ),
+              subtitle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade700,
+              ),
+            ),
       ),
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
         cardColor: Colors.black,
-        dividerColor: Colors.white24,
+        dividerColor: Colors.white.withOpacity(0.3),
+        dividerTheme: DividerThemeData(
+          color: Colors.white.withOpacity(0.4),
+        ),
         brightness: Brightness.dark,
         iconTheme: IconThemeData(
           color: Colors.white,
@@ -54,6 +79,28 @@ class MyTestApp extends StatelessWidget {
               surface: Colors.lightBlue.shade900,
               onSurface: Colors.lightBlue.shade100,
               secondary: Colors.lightBlue.shade800,
+            ),
+        textTheme: ThemeData.dark().textTheme.copyWith(
+              title: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              body1: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(0.9),
+              ),
+              caption: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.9)),
+              subtitle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(
+                  0.6,
+                ),
+              ),
             ),
       ),
     );

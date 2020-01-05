@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/subreddit_feed.dart';
 
-class PostControls extends StatefulWidget {
+class PostControls extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
 
   PostControls(this.postData);
-  @override
-  _PostControlsState createState() => _PostControlsState();
-}
-
-class _PostControlsState extends State<PostControls> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,172 +20,98 @@ class _PostControlsState extends State<PostControls> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0.0),
-                        child: Text(
-                          widget.postData.subredditNamePrefixed,
-                          style: Theme.of(context).textTheme.subtitle.copyWith(
-                                color: Theme.of(context).accentColor,
-                              ),
-                        ),
-                      ),
-                      Text(
-                        'u/' + widget.postData.author,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Container(),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.link,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      // TODO: implement this
-                      print('copy link to clipboard');
-                    },
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        widget.postData.domain,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                      Text(
-                        getTimePosted(widget.postData.createdUtc),
-                        style: Theme.of(context).textTheme.caption,
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 4.0,
-              ),
-              Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Icon(
-                    Icons.comment,
-                    size: 18,
-                    color: Colors.grey,
+                    Icons.arrow_upward,
+                    size: 16,
+                    color: Theme.of(context).textTheme.subtitle.color,
+                  ),
+                  SizedBox(
+                    width: 4.0,
+                  ),
+                  Text(
+                    getRoundedToThousand(postData.score),
+                    textAlign: TextAlign.center,
+                    style: postData.likes == null
+                        ? Theme.of(context).textTheme.subtitle
+                        : Theme.of(context).textTheme.subtitle.copyWith(
+                              color: postData.likes == null
+                                  ? Colors.grey
+                                  : postData.likes == true
+                                      ? Colors.orange
+                                      : Colors.purple,
+                            ),
                   ),
                   SizedBox(
                     width: 8.0,
                   ),
-                  Text(widget.postData.numComments.toString() + ' Comments'),
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    size: 16,
+                    color: Theme.of(context).textTheme.subtitle.color,
+                  ),
+                  SizedBox(
+                    width: 4.0,
+                  ),
+                  Text(
+                    getRoundedToThousand(postData.numComments),
+                    style: Theme.of(context).textTheme.subtitle,
+                  ),
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Icon(
+                    Icons.access_time,
+                    size: 16,
+                    color: Theme.of(context).textTheme.subtitle.color,
+                  ),
+                  SizedBox(
+                    width: 4.0,
+                  ),
+                  Text(
+                    getTimePosted(postData.createdUtc),
+                    style: Theme.of(context).textTheme.subtitle,
+                  ),
                   Expanded(
                     child: Container(),
                   ),
                   IconButton(
                     icon: Icon(Icons.more_horiz),
                     color: Colors.grey,
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        useRootNavigator: true,
-                        elevation: 10,
-                        builder: (context) {
-                          return DraggableScrollableSheet(
-                            expand: false,
-                            initialChildSize: 0.3,
-                            maxChildSize: 0.7,
-                            minChildSize: 0.1,
-                            builder: (context, controller) {
-                              return CustomScrollView(
-                                controller: controller,
-                                slivers: <Widget>[
-                                  SliverList(
-                                    delegate: SliverChildListDelegate(<Widget>[
-                                      ListTile(
-                                        title: Text('View Profile'),
-                                        leading: CircleAvatar(
-                                          child: Icon(Icons.person),
-                                        ),
-                                      ),
-                                      ListTile(
-                                        title: Text('View Subreddit'),
-                                        leading: CircleAvatar(
-                                          backgroundImage: AssetImage(
-                                            'assets/default_icon.png',
-                                          ),
-                                        ),
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SubredditFeedPage(
-                                                subreddit:
-                                                    widget.postData.subreddit,
-                                              ),
-                                            )),
-                                      )
-                                    ]),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
+                    onPressed: () => showPostOptions(context),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
                     onPressed: () {
                       if (Provider.of<UserInformationProvider>(context)
                           .signedIn) {
-                        if (widget.postData.likes == true) {
-                          model.votePost(id: widget.postData.id, dir: 0);
+                        if (postData.likes == true) {
+                          model.votePost(id: postData.id, dir: 0);
                         } else {
-                          model.votePost(id: widget.postData.id, dir: 1);
+                          model.votePost(id: postData.id, dir: 1);
                         }
                       } else {
                         buildSnackBar(context);
                       }
                     },
-                    color: widget.postData.likes == null ||
-                            widget.postData.likes == false
-                        ? Colors.grey
+                    color: postData.likes == null || postData.likes == false
+                        ? Theme.of(context).textTheme.subtitle.color
                         : Colors.orange,
                     splashColor: Colors.orange,
                   ),
-                  Text(
-                    widget.postData.score.toString(),
-                    textAlign: TextAlign.center,
-                    style: widget.postData.likes == null
-                        ? Theme.of(context).textTheme.button
-                        : Theme.of(context).textTheme.button.copyWith(
-                              color: widget.postData.likes == null
-                                  ? Colors.grey
-                                  : widget.postData.likes == true
-                                      ? Colors.orange
-                                      : Colors.purple,
-                            ),
-                  ),
                   IconButton(
                     icon: Icon(Icons.arrow_downward),
-                    color: widget.postData.likes == null ||
-                            widget.postData.likes == true
-                        ? Colors.grey
+                    color: postData.likes == null || postData.likes == true
+                        ? Theme.of(context).textTheme.subtitle.color
                         : Colors.purple,
                     onPressed: () {
                       if (Provider.of<UserInformationProvider>(context)
                           .signedIn) {
-                        if (widget.postData.likes == false) {
-                          model.votePost(id: widget.postData.id, dir: 0);
+                        if (postData.likes == false) {
+                          model.votePost(id: postData.id, dir: 0);
                         } else {
-                          model.votePost(id: widget.postData.id, dir: -1);
+                          model.votePost(id: postData.id, dir: -1);
                         }
                       } else {
                         buildSnackBar(context);
@@ -210,30 +128,52 @@ class _PostControlsState extends State<PostControls> {
     );
   }
 
-  String getTimePosted(double orig) {
-    DateTime postDate = DateTime.fromMillisecondsSinceEpoch(
-      orig.floor() * 1000,
-      isUtc: true,
+  void showPostOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      elevation: 10,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.3,
+          maxChildSize: 0.7,
+          minChildSize: 0.1,
+          builder: (context, controller) {
+            return CustomScrollView(
+              controller: controller,
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildListDelegate(<Widget>[
+                    ListTile(
+                      title: Text('View Profile'),
+                      leading: CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('View Subreddit'),
+                      leading: CircleAvatar(
+                        backgroundImage: AssetImage(
+                          'assets/default_icon.png',
+                        ),
+                      ),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubredditFeedPage(
+                              subreddit: postData.subreddit,
+                            ),
+                          )),
+                    )
+                  ]),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
-    Duration difference = DateTime.now().toUtc().difference(postDate);
-    if (difference.inDays <= 0) {
-      if (difference.inHours <= 0) {
-        if (difference.inMinutes <= 0) {
-          return "Few Moments Ago";
-        } else {
-          return difference.inMinutes.toString() +
-              (difference.inMinutes == 1 ? " minute" : " minutes") +
-              " ago";
-        }
-      } else {
-        return difference.inHours.toString() +
-            (difference.inHours == 1 ? " hour" : " hours") +
-            " ago";
-      }
-    } else {
-      return difference.inDays.toString() +
-          (difference.inDays == 1 ? " day" : " days") +
-          " ago";
-    }
   }
 }

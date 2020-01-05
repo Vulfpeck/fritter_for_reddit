@@ -54,8 +54,11 @@ class CommentsProvider with ChangeNotifier {
     String url;
     this.sort = sort;
     if (_storageHelper.signInStatus) {
+      if (await _storageHelper.needsTokenRefresh()) {
+        _storageHelper.performTokenRefresh();
+      }
       url =
-          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false&depth=3';
+          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
       try {
         final response = await http.get(
           url,
@@ -92,7 +95,7 @@ class CommentsProvider with ChangeNotifier {
       }
     } else {
       url =
-          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false&depth=3';
+          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
       try {
         final response = await http.get(
           url,
@@ -144,10 +147,13 @@ class CommentsProvider with ChangeNotifier {
     moreParentLoadingId = moreParentId;
     notifyListeners();
 
+    if (await _storageHelper.needsTokenRefresh()) {
+      _storageHelper.performTokenRefresh();
+    }
     String childrenString = "";
     if (children != null)
       for (String child in children) {
-        childrenString += child + ", ";
+        childrenString += child + ",";
       }
     else
       print('children is null');
@@ -158,8 +164,10 @@ class CommentsProvider with ChangeNotifier {
 
     if (_storageHelper.signInStatus) {
       String authToken = await _storageHelper.authToken;
+      print("User is auth so using oauth to get more comments");
       final url =
-          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}&depth=2';
+          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort=${changeCommentSortConvertToString[this.sort]}';
+      print(url);
       try {
         final response = await http.get(
           url,
@@ -197,6 +205,7 @@ class CommentsProvider with ChangeNotifier {
           }
 //        print(_moreComments.json);
         } else {
+          print(response.reasonPhrase);
           print("there was an error fetching the comments");
         }
       } catch (e) {
@@ -256,15 +265,18 @@ class CommentsProvider with ChangeNotifier {
 
   Future<int> collapseUncollapseComment(
       {@required CommentPojo.Child comment, @required bool collapse}) async {
+    // first find where the "parent" is in the list
     int index = _commentsList.indexWhere(
       (ele) {
         return ele.data.id == comment.data.id;
       },
     );
+
     comment.data.collapse = collapse;
     comment.data.collapseParent = collapse;
     index++;
     int count = 0;
+    // iterate through comments until you find one which has more depth than the parent
     while (index < _commentsList.length) {
       if (_commentsList.elementAt(index).data.depth <= comment.data.depth) {
         break;
