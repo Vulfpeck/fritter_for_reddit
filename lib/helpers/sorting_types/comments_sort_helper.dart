@@ -5,7 +5,7 @@ enum CommentSortTypes {
   Controversial,
   Old,
   Random,
-  QA,
+  QandA,
   Live,
   Best,
 }
@@ -17,7 +17,7 @@ Map<CommentSortTypes, String> changeCommentSortConvertToString = {
   CommentSortTypes.Controversial: 'controversial',
   CommentSortTypes.Old: 'old',
   CommentSortTypes.Random: 'random',
-  CommentSortTypes.QA: 'qa',
+  CommentSortTypes.QandA: 'qa',
   CommentSortTypes.Live: 'live',
   CommentSortTypes.Best: 'best',
 };
@@ -29,7 +29,7 @@ Map<String, CommentSortTypes> changeCommentSortConvertToEnum = {
   'controversial': CommentSortTypes.Controversial,
   'old': CommentSortTypes.Old,
   'random': CommentSortTypes.Random,
-  'qa': CommentSortTypes.QA,
+  'qa': CommentSortTypes.QandA,
   'live': CommentSortTypes.Live,
   'best': CommentSortTypes.Best,
 };

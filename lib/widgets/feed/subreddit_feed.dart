@@ -5,6 +5,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
+import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
 class SubredditFeed extends StatefulWidget {
   @override
@@ -60,16 +61,19 @@ class _SubredditFeedState extends State<SubredditFeed>
                         0,
                       ),
                       context: context,
-                      items: <String>[
-                        'Today',
-                        'Week',
-                        'Month',
-                        'Year',
-                        'All TIme'
-                      ].map((value) {
+                      items: <String>['Dat', 'Week', 'Month', 'Year', 'All']
+                          .map((value) {
                         return PopupMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: ListTile(
+                            title: Text(value),
+                            onTap: () {
+                              model.fetchPostsListing(
+                                currentSort: "top/?sort=top&t=$value",
+                                currentSubreddit: model.sub,
+                              );
+                            },
+                          ),
                         );
                       }).toList(),
                     );
@@ -190,10 +194,13 @@ class _SubredditFeedState extends State<SubredditFeed>
                               },
                               onTap: () => _openComments(item, context),
                               child: Hero(
-                                child: SingleChildScrollView(
-                                  child: FeedCard(
-                                    item,
-                                  ),
+                                child: Column(
+                                  children: <Widget>[
+                                    FeedCard(
+                                      item,
+                                    ),
+                                    PostControls(item),
+                                  ],
                                 ),
                                 tag: item.id,
                               ),
@@ -227,28 +234,46 @@ class _SubredditFeedState extends State<SubredditFeed>
           ? changeCommentSortConvertToEnum[item.suggestedSort]
           : CommentSortTypes.Best,
     );
-    Navigator.of(context).push(PageRouteBuilder(
-      pageBuilder: (BuildContext context, _, __) {
-        return CommentsSheet(item);
-      },
-      fullscreenDialog: false,
-      opaque: false,
-      transitionsBuilder:
-          (context, primaryanimation, secondaryanimation, child) {
-        return FadeTransition(
-          opacity: primaryanimation,
-          child: child,
-        );
-      },
-      transitionDuration: Duration(
-        milliseconds: 300,
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (BuildContext context) {
+          return CommentsSheet(item);
+        },
+        fullscreenDialog: true,
+        title: "Comments",
       ),
-    )
+//      CustomRoute(
+//        enterPage: CommentsSheet(
+//          item,
+//        ),
+//        exitPage: this.widget,
+//      ),
+//      PageRouteBuilder(
+//        pageBuilder: (BuildContext context, _, __) {
+//          return CommentsSheet(item);
+//        },
+//        fullscreenDialog: false,
+//        opaque: false,
+//        transitionsBuilder:
+//            (context, primaryanimation, secondaryanimation, child) {
+//          return FadeTransition(
+//            child: child,
+//            opacity: CurvedAnimation(
+//              parent: primaryanimation,
+//              curve: Curves.easeInToLinear,
+//              reverseCurve: Curves.linearToEaseOut,
+//            ),
+//          );
+//        },
+//        transitionDuration: Duration(
+//          milliseconds: 350,
+//        ),
+//      ),
 //      SlideUpRoute(
 //        builder: (BuildContext context) => CommentsSheet(
 //          item,
 //        ),
 //      ),
-        );
+    );
   }
 }

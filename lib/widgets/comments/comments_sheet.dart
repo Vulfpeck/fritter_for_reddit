@@ -8,6 +8,7 @@ import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comment_list_item.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
+import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
 class CommentsSheet extends StatelessWidget {
   final PostsFeedDataChildrenData item;
@@ -18,37 +19,21 @@ class CommentsSheet extends StatelessWidget {
     print("Post id is " + item.name);
     return Dismissible(
       direction: DismissDirection.startToEnd,
-      movementDuration: Duration(milliseconds: 150),
-      background: Stack(
-        children: <Widget>[
-          Positioned(
-            top: 0,
-            bottom: 0,
-            right: 0,
-            left: 0,
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                child: Container(
-                  color: Colors.black.withOpacity(0.5),
-                  alignment: Alignment.centerLeft,
-                  child: Material(
-                    color: Colors.black.withOpacity(0.2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(48),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Icon(
-                        Icons.arrow_back,
-                      ),
-                    ),
-                  ),
-                ),
+      movementDuration: Duration(milliseconds: 450),
+      background: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            color: Colors.black.withOpacity(0.5),
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Icon(
+                Icons.arrow_back,
               ),
             ),
           ),
-        ],
+        ),
       ),
       onDismissed: (direction) {
         Navigator.pop(context);
@@ -60,7 +45,7 @@ class CommentsSheet extends StatelessWidget {
             body: Hero(
               tag: item.id,
               child: Material(
-                color: Colors.transparent,
+                color: Theme.of(context).cardColor,
                 child: CustomScrollView(
                   slivers: <Widget>[
                     SliverPersistentHeader(
@@ -90,6 +75,14 @@ class CommentsSheet extends StatelessWidget {
                                 child: FeedCard(item),
                               ),
                             ),
+                            item.isSelf &&
+                                    item.preview == null &&
+                                    item.selftextHtml != null
+                                ? FeedCardBodySelfText(
+                                    selftextHtml: item.selftextHtml,
+                                  )
+                                : Container(),
+                            PostControls(item),
                             Divider(),
                             CommentsControlBar(item),
                             Divider(),

@@ -101,7 +101,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 changeCommentSortConvertToString[
                     CommentSortTypes.Controversial],
                 changeCommentSortConvertToString[CommentSortTypes.Old],
-                changeCommentSortConvertToString[CommentSortTypes.QA],
+                changeCommentSortConvertToString[CommentSortTypes.QandA],
               ].map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value.toString(),

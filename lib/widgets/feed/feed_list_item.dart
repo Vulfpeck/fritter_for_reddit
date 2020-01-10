@@ -7,7 +7,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
-import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class FeedCard extends StatelessWidget {
@@ -28,6 +27,8 @@ class FeedCard extends StatelessWidget {
             child: FeedCardTitle(
               title: data.title,
               stickied: data.stickied,
+              linkFlairText: data.linkFlairText,
+              nsfw: data.over18,
             ),
           ),
           Padding(
@@ -49,21 +50,6 @@ class FeedCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                   ),
-                  data.authorFlairText != null
-                      ? TextSpan(
-                          text: " " + data.authorFlairText + " ",
-                          style: Theme.of(context).textTheme.subtitle.copyWith(
-                                decorationStyle: TextDecorationStyle.solid,
-                                decoration: TextDecoration.lineThrough,
-                                decorationThickness: 24,
-                                decorationColor: Theme.of(context)
-                                    .textTheme
-                                    .subtitle
-                                    .color
-                                    .withOpacity(0.1),
-                              ),
-                        )
-                      : TextSpan(),
                 ],
                 style: Theme.of(context).textTheme.subtitle,
               ),
@@ -72,20 +58,14 @@ class FeedCard extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: Container(
-              child: data.isSelf &&
-                      data.preview == null &&
-                      data.selftextHtml != null
-                  ? FeedCardBodySelfText(selftextHtml: data.selftextHtml)
-                  : data.preview != null
-                      ? Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                          child: FeedCardBodyImage(data.preview.images),
-                        )
-                      : Container(),
+              child: data.preview != null && data.isSelf == false
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+                      child: FeedCardBodyImage(data.preview.images),
+                    )
+                  : Container(),
             ),
           ),
-          PostControls(data),
         ],
       ),
     );
@@ -95,30 +75,79 @@ class FeedCard extends StatelessWidget {
 class FeedCardTitle extends StatelessWidget {
   final String title;
   final bool stickied;
-  FeedCardTitle({this.title, this.stickied});
+  final String linkFlairText;
+  final bool nsfw;
+
+  FeedCardTitle({
+    @required this.title,
+    @required this.stickied,
+    @required this.linkFlairText,
+    @required this.nsfw,
+  });
 
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        StickyTag(stickied),
-        Padding(
-          padding: const EdgeInsets.only(
-            bottom: 8.0,
-            left: 16.0,
-            right: 16.0,
-            top: 4.0,
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        bottom: 4.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          StickyTag(stickied),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: RichText(
+              text: TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: _htmlUnescape.convert(title) + "  ",
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Text(
-            _htmlUnescape.convert(title),
-            style: Theme.of(context).textTheme.title,
-          ),
-        ),
-      ],
+          nsfw == true || linkFlairText != null
+              ? RichText(
+                  textScaleFactor: 0.9,
+                  text: TextSpan(
+                    children: <TextSpan>[
+                      nsfw != null && nsfw
+                          ? TextSpan(
+                              text: "NSFW ",
+                              style: TextStyle(
+                                color: Colors.red.withOpacity(
+                                  0.9,
+                                ),
+                              ),
+                            )
+                          : TextSpan(),
+                      linkFlairText != null
+                          ? TextSpan(
+                              text: linkFlairText,
+                              style:
+                                  Theme.of(context).textTheme.subtitle.copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .subtitle
+                                            .color
+                                            .withOpacity(0.8),
+                                      ),
+                            )
+                          : TextSpan(),
+                    ],
+                    style: Theme.of(context).textTheme.subtitle,
+                  ),
+                )
+              : Container(),
+        ],
+      ),
     );
   }
 }
@@ -209,7 +238,7 @@ class StickyTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return _isStickied
         ? Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16, bottom: 12.0),
+            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0),
             child: Container(
               child: Padding(
                 padding: const EdgeInsets.all(4.0),

@@ -51,8 +51,9 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<void> fetchPostsListing({
-    currentSubreddit = "",
-    currentSort = "Hot",
+    String currentSubreddit = "",
+    String currentSort = "Hot",
+    loadingTop = false,
   }) async {
     await _storageHelper.init();
     _state = ViewState.Busy;
@@ -114,8 +115,9 @@ class FeedProvider with ChangeNotifier {
         String url;
         if (currentSubreddit == "") {
           _currentPage = CurrentPage.FrontPage;
+
           url =
-              "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/?limit=10";
+              "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/";
         } else {
           _currentPage = CurrentPage.Other;
           url =

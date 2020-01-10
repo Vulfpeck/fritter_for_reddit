@@ -42,8 +42,8 @@ class MyTestApp extends StatelessWidget {
         cardColor: Colors.white,
         textTheme: Theme.of(context).textTheme.copyWith(
               title: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+                fontSize: 17,
+                fontWeight: FontWeight.w400,
               ),
               body1: TextStyle(
                 fontSize: 15,
@@ -82,23 +82,24 @@ class MyTestApp extends StatelessWidget {
             ),
         textTheme: ThemeData.dark().textTheme.copyWith(
               title: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+                fontSize: 17,
+                fontWeight: FontWeight.w400,
               ),
               body1: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withOpacity(0.8),
               ),
               caption: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.9)),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.9),
+              ),
               subtitle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withOpacity(
-                  0.6,
+                  0.55,
                 ),
               ),
             ),

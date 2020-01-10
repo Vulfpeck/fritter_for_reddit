@@ -269,7 +269,9 @@ class _CommentBodyState extends State<CommentBody> {
                         Text(
                           (widget.comment.data.scoreHidden
                               ? " [?]"
-                              : " " + widget.comment.data.score.toString()),
+                              : " " +
+                                  getRoundedToThousand(
+                                      widget.comment.data.score)),
                           style: widget.comment.data.likes != null
                               ? widget.comment.data.likes == true
                                   ? Theme.of(context)
@@ -287,8 +289,8 @@ class _CommentBodyState extends State<CommentBody> {
                                             ColorObjects.DownvoteColor),
                                       )
                               : Theme.of(context).textTheme.subtitle,
-                          softWrap: false,
-                          overflow: TextOverflow.fade,
+                          softWrap: true,
+                          overflow: TextOverflow.clip,
                           maxLines: 100,
                         ),
                       ],
