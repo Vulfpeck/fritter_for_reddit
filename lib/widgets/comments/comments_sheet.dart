@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_provider_app/exports.dart';
@@ -17,42 +18,53 @@ class CommentsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("Post id is " + item.name);
-    return Dismissible(
-      direction: DismissDirection.startToEnd,
-      movementDuration: Duration(milliseconds: 450),
-      background: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          child: Container(
-            color: Colors.black.withOpacity(0.5),
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Icon(
-                Icons.arrow_back,
+    return Hero(
+      tag: item.id,
+      child: Dismissible(
+        direction: DismissDirection.startToEnd,
+        movementDuration: Duration(milliseconds: 450),
+        background: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Icon(
+                  Icons.arrow_back,
+                ),
               ),
             ),
           ),
         ),
-      ),
-      onDismissed: (direction) {
-        Navigator.pop(context);
-      },
-      key: Key("test"),
-      child: Consumer(
-        builder: (BuildContext context, CommentsProvider model, _) {
-          return Scaffold(
-            body: Hero(
-              tag: item.id,
-              child: Material(
+        onDismissed: (direction) {
+          Navigator.pop(context);
+        },
+        key: Key("test"),
+        child: Consumer(
+          builder: (BuildContext context, CommentsProvider model, _) {
+            return Scaffold(
+              body: Material(
                 color: Theme.of(context).cardColor,
                 child: CustomScrollView(
                   slivers: <Widget>[
-                    SliverPersistentHeader(
-                      pinned: true,
+                    SliverAppBar(
+                      title: Text("Comments"),
+                      automaticallyImplyLeading: true,
+                      iconTheme: Theme.of(context).iconTheme,
+                      backgroundColor: Theme.of(context).cardColor,
                       floating: true,
-                      delegate: _TranslucentSliverAppBarDelegate(
-                        MediaQuery.of(context).padding,
+                      brightness: MediaQuery.of(context).platformBrightness,
+                      pinned: false,
+                      snap: true,
+                      elevation: 0,
+                      textTheme: Theme.of(context).textTheme,
+                      leading: IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: false).pop();
+                        },
                       ),
                     ),
                     SliverList(
@@ -145,12 +157,21 @@ class CommentsSheet extends StatelessWidget {
                         ],
                       ),
                     ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          SizedBox(
+                            height: 150,
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

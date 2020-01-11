@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/widgets/feed/subreddit_feed.dart';
@@ -19,10 +20,12 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
   @override
   Widget build(BuildContext context) {
     print("New scaffold from " + widget.subreddit);
-    return ChangeNotifierProvider(
-      builder: (context) => FeedProvider.openFromName(widget.subreddit),
-      child: Scaffold(
-        body: SubredditFeed(),
+    return CupertinoPageScaffold(
+      child: ChangeNotifierProvider(
+        builder: (context) => FeedProvider.openFromName(widget.subreddit),
+        child: Scaffold(
+          body: SubredditFeed(),
+        ),
       ),
     );
   }

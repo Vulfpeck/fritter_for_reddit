@@ -170,10 +170,17 @@ class FeedCardBodyImage extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (BuildContext context) {
-                return PhotoViewerScreen(imageUrl: url);
-              }));
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(
+                CupertinoPageRoute(
+                  builder: (BuildContext context) {
+                    return PhotoViewerScreen(imageUrl: url);
+                  },
+                  fullscreenDialog: true,
+                ),
+              );
             },
             child: Image(
               image: CachedNetworkImageProvider(
@@ -209,7 +216,8 @@ class FeedCardBodySelfText extends StatelessWidget {
         if (url.startsWith("/r/") || url.startsWith("r/")) {
           Navigator.push(
             context,
-            MaterialPageRoute(
+            CupertinoPageRoute(
+              fullscreenDialog: true,
               builder: (BuildContext context) {
                 return SubredditFeedPage(
                     subreddit: url.startsWith("/r/")

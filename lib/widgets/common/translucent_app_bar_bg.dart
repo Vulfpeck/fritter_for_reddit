@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
+import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 
 class TranslucentAppBarBackground extends StatefulWidget {
   @override
@@ -20,7 +21,7 @@ class _TranslucentAppBarBackgroundState
       builder: (BuildContext context, FeedProvider model, _) {
         var headerColor =
             MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? TransparentHexColor("#000000", "40")
+                ? TransparentHexColor("#000000", "80")
                 : TransparentHexColor("#FFFFFF", "20");
 
         if (prov.subredditInformationEntity != null &&
@@ -48,12 +49,32 @@ class _TranslucentAppBarBackgroundState
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text(
-                                    'Front Page',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                  Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'Front Page',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {
+                                          return Navigator.of(context,
+                                                  rootNavigator: false)
+                                              .push(
+                                            CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  LeftDrawer(),
+                                              fullscreenDialog: true,
+                                            ),
+                                          );
+                                        },
+                                        color: Theme.of(context).accentColor,
+                                      )
+                                    ],
                                   ),
                                 ],
                               ),
@@ -68,7 +89,8 @@ class _TranslucentAppBarBackgroundState
                                 children: <Widget>[
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
+                                      vertical: 0.0,
+                                    ),
                                     child: Row(
                                       children: <Widget>[
                                         CircleAvatar(
@@ -158,17 +180,38 @@ class _TranslucentAppBarBackgroundState
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
-                                            Text(
-                                              prov.subredditInformationEntity
-                                                  .data.displayNamePrefixed,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headline
-                                                  .copyWith(
-                                                    fontWeight: FontWeight.w600,
+                                            Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  prov.subredditInformationEntity
+                                                      .data.displayNamePrefixed,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                  overflow: TextOverflow.fade,
+                                                  softWrap: false,
+                                                ),
+                                                IconButton(
+                                                  icon:
+                                                      Icon(Icons.arrow_forward),
+                                                  onPressed: () => Navigator.of(
+                                                          context,
+                                                          rootNavigator: false)
+                                                      .push(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          LeftDrawer(),
+                                                      fullscreenDialog: true,
+                                                    ),
                                                   ),
-                                              overflow: TextOverflow.fade,
-                                              softWrap: false,
+                                                  color: Theme.of(context)
+                                                      .accentColor,
+                                                )
+                                              ],
                                             ),
                                             Text(
                                               prov.subredditInformationEntity

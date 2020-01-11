@@ -156,14 +156,14 @@ class _CommentBodyState extends State<CommentBody> {
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        onLongPress: isExpanded
-            ? null
-            : () {
-                collapse(widget.comment, context);
-              },
-        onTap: () {
+        onDoubleTap: () {
           setState(() {
             isExpanded = !isExpanded;
+          });
+        },
+        onTap: () {
+          setState(() {
+            collapse(widget.comment, context);
           });
         },
         child: Column(
@@ -328,7 +328,8 @@ class _CommentBodyState extends State<CommentBody> {
                   if (url.startsWith("/r/") || url.startsWith("r/")) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
+                        fullscreenDialog: true,
                         builder: (BuildContext context) {
                           return SubredditFeedPage(
                               subreddit: url.startsWith("/r/")
@@ -356,6 +357,9 @@ class _CommentBodyState extends State<CommentBody> {
                           onPressed: () {
                             if (Provider.of<UserInformationProvider>(context)
                                 .signedIn) {
+                              setState(() {
+                                isExpanded = !isExpanded;
+                              });
                               if (widget.comment.data.likes == true) {
                                 Provider.of<CommentsProvider>(context)
                                     .voteComment(
@@ -385,6 +389,9 @@ class _CommentBodyState extends State<CommentBody> {
                               : getColor(_platformBrightness,
                                   ColorObjects.DownvoteColor),
                           onPressed: () {
+                            setState(() {
+                              isExpanded = !isExpanded;
+                            });
                             if (Provider.of<UserInformationProvider>(context)
                                 .signedIn) {
                               if (widget.comment.data.likes == false) {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/states.dart';
 import 'package:flutter_provider_app/models/subreddits/child.dart';
@@ -184,6 +185,45 @@ class UserInformationProvider with ChangeNotifier {
             .toLowerCase()
             .compareTo(b.display_name.toLowerCase());
       });
+    }
+  }
+
+  Future<void> authenticateUser(BuildContext context) async {
+    launchURL(
+        context,
+        "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
+            CLIENT_ID +
+            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+    bool res = await this.performAuthentication();
+    print("final res: " + res.toString());
+    if (res) {
+      await Provider.of<FeedProvider>(context).fetchPostsListing();
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text('Sign '),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('Retry'),
+                onPressed: () {
+                  authenticateUser(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 }

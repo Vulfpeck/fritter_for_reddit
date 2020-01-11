@@ -16,6 +16,7 @@ class FeedProvider with ChangeNotifier {
 
   String sub = "";
   String sort = "Hot";
+  String subListingFetchUrl = "";
 
   bool _subInformationLoadingError = false;
   bool _feedInformationLoadingError = false;
@@ -71,20 +72,37 @@ class FeedProvider with ChangeNotifier {
         String url = "";
         if (this.sub != "") {
           _currentPage = CurrentPage.Other;
-          url =
-              "https://www.reddit.com/r/${sub.toLowerCase()}/${currentSort.toString().toLowerCase()}.json";
+          url = "https://www.reddit.com";
+          if (loadingTop) {
+            url = url +
+                "/r/${currentSubreddit.toLowerCase()}" +
+                currentSort.toString().toLowerCase() +
+                "&limit=10";
+          } else {
+            url = url +
+                "/r/${currentSubreddit.toLowerCase()}" +
+                "/${currentSort.toString().toLowerCase()}.json" +
+                "?limit=10";
+          }
         } else {
           _currentPage = CurrentPage.FrontPage;
-          url =
-              "https://www.reddit.com/${currentSort.toString().toLowerCase()}.json";
+          url = "https://www.reddit.com";
+          if (loadingTop) {
+            url = url + currentSort.toString().toLowerCase() + "&limit=10";
+          } else {
+            url =
+                url + "/${currentSort.toString().toLowerCase()}.json?limit=10";
+          }
         }
 
+        print(url);
         response = await http.get(url).catchError((e) {
           print("Feed fetch error");
           notifyListeners();
           throw new Exception("Feed fetch error");
         });
         if (response.statusCode == 200) {
+          subListingFetchUrl = url;
           _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
           final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
           final subInfoResponse = await http.get(
@@ -98,7 +116,6 @@ class FeedProvider with ChangeNotifier {
                 new SubredditInformationEntity.fromJson(
                     json.decode(subInfoResponse.body));
             this.sub = _subredditInformationEntity.data.displayName;
-            print(response.body);
           } else {
             print(response.body);
           }
@@ -113,17 +130,30 @@ class FeedProvider with ChangeNotifier {
 
         String token = await _storageHelper.authToken;
         String url;
-        if (currentSubreddit == "") {
-          _currentPage = CurrentPage.FrontPage;
-
-          url =
-              "https://oauth.reddit.com/${currentSort.toString().toLowerCase()}/";
-        } else {
+        if (this.sub != "") {
           _currentPage = CurrentPage.Other;
-          url =
-              "https://oauth.reddit.com/r/$currentSubreddit/${currentSort.toString().toLowerCase()}/?limit=10";
+          url = "https://oauth.reddit.com";
+          if (loadingTop) {
+            url = url +
+                "/r/${currentSubreddit.toLowerCase()}" +
+                currentSort.toString().toLowerCase() +
+                "&limit=10";
+          } else {
+            url = url +
+                "/r/${currentSubreddit.toLowerCase()}" +
+                "/${currentSort.toString().toLowerCase()}.json" +
+                "?limit=10";
+          }
+        } else {
+          _currentPage = CurrentPage.FrontPage;
+          url = "https://oauth.reddit.com";
+          if (loadingTop) {
+            url = url + currentSort.toString().toLowerCase() + "&limit=10";
+          } else {
+            url =
+                url + "/${currentSort.toString().toLowerCase()}.json?limit=10";
+          }
         }
-
         print("Feed fetch url is : " + url);
         response = await http.get(
           url,
@@ -134,9 +164,10 @@ class FeedProvider with ChangeNotifier {
         ).catchError((e) {
           throw new Exception("Feed fetch error");
         });
-        if (response.statusCode == 200)
+        if (response.statusCode == 200) {
           _postFeed = new PostsFeedEntity.fromJson(json.decode(response.body));
-        else
+          subListingFetchUrl = url;
+        } else
           throw new Exception("Failed to load data: " + response.reasonPhrase);
 
         if (_currentPage != CurrentPage.FrontPage)
@@ -269,13 +300,7 @@ class FeedProvider with ChangeNotifier {
         if (await _storageHelper.needsTokenRefresh()) {
           await _storageHelper.performTokenRefresh();
         }
-        if (sub != "") {
-          url =
-              "https://oauth.reddit.com/r/$sub/${sort.toString().toLowerCase()}/?limit=10&after=${postFeed.data.after}";
-        } else {
-          url = url =
-              "https://oauth.reddit.com/${sort.toString().toLowerCase()}/?limit=10&after=${postFeed.data.after}";
-        }
+        url = subListingFetchUrl + "&after=${postFeed.data.after}";
         print(url);
         String token = await _storageHelper.authToken;
         http.Response subredditResponse = await http.get(
@@ -294,14 +319,7 @@ class FeedProvider with ChangeNotifier {
         print("new after : " + newData.data.after);
         _postFeed.data.after = newData.data.after;
       } else {
-        url = "http://www.reddit.com";
-        if (sub != "") {
-          url =
-              "https://www.reddit.com/r/$sub/${sort.toString().toLowerCase()}.json?limit=10&after=${postFeed.data.after}";
-        } else {
-          url = url =
-              "https://www.reddit.com/${sort.toString().toLowerCase()}.json?limit=10&after=${postFeed.data.after}";
-        }
+        url = subListingFetchUrl + "&after=${postFeed.data.after}";
         print(url);
         http.Response subredditResponse = await http.get(
           url,

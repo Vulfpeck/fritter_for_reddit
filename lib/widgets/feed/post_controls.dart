@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
@@ -139,7 +140,6 @@ class PostControls extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      useRootNavigator: true,
       elevation: 10,
       builder: (context) {
         return DraggableScrollableSheet(
@@ -166,13 +166,20 @@ class PostControls extends StatelessWidget {
                           'assets/default_icon.png',
                         ),
                       ),
-                      onTap: () => Navigator.push(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        return Navigator.of(
                           context,
-                          MaterialPageRoute(
+                          rootNavigator: false,
+                        ).push(
+                          CupertinoPageRoute(
                             builder: (context) => SubredditFeedPage(
                               subreddit: postData.subreddit,
                             ),
-                          )),
+                            fullscreenDialog: true,
+                          ),
+                        );
+                      },
                     )
                   ]),
                 ),

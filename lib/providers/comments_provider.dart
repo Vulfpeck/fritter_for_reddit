@@ -18,6 +18,7 @@ class CommentsProvider with ChangeNotifier {
   ViewState get commentsMoreLoadingState => _commentsMoreLoadingState;
 
   var collapsedChildrenCount = new Map();
+  Map<String, List<CommentPojo.Child>> map = {};
 
   List<CommentPojo.Child> _commentsList;
   List<CommentPojo.Child> get commentsList => _commentsList;
@@ -27,18 +28,6 @@ class CommentsProvider with ChangeNotifier {
 
   CommentsProvider() {
     _storageHelper = new SecureStorageHelper();
-  }
-
-  void process(List<dynamic> commentList, int level) {
-    for (int i = 0; i < commentList.length; i++) {
-      if (commentList.elementAt(i)['kind'] == null) {
-        continue;
-      }
-      if (commentList.elementAt(i)['kind'] != 't1') {
-        continue;
-      }
-      Map<String, dynamic> dataMap = commentList.elementAt(i)['data'];
-    }
   }
 
   Future<void> fetchComments({
