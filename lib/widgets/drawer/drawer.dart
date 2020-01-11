@@ -313,6 +313,7 @@ class DrawerSliverAppBar extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.secondary,
       automaticallyImplyLeading: true,
       expandedHeight: 170,
+      brightness: MediaQuery.of(context).platformBrightness,
       iconTheme: Theme.of(context).iconTheme,
       flexibleSpace: FlexibleSpaceBar(
         background: SafeArea(
