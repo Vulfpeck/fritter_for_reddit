@@ -27,7 +27,7 @@ class _SubredditFeedState extends State<SubredditFeed>
   }
 
   void _scrollListener() {
-    if (_controller.position.maxScrollExtent - _controller.offset <= 400 &&
+    if (_controller.position.maxScrollExtent - _controller.offset <= 100 &&
         Provider.of<FeedProvider>(context).loadMorePostsState !=
             ViewState.Busy) {
       Provider.of<FeedProvider>(context).loadMorePosts();
@@ -40,6 +40,7 @@ class _SubredditFeedState extends State<SubredditFeed>
       builder: (BuildContext context, FeedProvider model, _) {
         return CustomScrollView(
           controller: _controller,
+          physics: AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
 //          CupertinoSliverNavigationBar(
 //            largeTitle: Text(

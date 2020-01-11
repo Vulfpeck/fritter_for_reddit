@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_provider_app/pages/search_screen.dart';
 import 'package:flutter_provider_app/pages/user_profile.dart';
 import 'package:flutter_provider_app/widgets/feed/subreddit_feed.dart';
 
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       child: CupertinoTabScaffold(
         controller: _tabController,
         tabBar: CupertinoTabBar(
-          backgroundColor: Theme.of(context).cardColor.withOpacity(0.80),
+          backgroundColor: Theme.of(context).cardColor.withOpacity(0.90),
           activeColor: Theme.of(context).accentColor,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -58,21 +59,7 @@ class _HomePageState extends State<HomePage> {
               {
                 return CupertinoTabView(
                   navigatorKey: secondTabNavKey,
-                  builder: (BuildContext context) => Scaffold(
-                    body: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            "👻",
-                            style: Theme.of(context).textTheme.display2,
-                          ),
-                          Text("Coming Soon"),
-                        ],
-                      ),
-                    ),
-                  ),
+                  builder: (BuildContext context) => SearchPage(),
                 );
               }
             case 2:

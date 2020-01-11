@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/pages/app_home.dart';
+import 'package:flutter_provider_app/providers/search_provider.dart';
 
 void main() {
   runApp(
@@ -14,7 +15,10 @@ void main() {
         ),
         ChangeNotifierProvider(
           builder: (_) => CommentsProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => SearchProvider(),
+        ),
       ],
       child: MyTestApp(),
     ),
@@ -73,7 +77,7 @@ class MyTestApp extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        accentColor: Colors.lightBlueAccent,
+        accentColor: Colors.blueAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
               surface: Colors.lightBlue.shade900,

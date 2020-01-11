@@ -22,15 +22,15 @@ class _TranslucentAppBarBackgroundState
         var headerColor =
             MediaQuery.of(context).platformBrightness == Brightness.dark
                 ? TransparentHexColor("#000000", "80")
-                : TransparentHexColor("#FFFFFF", "20");
+                : TransparentHexColor("#FFFFFF", "bb");
 
-        if (prov.subredditInformationEntity != null &&
-            prov.subredditInformationEntity.data.bannerBackgroundColor != "") {
-          headerColor = TransparentHexColor(
-            prov.subredditInformationEntity.data.bannerBackgroundColor,
-            "40",
-          );
-        }
+//        if (prov.subredditInformationEntity != null &&
+//            prov.subredditInformationEntity.data.bannerBackgroundColor != "") {
+//          headerColor = TransparentHexColor(
+//            prov.subredditInformationEntity.data.bannerBackgroundColor,
+//            "00",
+//          );
+//        }
         return ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),

@@ -149,6 +149,7 @@ class PostControls extends StatelessWidget {
           minChildSize: 0.1,
           builder: (context, controller) {
             return CustomScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
               controller: controller,
               slivers: <Widget>[
                 SliverList(
