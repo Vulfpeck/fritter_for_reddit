@@ -18,10 +18,7 @@ class CommentsProvider with ChangeNotifier {
   ViewState get commentsMoreLoadingState => _commentsMoreLoadingState;
 
   var collapsedChildrenCount = new Map();
-  Map<String, List<CommentPojo.Child>> map = {};
-
-  List<CommentPojo.Child> _commentsList;
-  List<CommentPojo.Child> get commentsList => _commentsList;
+  Map<String, List<CommentPojo.Child>> commentsMap = {};
 
   String moreParentLoadingId = "";
   SecureStorageHelper _storageHelper;
@@ -31,106 +28,109 @@ class CommentsProvider with ChangeNotifier {
   }
 
   Future<void> fetchComments({
-    String subredditName,
-    String postId,
-    CommentSortTypes sort,
+    @required String subredditName,
+    @required String postId,
+    @required CommentSortTypes sort,
+    @required bool requestingRefresh,
   }) async {
     _commentsLoadingState = ViewState.Busy;
     notifyListeners();
-    await _storageHelper.init();
-    String authToken = await _storageHelper.authToken;
-    String sortString = changeCommentSortConvertToString[sort];
-    String url;
-    this.sort = sort;
-    if (_storageHelper.signInStatus) {
-      if (await _storageHelper.needsTokenRefresh()) {
-        _storageHelper.performTokenRefresh();
-      }
-      url =
-          'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
-      try {
-        final response = await http.get(
-          url,
-          headers: {
-            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-            'Authorization': 'bearer ' + authToken,
-          },
-        );
-        print(url);
-        print(response.statusCode.toString() + "••••••••••••••");
-        if (response.statusCode == 200) {
-          _commentsList = new List<CommentPojo.Child>();
-//      print(json.decode(response.body));
-          final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
-
-          Queue<CommentPojo.Child> q = Queue.from(c.data.children);
-          List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
-          while (q.isNotEmpty) {
-            var x = q.removeFirst();
-            if (x.kind == CommentPojo.Kind.T1 ||
-                (x.kind == CommentPojo.Kind.MORE) &&
-                    x.data.children.length != 0) {
-              finalList.add(x);
-            }
-          }
-
-          _commentsList = finalList;
-        } else {
-          print(response.statusCode);
-          print('fetch failed');
+    if (requestingRefresh || commentsMap[postId] == null) {
+      await _storageHelper.init();
+      String authToken = await _storageHelper.authToken;
+      String sortString = changeCommentSortConvertToString[sort];
+      String url;
+      this.sort = sort;
+      if (_storageHelper.signInStatus) {
+        if (await _storageHelper.needsTokenRefresh()) {
+          _storageHelper.performTokenRefresh();
         }
-      } catch (e) {
-        print('Exceptions ${e.toString()}');
-      }
-    } else {
-      url =
-          'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
-      try {
-        final response = await http.get(
-          url,
-          headers: {
-            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-          },
-        );
-        print(url);
-        print(response.statusCode.toString() + "••••••••••••••");
-        if (response.statusCode == 200) {
-          _commentsList = new List<CommentPojo.Child>();
+        url =
+            'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+        try {
+          final response = await http.get(
+            url,
+            headers: {
+              'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+              'Authorization': 'bearer ' + authToken,
+            },
+          );
+          print(url);
+          print(response.statusCode.toString() + "••••••••••••••");
+          if (response.statusCode == 200) {
 //      print(json.decode(response.body));
-          final c = CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
+            final c =
+                CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
 
-          Queue<CommentPojo.Child> q = Queue.from(c.data.children);
-          List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
-          while (q.isNotEmpty) {
-            var x = q.removeFirst();
-            if (x.kind == CommentPojo.Kind.T1 ||
-                (x.kind == CommentPojo.Kind.MORE) &&
-                    x.data.children.length != 0) {
-//          print(" | " * x.data.depth + "-" + x.data.author)
-              finalList.add(x);
-              if (x.kind == CommentPojo.Kind.MORE) {
-//            print(x.data.children);
+            Queue<CommentPojo.Child> q = Queue.from(c.data.children);
+            List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
+            while (q.isNotEmpty) {
+              var x = q.removeFirst();
+              if (x.kind == CommentPojo.Kind.T1 ||
+                  (x.kind == CommentPojo.Kind.MORE) &&
+                      x.data.children.length != 0) {
+                finalList.add(x);
               }
             }
-          }
 
-          _commentsList = finalList;
-        } else {
-          print(response.statusCode);
-          print('fetch failed');
+            commentsMap[postId] = finalList;
+          } else {
+            print(response.statusCode);
+            print('fetch failed');
+          }
+        } catch (e) {
+          print('Exceptions ${e.toString()}');
         }
-      } catch (e) {
-        print('Exceptions ${e.toString()}');
+      } else {
+        url =
+            'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
+        try {
+          final response = await http.get(
+            url,
+            headers: {
+              'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+            },
+          );
+          print(url);
+          print(response.statusCode.toString() + "••••••••••••••");
+          if (response.statusCode == 200) {
+//      print(json.decode(response.body));
+            final c =
+                CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
+
+            Queue<CommentPojo.Child> q = Queue.from(c.data.children);
+            List<CommentPojo.Child> finalList = new List<CommentPojo.Child>();
+            while (q.isNotEmpty) {
+              var x = q.removeFirst();
+              if (x.kind == CommentPojo.Kind.T1 ||
+                  (x.kind == CommentPojo.Kind.MORE) &&
+                      x.data.children.length != 0) {
+//          print(" | " * x.data.depth + "-" + x.data.author)
+                finalList.add(x);
+                if (x.kind == CommentPojo.Kind.MORE) {
+//            print(x.data.children);
+                }
+              }
+            }
+            commentsMap[postId] = finalList;
+          } else {
+            print(response.statusCode);
+            print('fetch failed');
+          }
+        } catch (e) {
+          print('Exceptions ${e.toString()}');
+        }
       }
-    }
+    } else {}
     _commentsLoadingState = ViewState.Idle;
     notifyListeners();
   }
 
   Future<void> fetchChildren({
-    List<String> children,
-    String id,
-    String moreParentId,
+    @required List<String> children,
+    @required String postId,
+    @required String postFullName,
+    @required String moreParentId,
   }) async {
     _commentsMoreLoadingState = ViewState.Busy;
     moreParentLoadingId = moreParentId;
@@ -155,7 +155,7 @@ class CommentsProvider with ChangeNotifier {
       String authToken = await _storageHelper.authToken;
       print("User is auth so using oauth to get more comments");
       final url =
-          'https://oauth.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort=${changeCommentSortConvertToString[this.sort]}';
+          'https://oauth.reddit.com/api/morechildren?link_id=$postFullName&api_type=json&children=$childrenString&sort=${changeCommentSortConvertToString[this.sort]}';
       print(url);
       try {
         final response = await http.get(
@@ -172,20 +172,20 @@ class CommentsProvider with ChangeNotifier {
             json.decode(response.body),
           );
           print("comments saved in the entity");
-          CommentPojo.Child parent = _commentsList.firstWhere((ele) {
+          CommentPojo.Child parent = commentsMap[postId].firstWhere((ele) {
             if (ele.data.id.compareTo(moreParentId) == 0) {
               return true;
             } else {
               return false;
             }
           });
-          int parentIndex = _commentsList.indexOf(parent);
+          int parentIndex = commentsMap[postId].indexOf(parent);
           print(parent.kind);
           print(parent.data.children);
           print(parentIndex);
-          _commentsList.remove(parent);
+          commentsMap[postId].remove(parent);
           for (var x in _moreComments.json.data.things) {
-            _commentsList.insert(
+            commentsMap[postId].insert(
               parentIndex++,
               new CommentPojo.Child.fromMap(
                 x.toJson(),
@@ -202,7 +202,7 @@ class CommentsProvider with ChangeNotifier {
       }
     } else {
       final url =
-          'https://api.reddit.com/api/morechildren?link_id=$id&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}';
+          'https://api.reddit.com/api/morechildren?link_id=$postFullName&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}';
       try {
         final response = await http.get(
           url,
@@ -217,7 +217,7 @@ class CommentsProvider with ChangeNotifier {
             json.decode(response.body),
           );
           print("comments saved in the entity");
-          CommentPojo.Child parent = _commentsList.firstWhere((ele) {
+          CommentPojo.Child parent = commentsMap[postId].firstWhere((ele) {
             print(ele.data.id);
             if (ele.data.id.compareTo(moreParentId) == 0) {
               return true;
@@ -225,13 +225,13 @@ class CommentsProvider with ChangeNotifier {
               return false;
             }
           });
-          int parentIndex = _commentsList.indexOf(parent);
+          int parentIndex = commentsMap[postId].indexOf(parent);
           print(parent.kind);
           print(parent.data.children);
           print(parentIndex);
-          _commentsList.remove(parent);
+          commentsMap[postId].remove(parent);
           for (var x in _moreComments.json.data.things) {
-            _commentsList.insert(
+            commentsMap[postId].insert(
               parentIndex++,
               new CommentPojo.Child.fromMap(
                 x.toJson(),
@@ -252,26 +252,27 @@ class CommentsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> collapseUncollapseComment(
-      {@required CommentPojo.Child comment, @required bool collapse}) async {
+  Future<int> collapseUncollapseComment({
+    @required int parentCommentIndex,
+    @required bool collapse,
+    @required postId,
+  }) async {
     // first find where the "parent" is in the list
-    int index = _commentsList.indexWhere(
-      (ele) {
-        return ele.data.id == comment.data.id;
-      },
-    );
-
+    int index = parentCommentIndex;
+    CommentPojo.Child comment =
+        commentsMap[postId].elementAt(parentCommentIndex);
     comment.data.collapse = collapse;
     comment.data.collapseParent = collapse;
     index++;
     int count = 0;
     // iterate through comments until you find one which has more depth than the parent
-    while (index < _commentsList.length) {
-      if (_commentsList.elementAt(index).data.depth <= comment.data.depth) {
+    while (index < commentsMap[postId].length) {
+      if (commentsMap[postId].elementAt(index).data.depth <=
+          comment.data.depth) {
         break;
       } else {
-        _commentsList.elementAt(index).data.collapse = collapse;
-        _commentsList.elementAt(index).data.collapseParent = false;
+        commentsMap[postId].elementAt(index).data.collapseParent = false;
+        commentsMap[postId].elementAt(index).data.collapse = collapse;
       }
       index++;
       count++;
@@ -285,9 +286,10 @@ class CommentsProvider with ChangeNotifier {
     return count;
   }
 
-  Future<bool> voteComment({@required String id, @required int dir}) async {
+  Future<bool> voteComment(
+      {@required String id, @required int dir, @required postId}) async {
     await _storageHelper.fetchData();
-    CommentPojo.Child item = _commentsList.firstWhere((v) {
+    CommentPojo.Child item = commentsMap[postId].firstWhere((v) {
       return v.data.id.compareTo(id) == 0 ? true : false;
     });
     notifyListeners();

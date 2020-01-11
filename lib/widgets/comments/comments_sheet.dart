@@ -117,8 +117,8 @@ class CommentsSheet extends StatelessWidget {
                                 ),
                               ],
                             )
-                          : model.commentsList == null ||
-                                  model.commentsList.length == 0
+                          : model.commentsMap[item.id] == null ||
+                                  model.commentsMap[item.id].length == 0
                               ? SliverChildListDelegate(
                                   <Widget>[
                                     SizedBox(
@@ -137,15 +137,16 @@ class CommentsSheet extends StatelessWidget {
                                 )
                               : SliverChildBuilderDelegate(
                                   (BuildContext context, int index) {
-                                    var commentItem =
-                                        model.commentsList.elementAt((index));
+                                    var commentItem = model.commentsMap[item.id]
+                                        .elementAt((index));
                                     return CommentItem(
                                       commentItem,
                                       item.name,
-                                      commentItem.data.id,
+                                      item.id,
+                                      index,
                                     );
                                   },
-                                  childCount: model.commentsList.length,
+                                  childCount: model.commentsMap[item.id].length,
                                 ),
                     ),
                     SliverList(
@@ -174,65 +175,5 @@ class CommentsSheet extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _TranslucentSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  /// This is required to calculate the height of the bar
-  final EdgeInsets safeAreaPadding;
-
-  _TranslucentSliverAppBarDelegate(this.safeAreaPadding);
-
-  @override
-  double get minExtent => safeAreaPadding.top;
-
-  @override
-  double get maxExtent => minExtent + 72;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      // Don't wrap this in any SafeArea widgets, use padding instead
-      padding: EdgeInsets.only(top: safeAreaPadding.top),
-      height: maxExtent,
-      color: Colors.transparent,
-      // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
-      child: Stack(
-        overflow: Overflow.clip,
-        children: <Widget>[
-          Positioned(
-            bottom: 0,
-            right: 16,
-            child: SizedBox(
-              height: 56,
-              width: 56,
-              child: Material(
-                type: MaterialType.button,
-                borderRadius: BorderRadius.circular(100),
-                elevation: 5,
-                color: Theme.of(context).cardColor,
-                child: InkWell(
-                  splashColor: Theme.of(context).accentColor,
-                  borderRadius: BorderRadius.circular(100),
-                  onTap: () => Navigator.pop(context),
-                  child: Icon(
-                    Icons.close,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(_TranslucentSliverAppBarDelegate old) {
-    return maxExtent != old.maxExtent ||
-        minExtent != old.minExtent ||
-        safeAreaPadding != old.safeAreaPadding;
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
-import 'package:flutter_provider_app/providers/feed_provider.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -205,18 +204,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                               Icons.arrow_forward,
                             ),
                             onPressed: () {
-                              Navigator.of(context).pop();
-                              return Navigator.of(
-                                context,
-                                rootNavigator: false,
-                              ).push(
-                                CupertinoPageRoute(
-                                  builder: (context) => SubredditFeedPage(
-                                    subreddit: _subredditGoController.text,
-                                  ),
-                                  fullscreenDialog: true,
-                                ),
-                              );
+                              loadNewSubreddit(
+                                  context, _subredditGoController.text);
                             },
                           ),
                         ),
@@ -302,9 +291,18 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   loadNewSubreddit(BuildContext context, String text) {
     final text = _subredditGoController.text.replaceAll(" ", "");
-    Provider.of<FeedProvider>(context)
-        .fetchPostsListing(currentSubreddit: text, currentSort: "hot");
     Navigator.of(context).pop();
+    return Navigator.of(
+      context,
+      rootNavigator: false,
+    ).push(
+      CupertinoPageRoute(
+        builder: (context) => SubredditFeedPage(
+          subreddit: text,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
   }
 }
 

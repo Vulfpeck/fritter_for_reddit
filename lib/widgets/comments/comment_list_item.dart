@@ -18,9 +18,10 @@ import '../../exports.dart';
 class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
   final String name;
-  final String id;
+  final String postId;
+  final int commentIndex;
 
-  CommentItem(this._comment, this.name, this.id);
+  CommentItem(this._comment, this.name, this.postId, this.commentIndex);
 
   @override
   _CommentItemState createState() => _CommentItemState();
@@ -42,17 +43,23 @@ class _CommentItemState extends State<CommentItem>
               child: AnimatedSize(
                 vsync: this,
                 child: widget._comment.data.collapseParent == true
-                    ? CollapsedCommentParent(comment: widget._comment)
+                    ? CollapsedCommentParent(
+                        comment: widget._comment,
+                        postId: widget.postId,
+                        commentIndex: widget.commentIndex,
+                      )
                     : widget._comment.data.collapse == true
                         ? Container()
                         : widget._comment.kind == CommentPojo.Kind.MORE
                             ? MoreCommentKind(
                                 comment: widget._comment,
-                                name: widget.name,
-                                id: widget.id,
+                                postFullName: widget.name,
+                                id: widget.postId,
                               )
                             : CommentBody(
+                                commentIndex: widget.commentIndex,
                                 comment: widget._comment,
+                                postId: widget.postId,
                               ),
                 duration: Duration(
                   milliseconds: 250,
@@ -81,7 +88,13 @@ class _CommentItemState extends State<CommentItem>
 
 class CollapsedCommentParent extends StatelessWidget {
   final CommentPojo.Child comment;
-  CollapsedCommentParent({@required this.comment});
+  final String postId;
+  final int commentIndex;
+  CollapsedCommentParent({
+    @required this.comment,
+    @required this.postId,
+    @required this.commentIndex,
+  });
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -98,7 +111,7 @@ class CollapsedCommentParent extends StatelessWidget {
             child: ListTile(
               dense: true,
               onTap: () {
-                collapse(comment, context);
+                collapse(commentIndex, context);
               },
               title: Text(
                 'Comment Collapsed',
@@ -116,18 +129,23 @@ class CollapsedCommentParent extends StatelessWidget {
     );
   }
 
-  void collapse(CommentPojo.Child comment, BuildContext context) {
+  void collapse(int commentIndex, BuildContext context) {
     Provider.of<CommentsProvider>(context).collapseUncollapseComment(
-      comment: comment,
       collapse: false,
+      postId: postId,
+      parentCommentIndex: commentIndex,
     );
   }
 }
 
 class CommentBody extends StatefulWidget {
   final CommentPojo.Child comment;
-
-  CommentBody({this.comment});
+  final String postId;
+  final int commentIndex;
+  CommentBody(
+      {@required this.comment,
+      @required this.postId,
+      @required this.commentIndex});
 
   @override
   _CommentBodyState createState() => _CommentBodyState();
@@ -156,7 +174,7 @@ class _CommentBodyState extends State<CommentBody> {
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        onDoubleTap: () {
+        onLongPress: () {
           setState(() {
             isExpanded = !isExpanded;
           });
@@ -363,11 +381,15 @@ class _CommentBodyState extends State<CommentBody> {
                               if (widget.comment.data.likes == true) {
                                 Provider.of<CommentsProvider>(context)
                                     .voteComment(
-                                        id: widget.comment.data.id, dir: 0);
+                                        id: widget.comment.data.id,
+                                        dir: 0,
+                                        postId: widget.postId);
                               } else {
                                 Provider.of<CommentsProvider>(context)
                                     .voteComment(
-                                        id: widget.comment.data.id, dir: 1);
+                                        id: widget.comment.data.id,
+                                        dir: 1,
+                                        postId: widget.postId);
                               }
                             } else {
                               buildSnackBar(context);
@@ -397,11 +419,15 @@ class _CommentBodyState extends State<CommentBody> {
                               if (widget.comment.data.likes == false) {
                                 Provider.of<CommentsProvider>(context)
                                     .voteComment(
-                                        id: widget.comment.data.id, dir: 0);
+                                        id: widget.comment.data.id,
+                                        dir: 0,
+                                        postId: widget.postId);
                               } else {
                                 Provider.of<CommentsProvider>(context)
                                     .voteComment(
-                                        id: widget.comment.data.id, dir: -1);
+                                        id: widget.comment.data.id,
+                                        dir: -1,
+                                        postId: widget.postId);
                               }
                             } else {
                               buildSnackBar(context);
@@ -426,17 +452,20 @@ class _CommentBodyState extends State<CommentBody> {
   }
 
   void collapse(CommentPojo.Child comment, BuildContext context) async {
-    Provider.of<CommentsProvider>(context)
-        .collapseUncollapseComment(comment: comment, collapse: true);
+    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
+      parentCommentIndex: widget.commentIndex,
+      collapse: true,
+      postId: widget.postId,
+    );
   }
 }
 
 class MoreCommentKind extends StatelessWidget {
   final CommentPojo.Child comment;
-  final String name;
+  final String postFullName;
   final String id;
 
-  MoreCommentKind({this.comment, this.name, this.id});
+  MoreCommentKind({this.comment, this.postFullName, this.id});
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -451,7 +480,8 @@ class MoreCommentKind extends StatelessWidget {
                 onTap: () {
                   Provider.of<CommentsProvider>(context).fetchChildren(
                     children: comment.data.children,
-                    id: name,
+                    postId: id,
+                    postFullName: postFullName,
                     moreParentId: comment.data.id,
                   );
                 },

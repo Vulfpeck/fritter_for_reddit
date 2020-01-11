@@ -54,6 +54,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
               onPressed: () {
                 Provider.of<CommentsProvider>(context).fetchComments(
                   subredditName: widget.item.subreddit,
+                  requestingRefresh: true,
                   postId: widget.item.id,
                   sort: _selectedSort,
                 );
@@ -89,6 +90,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                   _selectedSort = changeCommentSortConvertToEnum[value];
                 });
                 Provider.of<CommentsProvider>(context).fetchComments(
+                  requestingRefresh: true,
                   subredditName: widget.item.subreddit,
                   postId: widget.item.id,
                   sort: _selectedSort,

@@ -7,7 +7,7 @@ String getTimePosted(double orig) {
   if (difference.inDays <= 0) {
     if (difference.inHours <= 0) {
       if (difference.inMinutes <= 0) {
-        return "Few Moments Ago";
+        return "Now";
       } else {
         return difference.inMinutes.toString() + "m";
       }

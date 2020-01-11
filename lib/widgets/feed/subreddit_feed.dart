@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
 import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
@@ -121,7 +122,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   initialValue: sortSelectorValue,
                 ),
                 IconButton(
-                  icon: Icon(Icons.menu),
+                  icon: Icon(Icons.group_work),
                   onPressed: () {
                     Navigator.of(context, rootNavigator: false).push(
                       CupertinoPageRoute(
@@ -263,8 +264,9 @@ class _SubredditFeedState extends State<SubredditFeed>
     );
   }
 
-  void _openComments(final item, BuildContext context) {
+  void _openComments(PostsFeedDataChildrenData item, BuildContext context) {
     Provider.of<CommentsProvider>(context).fetchComments(
+      requestingRefresh: false,
       subredditName: item.subreddit,
       postId: item.id,
       sort: item.suggestedSort != null
