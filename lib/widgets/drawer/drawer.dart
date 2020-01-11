@@ -88,7 +88,10 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                 backgroundImage:
                                     AssetImage('assets/default_icon.png'),
                                 backgroundColor: Theme.of(context).accentColor,
+                                maxRadius: 16,
                               ),
+                              subtitle: Text("Posts from your subscriptions"),
+                              dense: true,
                               onTap: () {
                                 Navigator.of(context, rootNavigator: false)
                                     .pop();
@@ -107,12 +110,14 @@ class _LeftDrawerState extends State<LeftDrawer> {
                             );
                           }
                           return ListTile(
+                            dense: true,
                             title: Text(
                               model.userSubreddits.data.children[index]
                                   .display_name,
                               style: Theme.of(context).textTheme.subhead,
                             ),
                             leading: CircleAvatar(
+                              maxRadius: 16,
                               backgroundImage: model.userSubreddits.data
                                           .children[index].community_icon !=
                                       ""
@@ -312,21 +317,14 @@ class DrawerSliverAppBar extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: Theme.of(context).colorScheme.secondary,
       automaticallyImplyLeading: true,
+      centerTitle: false,
       expandedHeight: 170,
       brightness: MediaQuery.of(context).platformBrightness,
       iconTheme: Theme.of(context).iconTheme,
       flexibleSpace: FlexibleSpaceBar(
-        background: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                "Subreddits",
-                style: Theme.of(context).textTheme.headline,
-              ),
-            ),
-          ),
+        centerTitle: false,
+        title: Text(
+          "Subreddits",
         ),
       ),
     );

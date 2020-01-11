@@ -20,6 +20,20 @@ class UserProfileScreen extends StatelessWidget {
             child: Center(
               child: CustomScrollView(
                 slivers: <Widget>[
+                  SliverAppBar(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    automaticallyImplyLeading: true,
+                    centerTitle: false,
+                    expandedHeight: 170,
+                    brightness: MediaQuery.of(context).platformBrightness,
+                    iconTheme: Theme.of(context).iconTheme,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: false,
+                      title: Text(
+                        "Account",
+                      ),
+                    ),
+                  ),
                   model.state == ViewState.Busy
                       ? SliverList(
                           delegate: SliverChildListDelegate(
@@ -33,82 +47,85 @@ class UserProfileScreen extends StatelessWidget {
                       : model.signedIn
                           ? SignedInProfileContent(model: model)
                           : SliverList(
-                              delegate: SliverChildListDelegate([
-                                Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16.0,
-                                      right: 16,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        SizedBox(
-                                          height: 150,
-                                        ),
-                                        Text(
-                                          "Hello 🥳",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .display1
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .title
-                                                    .color,
-                                              ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        SizedBox(
-                                          height: 12,
-                                        ),
-                                        Text(
-                                          "You're not signed in",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                        Text(
-                                          "Sign in to Fritter for maximum fun",
-                                          style:
-                                              Theme.of(context).textTheme.body2,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        SizedBox(
-                                          height: 32,
-                                        ),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.8,
-                                          height: 56.0,
-                                          child: RaisedButton(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                14,
-                                              ),
-                                            ),
-                                            child: Text("Sign In"),
-                                            onPressed: () {
-                                              model.authenticateUser(context);
-                                            },
+                              delegate: SliverChildListDelegate(
+                                [
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 16,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: <Widget>[
+                                          SizedBox(
+                                            height: 150,
                                           ),
-                                        ),
-                                      ],
+                                          Text(
+                                            "Hello 🥳",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .display1
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .title
+                                                      .color,
+                                                ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                            height: 12,
+                                          ),
+                                          Text(
+                                            "You're not signed in",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                          Text(
+                                            "Sign in to Fritter for maximum fun",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .body2,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                            height: 32,
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.8,
+                                            height: 56.0,
+                                            child: RaisedButton(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  14,
+                                                ),
+                                              ),
+                                              child: Text("Sign In"),
+                                              onPressed: () {
+                                                model.authenticateUser(context);
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ]),
+                                ],
+                              ),
                             ),
                 ],
               ),
