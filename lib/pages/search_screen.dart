@@ -57,7 +57,9 @@ class _SearchPageState extends State<SearchPage> {
                                               .subQueryResult.subreddits
                                               .elementAt(index)
                                               .iconImg)
-                                          : Container(),
+                                          : AssetImage(
+                                              'assets/default_icon.png',
+                                            ),
                                       backgroundColor: model
                                                   .subQueryResult.subreddits
                                                   .elementAt(index)

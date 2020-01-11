@@ -29,6 +29,27 @@ class SearchProvider with ChangeNotifier {
     if (_secureStorageHelper.signInStatus) {
       String authToken = await _secureStorageHelper.authToken;
       Uri uri = Uri.https(
+        'oauth.reddit.com',
+        'api/search_subreddits.json',
+        {
+          'query': query,
+        },
+      );
+      print(uri);
+      http.Response response = await http.post(
+        uri,
+        headers: {
+          'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+          'Authorization': 'bearer $authToken',
+        },
+      );
+      print("Subreddit search query status: " + response.statusCode.toString());
+
+      if (response.statusCode == 200) {
+        _subQueryResult = _subQueryResult.fromJson(json.decode(response.body));
+      }
+    } else {
+      Uri uri = Uri.https(
         'www.reddit.com',
         'api/search_subreddits.json',
         {
@@ -40,7 +61,6 @@ class SearchProvider with ChangeNotifier {
         uri,
         headers: {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-//          'Authorization': 'bearer $authToken',
         },
       );
       print("Subreddit search query status: " + response.statusCode.toString());
