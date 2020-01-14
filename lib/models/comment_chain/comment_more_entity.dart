@@ -25,8 +25,6 @@ class CommentMoreJson {
 //    print("data" + json["data"]);
     if (json['data'] != null) {
       data = CommentMoreJsonData.fromJson(json['data']);
-      print("*" * 10 + 'data stored is' + "*" * 10);
-      print(data.toJson().toString());
     } else {
       print('data is null');
     }

@@ -69,9 +69,8 @@ class MyTestApp extends StatelessWidget {
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
         cardColor: Colors.black,
-        dividerColor: Colors.white.withOpacity(0.3),
         dividerTheme: DividerThemeData(
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withOpacity(0.3),
         ),
         brightness: Brightness.dark,
         iconTheme: IconThemeData(

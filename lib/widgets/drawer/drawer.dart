@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
+import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class LeftDrawer extends StatefulWidget {
 }
 
 class _LeftDrawerState extends State<LeftDrawer> {
-  var _subredditGoController = new TextEditingController();
   final ScrollController _controller = ScrollController();
 
   @override
@@ -40,48 +40,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
-                                child: ListTile(
-                                  title: TextField(
-                                    decoration: InputDecoration(
-                                      hintText: 'Goto subreddit',
-                                      filled: true,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                    autofocus: false,
-                                    autocorrect: false,
-                                    controller: _subredditGoController,
-                                    onSubmitted: (value) {
-                                      loadNewSubreddit(context, value);
-                                    },
-                                  ),
-                                  trailing: IconButton(
-                                    tooltip: "Go",
-                                    icon: Icon(
-                                      Icons.arrow_forward,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      return Navigator.of(
-                                        context,
-                                        rootNavigator: false,
-                                      ).push(
-                                        CupertinoPageRoute(
-                                          builder: (context) =>
-                                              SubredditFeedPage(
-                                            subreddit:
-                                                _subredditGoController.text,
-                                          ),
-                                          fullscreenDialog: true,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                child: GoToSubredditWidget(),
                               );
                             }
                             if (index == -1) {
@@ -197,105 +156,72 @@ class _LeftDrawerState extends State<LeftDrawer> {
                       [
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: ListTile(
-                            title: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Goto subreddit',
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              autofocus: false,
-                              autocorrect: false,
-                              controller: _subredditGoController,
-                              onSubmitted: (value) {
-                                loadNewSubreddit(context, value);
-                              },
-                            ),
-                            trailing: IconButton(
-                              tooltip: "Go",
-                              icon: Icon(
-                                Icons.arrow_forward,
-                              ),
-                              onPressed: () {
-                                loadNewSubreddit(
-                                    context, _subredditGoController.text);
-                              },
-                            ),
-                          ),
+                          child: GoToSubredditWidget(),
                         ),
                       ],
                     ),
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            right: 16,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 150,
-                              ),
-                              Text(
-                                "Hello 🥳",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .display1
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .title
-                                          .color,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(
-                                height: 12,
-                              ),
-                              Text(
-                                "You're not signed in",
-                                style: Theme.of(context).textTheme.headline,
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                "Sign in to Fritter for maximum fun",
-                                style: Theme.of(context).textTheme.body2,
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(
-                                height: 32,
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                height: 56.0,
-                                child: RaisedButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      14,
-                                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16.0,
+                          right: 16,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 150,
+                            ),
+                            Text(
+                              "Hello 🥳",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .display1
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).textTheme.title.color,
                                   ),
-                                  child: Text("Sign In"),
-                                  onPressed: () {
-                                    model.authenticateUser(context);
-                                  },
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 12,
+                            ),
+                            Text(
+                              "You're not signed in",
+                              style: Theme.of(context).textTheme.headline,
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            Text(
+                              "Sign in to Fritter to see your subscriptions",
+                              style: Theme.of(context).textTheme.body2,
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 32,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              height: 56.0,
+                              child: RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
                                 ),
+                                child: Text("Sign In"),
+                                onPressed: () {
+                                  model.authenticateUser(context);
+                                },
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ]),
@@ -306,22 +232,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
           }
           return Container();
         }),
-      ),
-    );
-  }
-
-  loadNewSubreddit(BuildContext context, String text) {
-    final text = _subredditGoController.text.replaceAll(" ", "");
-    Navigator.of(context).pop();
-    return Navigator.of(
-      context,
-      rootNavigator: false,
-    ).push(
-      CupertinoPageRoute(
-        builder: (context) => SubredditFeedPage(
-          subreddit: text,
-        ),
-        fullscreenDialog: true,
       ),
     );
   }

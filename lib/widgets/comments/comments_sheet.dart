@@ -18,7 +18,6 @@ class CommentsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(item.media);
     return Hero(
       tag: item.id,
       child: Dismissible(

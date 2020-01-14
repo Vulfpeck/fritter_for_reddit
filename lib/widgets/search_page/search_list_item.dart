@@ -5,14 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/media_type_enum.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
+import 'package:flutter_provider_app/models/search_results/posts/search_posts_repo_entity_entity.dart';
 import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-class FeedCard extends StatelessWidget {
-  final PostsFeedDataChildrenData data;
-  FeedCard(this.data);
+class SearchCard extends StatelessWidget {
+  final SearchPostsRepoEntityDataChildrenData data;
+  SearchCard(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class FeedCard extends StatelessWidget {
         children: <Widget>[
           Material(
             color: Colors.transparent,
-            child: FeedCardTitle(
+            child: SearchCardTitle(
               title: data.title,
               stickied: data.stickied,
               linkFlairText: data.linkFlairText,
@@ -62,7 +61,7 @@ class FeedCard extends StatelessWidget {
               child: data.preview != null && data.isSelf == false
                   ? Padding(
                       padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                      child: FeedCardBodyImage(
+                      child: SearchCardBodyImage(
                         images: data.preview.images,
                         data: data,
                       ),
@@ -76,13 +75,13 @@ class FeedCard extends StatelessWidget {
   }
 }
 
-class FeedCardTitle extends StatelessWidget {
+class SearchCardTitle extends StatelessWidget {
   final String title;
   final bool stickied;
   final String linkFlairText;
   final bool nsfw;
 
-  FeedCardTitle({
+  SearchCardTitle({
     @required this.title,
     @required this.stickied,
     @required this.linkFlairText,
@@ -103,7 +102,7 @@ class FeedCardTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          StickyTag(stickied),
+          SearchStickyTag(stickied),
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: RichText(
@@ -156,18 +155,19 @@ class FeedCardTitle extends StatelessWidget {
   }
 }
 
-class FeedCardBodyImage extends StatelessWidget {
+class SearchCardBodyImage extends StatelessWidget {
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
-  final List<PostsFeedDatachildDataPreviewImages> images;
-  final PostsFeedDataChildrenData data;
+  final List<SearchPostsRepoEntityDatachildDataPreviewImages> images;
+  final SearchPostsRepoEntityDataChildrenData data;
 
-  FeedCardBodyImage({@required this.images, @required this.data});
+  SearchCardBodyImage({@required this.images, @required this.data});
 
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
     final double ratio = (mq.width) / images.first.source.width;
     String url = _htmlUnescape.convert(images.first.source.url);
+
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
         return Center(
@@ -175,9 +175,10 @@ class FeedCardBodyImage extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                Map<String, dynamic> result = getMediaType(data);
-                if (result['media_type'] == MediaType.Video ||
-                    result['media_type'] == MediaType.Image) {
+                print("media : " + data.media.toString());
+                if (data.media != null) {
+                  String videoUrl = getMediaUrl(data);
+                  bool isVideo = videoUrl != null && videoUrl.contains("mp4");
                   Navigator.of(
                     context,
                     rootNavigator: true,
@@ -185,14 +186,33 @@ class FeedCardBodyImage extends StatelessWidget {
                     CupertinoPageRoute(
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
-                          mediaUrl: result['url'],
-                          isVideo: result['media_type'] == MediaType.Video,
+                          mediaUrl: videoUrl == null ? url : videoUrl,
+                          isVideo: isVideo,
                         );
                       },
                       fullscreenDialog: true,
                     ),
                   );
-                } else {}
+                } else {
+                  if (data.isRedditMediaDomain) {
+                    Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).push(
+                      CupertinoPageRoute(
+                        builder: (BuildContext context) {
+                          return PhotoViewerScreen(
+                            mediaUrl: url,
+                            isVideo: false,
+                          );
+                        },
+                        fullscreenDialog: true,
+                      ),
+                    );
+                  } else {
+                    launchURL(context, data.url);
+                  }
+                }
               },
               child:
 //            data.media != null
@@ -206,8 +226,11 @@ class FeedCardBodyImage extends StatelessWidget {
                   url,
                 ),
                 fit: BoxFit.fitWidth,
+//                height: images.first.source.height.toDouble() * ratio ,
                 width: mq.width,
-                height: images.first.source.height.toDouble() * ratio,
+                height: images.first.source.height >= 500
+                    ? 500.0
+                    : images.first.source.height.toDouble(),
               ),
             ),
           ),
@@ -216,84 +239,38 @@ class FeedCardBodyImage extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
-    Map<String, dynamic> result = Map();
-    if (data.isRedditMediaDomain == null) {
-      data.isRedditMediaDomain = false;
-    }
-    switch (data.isRedditMediaDomain) {
-      case true:
-        {
-          if (data.media == null) {
-            result['media_type'] = MediaType.Image;
-            result['url'] = data.url;
-            return result;
-          } else {
-            print(data.media);
-            result['media_type'] = MediaType.Video;
-            String url = data.media['reddit_video']['fallback_url']
-                .toString()
-                .replaceFirstMapped(RegExp(r'DASH_\d+'), (match) {
-              print(match.start);
-              print(match.end);
-              return 'DASH_240';
-            });
-            result['url'] = url;
-            print("URLLLLLL" + url);
-            return result;
+  String getMediaUrl(SearchPostsRepoEntityDataChildrenData data) {
+    String url;
+    if (data.media != null) {
+      if (data.media['reddit_video'] != null) {
+        print("reddit video");
+      } else if (data.media['oembed']['provider_url'] != null) {
+        String subType = data.media['oembed']['provider_url'];
+        if (subType == "http://imgur.com") {
+          print("imgur thing");
+          if (!data.media['oembed']['url'].toString().contains('/a/')) {
+            print("Imgur url" + data.media['oembed']['url']);
           }
-          break;
+        } else if (subType == "https://gfycat.com") {
+          print('gfycat');
+          url = data.media['oembed']['thumbnail_url']
+              .toString()
+              .replaceAll(".gif", ".mp4")
+              .replaceAll("thumbs", "giant")
+              .replaceAll("-size_restricted", "");
         }
-      case false:
-        {
-          if (data.media == null) {
-            final Uri uri = Uri.parse(data.url);
-            print(uri);
-            print(uri.authority);
-            if (uri.authority == 'imgur.com' ||
-                uri.authority == 'i.imgur.com' ||
-                uri.authority == 'm.imgur.com') {
-              print("imgur domain");
-              if (uri.path.contains('/a/') || uri.path.contains('/gallery')) {
-                result['media_type'] = MediaType.ImgurGallery;
-                result['url'] = data.url;
-                return result;
-              } else if (uri.path.contains('mp4') ||
-                  uri.path.contains('gifv')) {
-                result['media_type'] = MediaType.Video;
-                result['url'] = data.url.replaceAll('gifv', 'mp4');
-                return result;
-              } else {
-                result['media_type'] = MediaType.Image;
-                result['url'] = data.url;
-                return result;
-              }
-            }
-          } else {
-            final Uri uri = Uri.parse(data.url);
-            if (uri.authority == 'gfycat.com') {
-              result['url'] = data.media['oembed']['thumbnail_url']
-                  .toString()
-                  .replaceAll(".gif", ".mp4")
-                  .replaceAll("thumbs", "giant")
-                  .replaceAll("-size_restricted", "");
-              result['media_type'] = MediaType.Video;
-              return result;
-            } else {
-              result['media_type'] = MediaType.Url;
-              result['url'] = data.url;
-              return result;
-            }
-          }
-          break;
-        }
+      } else {
+        print("other");
+      }
     }
+    print("Final media url" + url.toString());
+    return url;
   }
 }
 
-class FeedCardBodySelfText extends StatelessWidget {
+class SearchBodySelfText extends StatelessWidget {
   final String selftextHtml;
-  FeedCardBodySelfText({this.selftextHtml});
+  SearchBodySelfText({this.selftextHtml});
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
 
   @override
@@ -332,10 +309,10 @@ class FeedCardBodySelfText extends StatelessWidget {
   }
 }
 
-class StickyTag extends StatelessWidget {
+class SearchStickyTag extends StatelessWidget {
   final bool _isStickied;
 
-  StickyTag(this._isStickied);
+  SearchStickyTag(this._isStickied);
 
   @override
   Widget build(BuildContext context) {

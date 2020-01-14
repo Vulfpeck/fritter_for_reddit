@@ -237,7 +237,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                                     launchURL(context, item.url);
                                   }
                                 },
-                                onTap: () => _openComments(item, context),
+                                onTap: () {
+                                  _openComments(item, context);
+                                },
                                 child: Hero(
                                   child: SingleChildScrollView(
                                     child: Column(
@@ -275,18 +277,6 @@ class _SubredditFeedState extends State<SubredditFeed>
           : CommentSortTypes.Best,
     );
     Navigator.of(context).push(
-//      CupertinoPageRoute(
-//        builder: (BuildContext context) {
-//          return CommentsSheet(item);
-//        },
-//        title: "Comments",
-//      ),
-//      CustomRoute(
-//        enterPage: CommentsSheet(
-//          item,
-//        ),
-//        exitPage: this.widget,
-//      ),
       PageRouteBuilder(
         pageBuilder: (BuildContext context, _, __) {
           return CommentsSheet(item);
@@ -299,20 +289,15 @@ class _SubredditFeedState extends State<SubredditFeed>
             child: child,
             opacity: CurvedAnimation(
               parent: primaryanimation,
-              curve: Curves.easeInToLinear,
-              reverseCurve: Curves.linearToEaseOut,
+              curve: Curves.linearToEaseOut,
+              reverseCurve: Curves.easeInToLinear,
             ),
           );
         },
         transitionDuration: Duration(
-          milliseconds: 350,
+          milliseconds: 450,
         ),
       ),
-//      SlideUpRoute(
-//        builder: (BuildContext context) => CommentsSheet(
-//          item,
-//        ),
-//      ),
     );
   }
 }
