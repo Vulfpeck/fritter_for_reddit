@@ -47,6 +47,8 @@ class _SearchPageState extends State<SearchPage> {
                 physics: AlwaysScrollableScrollPhysics(),
                 slivers: <Widget>[
                   SearchBarWidget(),
+
+                  // subreddit headings
                   SliverList(
                     delegate: model.subQueryResult.subreddits != null
                         ? SliverChildListDelegate(
@@ -64,80 +66,69 @@ class _SearchPageState extends State<SearchPage> {
                           )
                         : SliverChildListDelegate([]),
                   ),
+
+                  // list of relevant subreddits
                   SliverList(
                     delegate: model.subQueryResult.subreddits != null
-                        ? model.subredditQueryLoadingState == ViewState.Busy
-                            ? SliverChildListDelegate(
-                                [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0,
-                                      vertical: 16,
-                                    ),
-                                    child: LinearProgressIndicator(),
-                                  )
-                                ],
-                              )
-                            : SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                                  return ListTile(
-                                    title: Text(
-                                      model.subQueryResult.subreddits
+                        ? SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return ListTile(
+                                title: Text(
+                                  model.subQueryResult.subreddits
+                                      .elementAt(index)
+                                      .name,
+                                ),
+                                leading: CircleAvatar(
+                                  backgroundImage: model
+                                                  .subQueryResult.subreddits
+                                                  .elementAt(index)
+                                                  .iconImg !=
+                                              "" &&
+                                          model.subQueryResult.subreddits
+                                                  .elementAt(index)
+                                                  .iconImg !=
+                                              null
+                                      ? CachedNetworkImageProvider(model
+                                          .subQueryResult.subreddits
+                                          .elementAt(index)
+                                          .iconImg)
+                                      : AssetImage(
+                                          'assets/default_icon.png',
+                                        ),
+                                  backgroundColor: model
+                                              .subQueryResult.subreddits
+                                              .elementAt(index)
+                                              .keyColor !=
+                                          ""
+                                      ? HexColor(
+                                          "#" +
+                                              model.subQueryResult.subreddits
+                                                  .elementAt(index)
+                                                  .keyColor,
+                                        )
+                                      : Theme.of(context).accentColor,
+                                ),
+                                onTap: () =>
+                                    Navigator.of(context, rootNavigator: false)
+                                        .push(
+                                  CupertinoPageRoute(
+                                    fullscreenDialog: true,
+                                    builder: (BuildContext context) =>
+                                        SubredditFeedPage(
+                                      subreddit: model.subQueryResult.subreddits
                                           .elementAt(index)
                                           .name,
                                     ),
-                                    leading: CircleAvatar(
-                                      backgroundImage: model
-                                                      .subQueryResult.subreddits
-                                                      .elementAt(index)
-                                                      .iconImg !=
-                                                  "" &&
-                                              model.subQueryResult.subreddits
-                                                      .elementAt(index)
-                                                      .iconImg !=
-                                                  null
-                                          ? CachedNetworkImageProvider(model
-                                              .subQueryResult.subreddits
-                                              .elementAt(index)
-                                              .iconImg)
-                                          : AssetImage(
-                                              'assets/default_icon.png',
-                                            ),
-                                      backgroundColor: model
-                                                  .subQueryResult.subreddits
-                                                  .elementAt(index)
-                                                  .keyColor !=
-                                              ""
-                                          ? HexColor(
-                                              "#" +
-                                                  model
-                                                      .subQueryResult.subreddits
-                                                      .elementAt(index)
-                                                      .keyColor,
-                                            )
-                                          : Theme.of(context).accentColor,
-                                    ),
-                                    onTap: () => Navigator.of(context,
-                                            rootNavigator: false)
-                                        .push(
-                                      CupertinoPageRoute(
-                                        fullscreenDialog: true,
-                                        builder: (BuildContext context) =>
-                                            SubredditFeedPage(
-                                          subreddit: model
-                                              .subQueryResult.subreddits
-                                              .elementAt(index)
-                                              .name,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                childCount:
-                                    model.subQueryResult.subreddits.length,
-                              )
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: model.subQueryResult.subreddits.length,
+                          )
                         : SliverChildListDelegate([]),
                   ),
+
+                  // posts subheading
                   SliverList(
                     delegate: model.postsQueryResult.data != null
                         ? SliverChildListDelegate(
@@ -155,96 +146,125 @@ class _SearchPageState extends State<SearchPage> {
                           )
                         : SliverChildListDelegate([]),
                   ),
+
+                  // list of posts from query
                   SliverList(
                     delegate: model.postsQueryResult.data != null
-                        ? model.postsQueryLoadingState == ViewState.Busy
+                        ? SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              if (index.isOdd) {
+                                return Divider();
+                              } else {
+                                final item = model
+                                    .postsQueryResult.data.children
+                                    .elementAt(index ~/ 2)
+                                    .data;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: Material(
+                                    color: Theme.of(context).cardColor,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Provider.of<CommentsProvider>(context)
+                                            .fetchComments(
+                                          requestingRefresh: false,
+                                          subredditName: item.subreddit,
+                                          postId: item.id,
+                                          sort: item.suggestedSort != null
+                                              ? changeCommentSortConvertToEnum[
+                                                  item.suggestedSort]
+                                              : CommentSortTypes.Best,
+                                        );
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                            pageBuilder:
+                                                (BuildContext context, _, __) {
+                                              return CommentsSheet(item);
+                                            },
+                                            fullscreenDialog: true,
+                                            opaque: false,
+                                            transitionsBuilder: (context,
+                                                primaryanimation,
+                                                secondaryanimation,
+                                                child) {
+                                              return FadeTransition(
+                                                child: child,
+                                                opacity: CurvedAnimation(
+                                                  parent: primaryanimation,
+                                                  curve: Curves.linearToEaseOut,
+                                                  reverseCurve:
+                                                      Curves.easeInToLinear,
+                                                ),
+                                              );
+                                            },
+                                            transitionDuration: Duration(
+                                              milliseconds: 450,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Hero(
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            children: <Widget>[
+                                              FeedCard(
+                                                item,
+                                              ),
+                                              PostControls(item),
+                                            ],
+                                          ),
+                                        ),
+                                        tag: item.id,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            childCount:
+                                model.postsQueryResult.data.children.length * 2,
+                          )
+                        : SliverChildListDelegate([]),
+                  ),
+                  SliverList(
+                    delegate: model.subQueryResult.subreddits == null &&
+                            model.postsQueryResult.data == null
+                        ? SliverChildListDelegate(
+                            [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1,
+                              ),
+                              Icon(
+                                Icons.search,
+                                color:
+                                    Theme.of(context).textTheme.subtitle.color,
+                                size: 56,
+                              ),
+                              SizedBox(
+                                height: 16,
+                              ),
+                              Center(
+                                child: Text(
+                                  "To get the results, search you must.",
+                                  style: Theme.of(context).textTheme.caption,
+                                ),
+                              ),
+                            ],
+                          )
+                        : SliverChildListDelegate([]),
+                  ),
+                  SliverList(
+                    delegate:
+                        model.subredditQueryLoadingState == ViewState.Busy ||
+                                model.postsQueryLoadingState == ViewState.Busy
                             ? SliverChildListDelegate([
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 16.0, right: 16, top: 8, bottom: 8),
+                                  padding: const EdgeInsets.all(16.0),
                                   child: LinearProgressIndicator(),
                                 )
                               ])
-                            : SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                                  if (index.isOdd) {
-                                    return Divider();
-                                  } else {
-                                    final item = model
-                                        .postsQueryResult.data.children
-                                        .elementAt(index ~/ 2)
-                                        .data;
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 16.0),
-                                      child: Material(
-                                        color: Theme.of(context).cardColor,
-                                        child: InkWell(
-                                          onTap: () {
-                                            Provider.of<CommentsProvider>(
-                                                    context)
-                                                .fetchComments(
-                                              requestingRefresh: false,
-                                              subredditName: item.subreddit,
-                                              postId: item.id,
-                                              sort: item.suggestedSort != null
-                                                  ? changeCommentSortConvertToEnum[
-                                                      item.suggestedSort]
-                                                  : CommentSortTypes.Best,
-                                            );
-                                            Navigator.of(context).push(
-                                              PageRouteBuilder(
-                                                pageBuilder:
-                                                    (BuildContext context, _,
-                                                        __) {
-                                                  return CommentsSheet(item);
-                                                },
-                                                fullscreenDialog: true,
-                                                opaque: false,
-                                                transitionsBuilder: (context,
-                                                    primaryanimation,
-                                                    secondaryanimation,
-                                                    child) {
-                                                  return FadeTransition(
-                                                    child: child,
-                                                    opacity: CurvedAnimation(
-                                                      parent: primaryanimation,
-                                                      curve: Curves
-                                                          .linearToEaseOut,
-                                                      reverseCurve:
-                                                          Curves.easeInToLinear,
-                                                    ),
-                                                  );
-                                                },
-                                                transitionDuration: Duration(
-                                                  milliseconds: 450,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Hero(
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                children: <Widget>[
-                                                  FeedCard(
-                                                    item,
-                                                  ),
-                                                  PostControls(item),
-                                                ],
-                                              ),
-                                            ),
-                                            tag: item.id,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                childCount: model
-                                        .postsQueryResult.data.children.length *
-                                    2,
-                              )
-                        : SliverChildListDelegate([]),
+                            : SliverChildListDelegate([]),
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
@@ -321,7 +341,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.clear),
-                    onPressed: () => controller.clear(),
+                    onPressed: () {
+                      controller.clear();
+                      model.clearResults();
+                    },
                   ),
                 ),
 //                onChanged: (String value) async {
@@ -330,10 +353,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 //                      .queryReddit(query: value);
 //                },
                 onSubmitted: (String textValue) {
-                  Provider.of<SearchProvider>(context)
-                      .queryReddit(query: textValue);
-                  Provider.of<SearchProvider>(context)
-                      .searchPosts(query: textValue);
+                  if (textValue != "") {
+                    Provider.of<SearchProvider>(context)
+                        .queryReddit(query: textValue);
+                    Provider.of<SearchProvider>(context)
+                        .searchPosts(query: textValue);
+                  }
                 },
               );
             },

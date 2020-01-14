@@ -137,56 +137,57 @@ class PostControls extends StatelessWidget {
   }
 
   void showPostOptions(BuildContext context) {
-    showModalBottomSheet(
+    showCupertinoModalPopup(
       context: context,
-      isScrollControlled: true,
-      elevation: 10,
+      useRootNavigator: false,
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.3,
-          maxChildSize: 0.7,
-          minChildSize: 0.1,
-          builder: (context, controller) {
-            return CustomScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              controller: controller,
-              slivers: <Widget>[
-                SliverList(
-                  delegate: SliverChildListDelegate(<Widget>[
-                    ListTile(
-                      title: Text('View Profile'),
-                      leading: CircleAvatar(
-                        child: Icon(Icons.person),
-                      ),
-                    ),
-                    ListTile(
-                      title: Text('View Subreddit'),
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage(
-                          'assets/default_icon.png',
+        return Material(
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.3,
+            maxChildSize: 0.7,
+            minChildSize: 0.1,
+            builder: (context, controller) {
+              return CustomScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                controller: controller,
+                slivers: <Widget>[
+                  SliverList(
+                    delegate: SliverChildListDelegate(<Widget>[
+                      ListTile(
+                        title: Text('View Profile'),
+                        leading: CircleAvatar(
+                          child: Icon(Icons.person),
                         ),
                       ),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        return Navigator.of(
-                          context,
-                          rootNavigator: false,
-                        ).push(
-                          CupertinoPageRoute(
-                            builder: (context) => SubredditFeedPage(
-                              subreddit: postData.subreddit,
-                            ),
-                            fullscreenDialog: true,
+                      ListTile(
+                        title: Text('View Subreddit'),
+                        leading: CircleAvatar(
+                          backgroundImage: AssetImage(
+                            'assets/default_icon.png',
                           ),
-                        );
-                      },
-                    )
-                  ]),
-                ),
-              ],
-            );
-          },
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          return Navigator.of(
+                            context,
+                            rootNavigator: false,
+                          ).push(
+                            CupertinoPageRoute(
+                              builder: (context) => SubredditFeedPage(
+                                subreddit: postData.subreddit,
+                              ),
+                              fullscreenDialog: true,
+                            ),
+                          );
+                        },
+                      )
+                    ]),
+                  ),
+                ],
+              );
+            },
+          ),
         );
       },
     );

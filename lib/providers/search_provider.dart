@@ -150,5 +150,6 @@ class SearchProvider with ChangeNotifier {
   void clearResults() {
     _postsQueryResult = PostsFeedEntity();
     _subQueryResult = SearchSubredditsRepoEntity();
+    notifyListeners();
   }
 }

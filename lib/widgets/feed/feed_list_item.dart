@@ -168,6 +168,7 @@ class FeedCardBodyImage extends StatelessWidget {
     final mq = MediaQuery.of(context).size;
     final double ratio = (mq.width) / images.first.source.width;
     String url = _htmlUnescape.convert(images.first.source.url);
+
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
         return Center(
@@ -185,7 +186,9 @@ class FeedCardBodyImage extends StatelessWidget {
                     CupertinoPageRoute(
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
-                          mediaUrl: result['url'],
+                          mediaUrl: result['media_type'] == MediaType.Image
+                              ? url
+                              : result['url'],
                           isVideo: result['media_type'] == MediaType.Video,
                         );
                       },
