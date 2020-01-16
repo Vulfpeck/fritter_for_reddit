@@ -281,7 +281,7 @@ class _SubredditFeedState extends State<SubredditFeed>
         pageBuilder: (BuildContext context, _, __) {
           return CommentsSheet(item);
         },
-        fullscreenDialog: true,
+        fullscreenDialog: false,
         opaque: false,
         transitionsBuilder:
             (context, primaryanimation, secondaryanimation, child) {
@@ -295,7 +295,7 @@ class _SubredditFeedState extends State<SubredditFeed>
           );
         },
         transitionDuration: Duration(
-          milliseconds: 450,
+          milliseconds: 250,
         ),
       ),
     );

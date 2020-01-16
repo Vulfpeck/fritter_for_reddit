@@ -160,7 +160,8 @@ class _SearchPageState extends State<SearchPage> {
                                     .elementAt(index ~/ 2)
                                     .data;
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  padding: const EdgeInsets.only(
+                                      bottom: 4.0, top: 4.0),
                                   child: Material(
                                     color: Theme.of(context).cardColor,
                                     child: InkWell(
@@ -198,7 +199,7 @@ class _SearchPageState extends State<SearchPage> {
                                               );
                                             },
                                             transitionDuration: Duration(
-                                              milliseconds: 450,
+                                              milliseconds: 250,
                                             ),
                                           ),
                                         );
@@ -237,8 +238,19 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               Icon(
                                 Icons.search,
-                                color:
-                                    Theme.of(context).textTheme.subtitle.color,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .caption
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .caption
+                                          .color
+                                          .withOpacity(
+                                            0.3,
+                                          ),
+                                    )
+                                    .color,
                                 size: 56,
                               ),
                               SizedBox(
@@ -247,7 +259,18 @@ class _SearchPageState extends State<SearchPage> {
                               Center(
                                 child: Text(
                                   "To get the results, search you must.",
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .caption
+                                            .color
+                                            .withOpacity(
+                                              0.7,
+                                            ),
+                                      ),
                                 ),
                               ),
                             ],
@@ -306,66 +329,73 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       brightness: MediaQuery.of(context).platformBrightness,
       backgroundColor: Theme.of(context).cardColor,
       flexibleSpace: FlexibleSpaceBar(
-        background: Padding(
-          padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 56,
-              left: 16.0,
-              right: 16.0),
-          child: Consumer(
-            builder:
-                (BuildContext context, SearchProvider model, Widget child) {
-              return TextField(
-                controller: controller,
-                autocorrect: false,
-                enableSuggestions: true,
-                autofocus: false,
-                keyboardAppearance: MediaQuery.of(context).platformBrightness,
-                decoration: InputDecoration(
-                  alignLabelWithHint: true,
-                  filled: true,
-                  hintText: "Search for subreddits and posts",
-                  prefixIcon: Icon(Icons.search),
-                  isDense: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(width: 2),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color:
-                          Theme.of(context).textTheme.title.color.withOpacity(
+        background: Stack(
+          children: <Widget>[
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Consumer(
+                builder:
+                    (BuildContext context, SearchProvider model, Widget child) {
+                  return TextField(
+                    controller: controller,
+                    autocorrect: false,
+                    enableSuggestions: true,
+                    autofocus: false,
+                    keyboardAppearance:
+                        MediaQuery.of(context).platformBrightness,
+                    decoration: InputDecoration(
+                      alignLabelWithHint: true,
+                      filled: true,
+                      hintText: "Search for subreddits and posts",
+                      prefixIcon: Icon(Icons.search),
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(width: 2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Theme.of(context)
+                              .textTheme
+                              .title
+                              .color
+                              .withOpacity(
                                 0.3,
                               ),
+                        ),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          controller.clear();
+                          model.clearResults();
+                        },
+                      ),
                     ),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      controller.clear();
-                      model.clearResults();
+                    onChanged: (String textValue) async {
+                      if (textValue == "") return;
+                      Provider.of<SearchProvider>(context)
+                          .searchSubreddits(query: textValue);
                     },
-                  ),
-                ),
-//                onChanged: (String value) async {
-//                  if (value == "") return;
-//                  Provider.of<SearchProvider>(context)
-//                      .queryReddit(query: value);
-//                },
-                onSubmitted: (String textValue) {
-                  if (textValue != "") {
-                    Provider.of<SearchProvider>(context)
-                        .queryReddit(query: textValue);
-                    Provider.of<SearchProvider>(context)
-                        .searchPosts(query: textValue);
-                  }
+                    onSubmitted: (String textValue) {
+                      if (textValue != "") {
+                        Provider.of<SearchProvider>(context)
+                            .searchSubreddits(query: textValue);
+                        Provider.of<SearchProvider>(context)
+                            .searchPosts(query: textValue);
+                      }
+                    },
+                  );
                 },
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
       ),
-      expandedHeight: MediaQuery.of(context).padding.top + 72,
+      expandedHeight: MediaQuery.of(context).padding.top + 96,
     );
   }
 }

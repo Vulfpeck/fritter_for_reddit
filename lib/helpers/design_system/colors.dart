@@ -25,11 +25,11 @@ Color getColor(Brightness platformBrightness, ColorObjects obj) {
         }
       case ColorObjects.UpvoteColor:
         {
-          return Colors.deepOrange.shade400;
+          return Colors.orangeAccent;
         }
       case ColorObjects.DownvoteColor:
         {
-          return Colors.deepPurple.shade300;
+          return Colors.purpleAccent;
         }
     }
   }

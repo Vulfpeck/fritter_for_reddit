@@ -34,8 +34,9 @@ class MyTestApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         brightness: Brightness.light,
         iconTheme: IconThemeData(
-          color: Colors.black,
+          color: Colors.black.withOpacity(0.7),
         ),
+        primaryColor: Colors.blue,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.blueGrey.shade50,
               surface: Colors.blueGrey.shade100,
@@ -46,21 +47,21 @@ class MyTestApp extends StatelessWidget {
         cardColor: Colors.white,
         textTheme: Theme.of(context).textTheme.copyWith(
               title: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
               body1: TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey.shade800,
               ),
               caption: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey.shade900,
               ),
               subtitle: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey.shade700,
               ),
@@ -70,7 +71,8 @@ class MyTestApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         cardColor: Colors.black,
         dividerTheme: DividerThemeData(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withOpacity(0.2),
+          thickness: 1,
         ),
         brightness: Brightness.dark,
         iconTheme: IconThemeData(
@@ -85,21 +87,22 @@ class MyTestApp extends StatelessWidget {
             ),
         textTheme: ThemeData.dark().textTheme.copyWith(
               title: TextStyle(
-                fontSize: 17,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(0.95),
               ),
               body1: TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withOpacity(0.8),
               ),
               caption: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withOpacity(0.9),
               ),
               subtitle: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withOpacity(
                   0.55,

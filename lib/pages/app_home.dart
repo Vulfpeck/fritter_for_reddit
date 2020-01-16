@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       child: CupertinoTabScaffold(
         controller: _tabController,
         tabBar: CupertinoTabBar(
-          backgroundColor: Theme.of(context).cardColor.withOpacity(0.75),
+          backgroundColor: Theme.of(context).cardColor.withOpacity(0.7),
           activeColor: Theme.of(context).accentColor,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(

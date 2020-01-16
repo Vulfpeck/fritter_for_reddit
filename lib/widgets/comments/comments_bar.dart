@@ -70,12 +70,13 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 children: <Widget>[
                   Text(
                     'Sort By',
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.subtitle,
                   ),
                   Text(
                     capitalizeString(
                       changeCommentSortConvertToString[_selectedSort],
                     ),
+                    style: Theme.of(context).textTheme.caption,
                   ),
                 ],
               ),

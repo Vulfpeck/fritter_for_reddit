@@ -30,9 +30,10 @@ class SearchProvider with ChangeNotifier {
     await _secureStorageHelper.init();
   }
 
-  Future<void> queryReddit({@required String query}) async {
+  Future<void> searchSubreddits({@required String query}) async {
     _subredditQueryLoadingState = ViewState.Busy;
     notifyListeners();
+    await _secureStorageHelper.init();
     if (_secureStorageHelper.signInStatus) {
       String authToken = await _secureStorageHelper.authToken;
       Uri uri = Uri.https(
@@ -85,6 +86,7 @@ class SearchProvider with ChangeNotifier {
     @required String query,
     String subreddit = "",
   }) async {
+    await _secureStorageHelper.init();
     _postsQueryLoadingState = ViewState.Busy;
     notifyListeners();
 

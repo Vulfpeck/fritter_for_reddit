@@ -16,8 +16,10 @@ class PhotoViewerScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
+        brightness: MediaQuery.of(context).platformBrightness,
         elevation: 0,
         backgroundColor: Colors.transparent,
+        iconTheme: Theme.of(context).iconTheme,
       ),
       body: isVideo
           ? VideoPlaySection(
@@ -65,6 +67,8 @@ class _VideoPlaySectionState extends State<VideoPlaySection> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).accentColor,
+        elevation: 4,
         onPressed: () {
           setState(() {
             if (_controller.value.isPlaying) {
