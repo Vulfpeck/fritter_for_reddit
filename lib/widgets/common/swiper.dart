@@ -24,7 +24,8 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
   DismissDirection direction;
   Offset commentOffset = Offset.zero;
   MediaQueryData _mediaQuery;
-
+  bool isDragging = false;
+  double initialPosition = 0;
   Animation<Alignment> _animation;
 
   /// Calculates and runs a [SpringSimulation].
@@ -81,15 +82,19 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
         _controller.stop();
       },
       onHorizontalDragStart: (details) {
-        print(details.localPosition.dx);
-        if (details.globalPosition.dx < size.width / 2) {
-          direction = DismissDirection.startToEnd;
-        } else {
-          direction = DismissDirection.endToStart;
-        }
+        initialPosition = details.localPosition.dx;
+        isDragging = false;
       },
       onHorizontalDragUpdate: (details) {
         setState(() {
+          if (!isDragging) {
+            isDragging = true;
+            if (details.localPosition.dx - initialPosition > 0) {
+              direction = DismissDirection.startToEnd;
+            } else {
+              direction = DismissDirection.endToStart;
+            }
+          }
           commentOffset += Offset(details.delta.dx, 0);
           if ((-1 * commentOffset.dx) / size.width > 0.0 &&
               (-1 * commentOffset.dx) / size.width < 0.40) {
@@ -100,6 +105,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
         });
       },
       onHorizontalDragEnd: (details) {
+        isDragging = false;
         _runAnimation(details.velocity.pixelsPerSecond, size);
         if (isUpvoting && direction == DismissDirection.endToStart) {
           if (Provider.of<UserInformationProvider>(context).signedIn) {
@@ -138,36 +144,37 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
       child: Stack(
         children: <Widget>[
           Positioned(
-            left: 0,
             right: 0,
             top: 0,
             bottom: 0,
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 150),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: direction == DismissDirection.startToEnd
-                    ? Text(
-                        "🐶 B O O P",
-                        style: Theme.of(context).textTheme.title,
-                      )
-                    : isUpvoting
-                        ? Icon(
-                            Icons.arrow_upward,
-                            color: getColor(_mediaQuery.platformBrightness,
-                                ColorObjects.UpvoteColor),
-                          )
-                        : Icon(
-                            Icons.arrow_downward,
-                            color: getColor(
-                              _mediaQuery.platformBrightness,
-                              ColorObjects.DownvoteColor,
-                            ),
-                          ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: isUpvoting
+                  ? Icon(
+                      Icons.arrow_upward,
+                      color: getColor(_mediaQuery.platformBrightness,
+                          ColorObjects.UpvoteColor),
+                    )
+                  : Icon(
+                      Icons.arrow_downward,
+                      color: getColor(
+                        _mediaQuery.platformBrightness,
+                        ColorObjects.DownvoteColor,
+                      ),
+                    ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "🐶boop",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.title,
               ),
-              alignment: direction == DismissDirection.startToEnd
-                  ? Alignment.centerLeft
-                  : Alignment.centerRight,
             ),
           ),
           Transform.translate(

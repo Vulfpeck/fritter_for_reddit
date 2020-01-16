@@ -33,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
               _scrollController.animateTo(
                 0,
                 duration: Duration(milliseconds: 350),
-                curve: Curves.linearToEaseOut,
+                curve: Curves.easeInToLinear,
               );
             },
           ),
@@ -183,7 +183,7 @@ class _SearchPageState extends State<SearchPage> {
                                               return CommentsSheet(item);
                                             },
                                             fullscreenDialog: true,
-                                            opaque: false,
+                                            opaque: true,
                                             transitionsBuilder: (context,
                                                 primaryanimation,
                                                 secondaryanimation,
@@ -192,14 +192,14 @@ class _SearchPageState extends State<SearchPage> {
                                                 child: child,
                                                 opacity: CurvedAnimation(
                                                   parent: primaryanimation,
-                                                  curve: Curves.linearToEaseOut,
+                                                  curve: Curves.easeInToLinear,
                                                   reverseCurve:
-                                                      Curves.easeInToLinear,
+                                                      Curves.linearToEaseOut,
                                                 ),
                                               );
                                             },
                                             transitionDuration: Duration(
-                                              milliseconds: 250,
+                                              milliseconds: 150,
                                             ),
                                           ),
                                         );

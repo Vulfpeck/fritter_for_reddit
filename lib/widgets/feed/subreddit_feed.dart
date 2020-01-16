@@ -282,20 +282,20 @@ class _SubredditFeedState extends State<SubredditFeed>
           return CommentsSheet(item);
         },
         fullscreenDialog: false,
-        opaque: false,
+        opaque: true,
         transitionsBuilder:
             (context, primaryanimation, secondaryanimation, child) {
           return FadeTransition(
             child: child,
             opacity: CurvedAnimation(
               parent: primaryanimation,
-              curve: Curves.linearToEaseOut,
-              reverseCurve: Curves.easeInToLinear,
+              curve: Curves.easeInToLinear,
+              reverseCurve: Curves.linearToEaseOut,
             ),
           );
         },
         transitionDuration: Duration(
-          milliseconds: 250,
+          milliseconds: 150,
         ),
       ),
     );

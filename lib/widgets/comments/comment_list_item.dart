@@ -69,7 +69,7 @@ class _CommentItemState extends State<CommentItem>
                 duration: Duration(
                   milliseconds: 250,
                 ),
-                curve: Curves.linearToEaseOut,
+                curve: Curves.easeInToLinear,
               ),
             ),
           ],
