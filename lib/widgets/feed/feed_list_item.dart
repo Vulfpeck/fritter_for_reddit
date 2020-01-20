@@ -14,64 +14,175 @@ class FeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
   FeedCard(this.data);
 
+  Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
+    Map<String, dynamic> result = Map();
+    if (data.isRedditMediaDomain == null) {
+      data.isRedditMediaDomain = false;
+    }
+    switch (data.isRedditMediaDomain) {
+      case true:
+        {
+          if (data.media == null) {
+            result['media_type'] = MediaType.Image;
+            result['url'] = data.url;
+            return result;
+          } else {
+            result['media_type'] = MediaType.Video;
+            String url = data.media['reddit_video']['fallback_url']
+                .toString()
+                .replaceFirstMapped(RegExp(r'DASH_\d+'), (match) {
+              return 'DASH_240';
+            });
+            result['url'] = url;
+            return result;
+          }
+          break;
+        }
+      case false:
+        {
+          if (data.media == null) {
+            final Uri uri = Uri.parse(data.url);
+            if (uri.authority == 'imgur.com' ||
+                uri.authority == 'i.imgur.com' ||
+                uri.authority == 'm.imgur.com') {
+              if (uri.path.contains('/a/') || uri.path.contains('/gallery')) {
+                result['media_type'] = MediaType.ImgurGallery;
+                result['url'] = data.url;
+                return result;
+              } else if (uri.path.contains('mp4') ||
+                  uri.path.contains('gifv')) {
+                result['media_type'] = MediaType.Video;
+                result['url'] = data.url.replaceAll('gifv', 'mp4');
+                return result;
+              } else {
+                result['media_type'] = MediaType.Image;
+                result['url'] = data.url;
+                return result;
+              }
+            }
+          } else {
+            final Uri uri = Uri.parse(data.url);
+            if (uri.authority == 'gfycat.com') {
+              result['url'] = data.media['oembed']['thumbnail_url']
+                  .toString()
+                  .replaceAll(".gif", ".mp4")
+                  .replaceAll("thumbs", "giant")
+                  .replaceAll("-size_restricted", "");
+              result['media_type'] = MediaType.Video;
+              return result;
+            } else {
+              result['media_type'] = MediaType.Url;
+              result['url'] = data.url;
+              return result;
+            }
+          }
+          break;
+        }
+    }
+
+    return {'media_type': MediaType.Url, 'url': data.url};
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Material(
-            color: Colors.transparent,
-            child: FeedCardTitle(
-              title: data.title,
-              stickied: data.stickied,
-              linkFlairText: data.linkFlairText,
-              nsfw: data.over18,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: 'in '),
-                  TextSpan(
-                    text: "r/" + data.subreddit,
-                    style: Theme.of(context).textTheme.subtitle.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                  TextSpan(text: " by "),
-                  TextSpan(
-                    text: "u/" + data.author + " ",
-                    style: Theme.of(context).textTheme.subtitle.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                ],
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: Container(
-              child: data.preview != null && data.isSelf == false
-                  ? Padding(
-                      padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                      child: FeedCardBodyImage(
-                        images: data.preview.images,
-                        data: data,
+    Map<String, dynamic> postMetaData = getMediaType(data);
+    final _htmlUnescape = HtmlUnescape();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        FeedCardTitle(
+          title: data.title,
+          stickied: data.stickied,
+          linkFlairText: data.linkFlairText,
+          nsfw: data.over18,
+          locked: data.locked,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: 'in '),
+                TextSpan(
+                  text: "r/" + data.subreddit,
+                  style: Theme.of(context).textTheme.subtitle.copyWith(
+                        fontWeight: FontWeight.w500,
                       ),
-                    )
-                  : Container(),
+                ),
+                TextSpan(text: " by "),
+                TextSpan(
+                  text: "u/" + data.author + " ",
+                  style: Theme.of(context).textTheme.subtitle.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ],
+              style: Theme.of(context).textTheme.subtitle,
             ),
           ),
-        ],
-      ),
+        ),
+        postMetaData['media_type'] == MediaType.Url && data.isSelf == false
+            ? Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 12.0,
+                  bottom: 4.0,
+                ),
+                child: Container(
+                  foregroundDecoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: Theme.of(context).accentColor.withOpacity(0.10),
+                  ),
+                  child: ListTile(
+                    dense: false,
+                    onTap: () {
+                      launchURL(context, data.url);
+                    },
+                    title: Text(
+                      data.url,
+                      style: Theme.of(context).textTheme.subtitle,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      textAlign: TextAlign.left,
+                    ),
+                    trailing: data.preview != null
+                        ? CircleAvatar(
+                            radius: 16,
+                            backgroundImage: CachedNetworkImageProvider(
+                              _htmlUnescape.convert(
+                                data.preview.images.last.source.url,
+                              ),
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 12,
+                            child: Icon(
+                              Icons.link,
+                              color: Colors.white,
+                            ),
+                            backgroundColor: Theme.of(context).accentColor,
+                          ),
+                  ),
+                ),
+              )
+            : Container(),
+        data.preview != null &&
+                data.isSelf == false &&
+                postMetaData['media_type'] != MediaType.Url
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+                child: FeedCardBodyImage(
+                  images: data.preview.images,
+                  data: data,
+                  postMetaData: postMetaData,
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 }
@@ -81,12 +192,14 @@ class FeedCardTitle extends StatelessWidget {
   final bool stickied;
   final String linkFlairText;
   final bool nsfw;
+  final bool locked;
 
   FeedCardTitle({
     @required this.title,
     @required this.stickied,
     @required this.linkFlairText,
     @required this.nsfw,
+    @required this.locked,
   });
 
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
@@ -157,11 +270,14 @@ class FeedCardTitle extends StatelessWidget {
 }
 
 class FeedCardBodyImage extends StatelessWidget {
+  final Map<String, dynamic> postMetaData;
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
   final List<PostsFeedDatachildDataPreviewImages> images;
   final PostsFeedDataChildrenData data;
 
-  FeedCardBodyImage({@required this.images, @required this.data});
+  FeedCardBodyImage(
+      {@required this.images, @required this.data, @required this.postMetaData})
+      : assert(postMetaData != null);
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +292,8 @@ class FeedCardBodyImage extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                Map<String, dynamic> result = getMediaType(data);
-                if (result['media_type'] == MediaType.Video ||
-                    result['media_type'] == MediaType.Image) {
+                if (postMetaData['media_type'] == MediaType.Video ||
+                    postMetaData['media_type'] == MediaType.Image) {
                   Navigator.of(
                     context,
                     rootNavigator: true,
@@ -186,13 +301,15 @@ class FeedCardBodyImage extends StatelessWidget {
                     CupertinoPageRoute(
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
-                          mediaUrl: result['media_type'] == MediaType.Image
-                              ? url
-                              : result['url'],
-                          isVideo: result['media_type'] == MediaType.Video,
+                          mediaUrl:
+                              postMetaData['media_type'] == MediaType.Image
+                                  ? url
+                                  : postMetaData['url'],
+                          isVideo:
+                              postMetaData['media_type'] == MediaType.Video,
                         );
                       },
-                      fullscreenDialog: true,
+                      fullscreenDialog: false,
                     ),
                   );
                 } else {}
@@ -218,80 +335,6 @@ class FeedCardBodyImage extends StatelessWidget {
       },
     );
   }
-
-  Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
-    Map<String, dynamic> result = Map();
-    if (data.isRedditMediaDomain == null) {
-      data.isRedditMediaDomain = false;
-    }
-    switch (data.isRedditMediaDomain) {
-      case true:
-        {
-          if (data.media == null) {
-            result['media_type'] = MediaType.Image;
-            result['url'] = data.url;
-            return result;
-          } else {
-            print(data.media);
-            result['media_type'] = MediaType.Video;
-            String url = data.media['reddit_video']['fallback_url']
-                .toString()
-                .replaceFirstMapped(RegExp(r'DASH_\d+'), (match) {
-              print(match.start);
-              print(match.end);
-              return 'DASH_240';
-            });
-            result['url'] = url;
-            print("URLLLLLL" + url);
-            return result;
-          }
-          break;
-        }
-      case false:
-        {
-          if (data.media == null) {
-            final Uri uri = Uri.parse(data.url);
-            print(uri);
-            print(uri.authority);
-            if (uri.authority == 'imgur.com' ||
-                uri.authority == 'i.imgur.com' ||
-                uri.authority == 'm.imgur.com') {
-              print("imgur domain");
-              if (uri.path.contains('/a/') || uri.path.contains('/gallery')) {
-                result['media_type'] = MediaType.ImgurGallery;
-                result['url'] = data.url;
-                return result;
-              } else if (uri.path.contains('mp4') ||
-                  uri.path.contains('gifv')) {
-                result['media_type'] = MediaType.Video;
-                result['url'] = data.url.replaceAll('gifv', 'mp4');
-                return result;
-              } else {
-                result['media_type'] = MediaType.Image;
-                result['url'] = data.url;
-                return result;
-              }
-            }
-          } else {
-            final Uri uri = Uri.parse(data.url);
-            if (uri.authority == 'gfycat.com') {
-              result['url'] = data.media['oembed']['thumbnail_url']
-                  .toString()
-                  .replaceAll(".gif", ".mp4")
-                  .replaceAll("thumbs", "giant")
-                  .replaceAll("-size_restricted", "");
-              result['media_type'] = MediaType.Video;
-              return result;
-            } else {
-              result['media_type'] = MediaType.Url;
-              result['url'] = data.url;
-              return result;
-            }
-          }
-          break;
-        }
-    }
-  }
 }
 
 class FeedCardBodySelfText extends StatelessWidget {
@@ -315,7 +358,7 @@ class FeedCardBodySelfText extends StatelessWidget {
           Navigator.push(
             context,
             CupertinoPageRoute(
-              fullscreenDialog: true,
+              fullscreenDialog: false,
               builder: (BuildContext context) {
                 return SubredditFeedPage(
                     subreddit: url.startsWith("/r/")
@@ -326,8 +369,6 @@ class FeedCardBodySelfText extends StatelessWidget {
           );
         } else if (url.startsWith("/u/") || url.startsWith("u/")) {
         } else {
-          print("launching web view");
-
           launchURL(context, url);
         }
       },

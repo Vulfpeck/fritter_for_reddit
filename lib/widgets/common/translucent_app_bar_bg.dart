@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
@@ -7,6 +8,11 @@ import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 
 class TranslucentAppBarBackground extends StatefulWidget {
+  /// give the page a title in case it is a feed such as front page, all,
+  /// or popular
+  final String pageTitle;
+
+  TranslucentAppBarBackground({this.pageTitle = ""});
   @override
   _TranslucentAppBarBackgroundState createState() =>
       _TranslucentAppBarBackgroundState();
@@ -22,7 +28,7 @@ class _TranslucentAppBarBackgroundState
         var headerColor =
             MediaQuery.of(context).platformBrightness == Brightness.dark
                 ? TransparentHexColor("#000000", "80")
-                : TransparentHexColor("#FFFFFF", "bb");
+                : TransparentHexColor("#FFFFFF", "aa");
 
 //        if (prov.subredditInformationEntity != null &&
 //            prov.subredditInformationEntity.data.bannerBackgroundColor != "") {
@@ -68,7 +74,7 @@ class _TranslucentAppBarBackgroundState
                                             CupertinoPageRoute(
                                               builder: (context) =>
                                                   LeftDrawer(),
-                                              fullscreenDialog: true,
+                                              fullscreenDialog: false,
                                             ),
                                           );
                                         },
@@ -91,142 +97,197 @@ class _TranslucentAppBarBackgroundState
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 0.0,
                                     ),
-                                    child: Row(
-                                      children: <Widget>[
-                                        CircleAvatar(
-                                          maxRadius: 24,
-                                          minRadius: 24,
-                                          backgroundImage: prov
-                                                      .subredditInformationEntity
-                                                      .data
-                                                      .communityIcon !=
-                                                  ""
-                                              ? NetworkImage(prov
-                                                  .subredditInformationEntity
-                                                  .data
-                                                  .communityIcon)
-                                              : prov.subredditInformationEntity
-                                                          .data.iconImg !=
-                                                      ""
-                                                  ? NetworkImage(prov
-                                                      .subredditInformationEntity
-                                                      .data
-                                                      .iconImg)
-                                                  : AssetImage(
-                                                      'assets/default_icon.png'),
-                                          backgroundColor: prov
-                                                      .subredditInformationEntity
-                                                      .data
-                                                      .primaryColor ==
-                                                  ""
-                                              ? Theme.of(context).accentColor
-                                              : HexColor(prov
-                                                  .subredditInformationEntity
-                                                  .data
-                                                  .primaryColor),
-                                        ),
-                                        prov.subredditInformationEntity.data
-                                                    .userIsSubscriber !=
-                                                null
-                                            ? Expanded(
-                                                child: Container(),
-                                              )
-                                            : Container(),
-                                        prov.subredditInformationEntity.data
-                                                    .userIsSubscriber !=
-                                                null
-                                            ? OutlineButton(
-                                                textColor: Theme.of(context)
-                                                    .textTheme
-                                                    .body1
-                                                    .color,
-                                                child: prov.partialState ==
-                                                        ViewState.Busy
-                                                    ? Container(
-                                                        width: 24.0,
-                                                        height: 24.0,
-                                                        child: Center(
-                                                          child:
-                                                              CircularProgressIndicator(),
-                                                        ),
-                                                      )
-                                                    : Text(prov
+                                    child: prov.subredditInformationEntity !=
+                                            null
+                                        ? Row(
+                                            children: <Widget>[
+                                              CircleAvatar(
+                                                maxRadius: 24,
+                                                minRadius: 24,
+                                                backgroundImage: prov
                                                             .subredditInformationEntity
                                                             .data
-                                                            .userIsSubscriber
-                                                        ? 'Subscribed'
-                                                        : 'Join'),
-                                                onPressed: () {
-                                                  prov.changeSubscriptionStatus(
-                                                    prov.subredditInformationEntity
-                                                        .data.name,
-                                                    !prov
+                                                            .communityIcon !=
+                                                        ""
+                                                    ? CachedNetworkImageProvider(
+                                                        prov.subredditInformationEntity
+                                                            .data.communityIcon,
+                                                      )
+                                                    : prov.subredditInformationEntity
+                                                                .data.iconImg !=
+                                                            ""
+                                                        ? CachedNetworkImageProvider(
+                                                            prov.subredditInformationEntity
+                                                                .data.iconImg,
+                                                          )
+                                                        : AssetImage(
+                                                            'assets/default_icon.png'),
+                                                backgroundColor: prov
+                                                            .subredditInformationEntity
+                                                            .data
+                                                            .primaryColor ==
+                                                        ""
+                                                    ? Theme.of(context)
+                                                        .accentColor
+                                                    : HexColor(prov
                                                         .subredditInformationEntity
                                                         .data
-                                                        .userIsSubscriber,
-                                                  );
-                                                },
-                                              )
-                                            : Container(),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Text(
-                                                  prov.subredditInformationEntity
-                                                      .data.displayNamePrefixed,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .headline
-                                                      .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                  overflow: TextOverflow.fade,
-                                                  softWrap: false,
-                                                ),
-                                                IconButton(
-                                                  icon:
-                                                      Icon(Icons.arrow_forward),
-                                                  onPressed: () => Navigator.of(
-                                                          context,
-                                                          rootNavigator: false)
-                                                      .push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          LeftDrawer(),
-                                                      fullscreenDialog: true,
-                                                    ),
+                                                        .primaryColor),
+                                              ),
+                                              prov.subredditInformationEntity.data
+                                                          .userIsSubscriber !=
+                                                      null
+                                                  ? Expanded(
+                                                      child: Container(),
+                                                    )
+                                                  : Container(),
+                                              prov.subredditInformationEntity.data
+                                                          .userIsSubscriber !=
+                                                      null
+                                                  ? OutlineButton(
+                                                      textColor:
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .body1
+                                                              .color,
+                                                      child: prov.partialState ==
+                                                              ViewState.Busy
+                                                          ? Container(
+                                                              width: 24.0,
+                                                              height: 24.0,
+                                                              child: Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              ),
+                                                            )
+                                                          : Text(prov
+                                                                  .subredditInformationEntity
+                                                                  .data
+                                                                  .userIsSubscriber
+                                                              ? 'Subscribed'
+                                                              : 'Join'),
+                                                      onPressed: () {
+                                                        prov.changeSubscriptionStatus(
+                                                          prov.subredditInformationEntity
+                                                              .data.name,
+                                                          !prov
+                                                              .subredditInformationEntity
+                                                              .data
+                                                              .userIsSubscriber,
+                                                        );
+                                                      },
+                                                    )
+                                                  : Container(),
+                                            ],
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text(
+                                                    widget.pageTitle,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline
+                                                        .copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
                                                   ),
-                                                  color: Theme.of(context)
-                                                      .accentColor,
-                                                )
-                                              ],
-                                            ),
-                                            Text(
-                                              prov.subredditInformationEntity
-                                                      .data.subscribers
-                                                      .toString() +
-                                                  " Subscribers",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .subhead,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                                  IconButton(
+                                                    icon: Icon(
+                                                        Icons.chevron_right),
+                                                    onPressed: () {
+                                                      return Navigator.of(
+                                                              context,
+                                                              rootNavigator:
+                                                                  false)
+                                                          .push(
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              LeftDrawer(),
+                                                          fullscreenDialog:
+                                                              false,
+                                                        ),
+                                                      );
+                                                    },
+                                                    color: Theme.of(context)
+                                                        .accentColor,
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                   ),
+                                  prov.subredditInformationEntity != null
+                                      ? Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                        prov
+                                                            .subredditInformationEntity
+                                                            .data
+                                                            .displayNamePrefixed,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline
+                                                            .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        softWrap: false,
+                                                      ),
+                                                      IconButton(
+                                                        icon: Icon(Icons
+                                                            .arrow_forward),
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                                    context,
+                                                                    rootNavigator:
+                                                                        false)
+                                                                .push(
+                                                          CupertinoPageRoute(
+                                                            builder: (context) =>
+                                                                LeftDrawer(),
+                                                            fullscreenDialog:
+                                                                false,
+                                                          ),
+                                                        ),
+                                                        color: Theme.of(context)
+                                                            .accentColor,
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    prov.subredditInformationEntity
+                                                            .data.subscribers
+                                                            .toString() +
+                                                        " Subscribers",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .subhead,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Container(),
                                   SizedBox(
                                     height: 24.0,
                                   )

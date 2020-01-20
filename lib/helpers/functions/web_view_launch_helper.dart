@@ -10,6 +10,7 @@ void launchURL(BuildContext context, String url) async {
         enableDefaultShare: true,
         enableUrlBarHiding: true,
         showPageTitle: true,
+        enableInstantApps: true,
         animation: new CustomTabsAnimation(
           startEnter: 'slide_up',
           endExit: 'slide_down',

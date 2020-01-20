@@ -8,7 +8,7 @@ import 'package:flutter_provider_app/pages/subreddit_feed.dart';
 class PostControls extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
 
-  PostControls(this.postData);
+  PostControls({@required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -85,40 +85,48 @@ class PostControls extends StatelessWidget {
                     ),
                     IconButton(
                       icon: Icon(Icons.more_horiz),
-                      color: Theme.of(context).textTheme.subtitle.color,
+                      color: Theme.of(context).dividerColor.withOpacity(0.4),
                       onPressed: () => showPostOptions(context),
                     ),
                     IconButton(
-                      icon: Icon(Icons.arrow_upward),
+                      icon: Icon(
+                        Icons.arrow_upward,
+                      ),
                       onPressed: () {
                         if (Provider.of<UserInformationProvider>(context)
                             .signedIn) {
                           if (postData.likes == true) {
-                            model.votePost(id: postData.id, dir: 0);
+                            model.votePost(postItem: postData, dir: 0);
                           } else {
-                            model.votePost(id: postData.id, dir: 1);
+                            model.votePost(
+                              postItem: postData,
+                              dir: 1,
+                            );
                           }
                         } else {
                           buildSnackBar(context);
                         }
                       },
                       color: postData.likes == null || postData.likes == false
-                          ? Theme.of(context).textTheme.subtitle.color
+                          ? Theme.of(context).dividerColor.withOpacity(0.5)
                           : Colors.orange,
                       splashColor: Colors.orange,
                     ),
                     IconButton(
                       icon: Icon(Icons.arrow_downward),
                       color: postData.likes == null || postData.likes == true
-                          ? Theme.of(context).textTheme.subtitle.color
+                          ? Theme.of(context).dividerColor.withOpacity(0.5)
                           : Colors.purple,
                       onPressed: () {
                         if (Provider.of<UserInformationProvider>(context)
                             .signedIn) {
                           if (postData.likes == false) {
-                            model.votePost(id: postData.id, dir: 0);
+                            model.votePost(
+                              postItem: postData,
+                              dir: 0,
+                            );
                           } else {
-                            model.votePost(id: postData.id, dir: -1);
+                            model.votePost(postItem: postData, dir: -1);
                           }
                         } else {
                           buildSnackBar(context);
@@ -177,7 +185,7 @@ class PostControls extends StatelessWidget {
                               builder: (context) => SubredditFeedPage(
                                 subreddit: postData.subreddit,
                               ),
-                              fullscreenDialog: true,
+                              fullscreenDialog: false,
                             ),
                           );
                         },

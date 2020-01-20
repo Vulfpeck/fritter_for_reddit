@@ -6,12 +6,36 @@ import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
 
 class LeftDrawer extends StatefulWidget {
+  final bool firstLaunch;
+
+  LeftDrawer({this.firstLaunch = false});
+
   @override
   _LeftDrawerState createState() => _LeftDrawerState();
 }
 
 class _LeftDrawerState extends State<LeftDrawer> {
   final ScrollController _controller = ScrollController();
+  final FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    if (widget.firstLaunch) {
+      Future.delayed(Duration(milliseconds: 500)).then((_) {
+        Navigator.of(context, rootNavigator: false).push(
+          CupertinoPageRoute(
+            builder: (BuildContext context) {
+              return SubredditFeedPage(
+                subreddit: "",
+                frontPageLoad: true,
+              );
+            },
+          ),
+        );
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,129 +44,101 @@ class _LeftDrawerState extends State<LeftDrawer> {
         child: Consumer<UserInformationProvider>(
             builder: (BuildContext context, UserInformationProvider model, _) {
           if (model.signedIn) {
-            if (model.state == ViewState.Busy) {
-              return Center(child: CircularProgressIndicator());
-            } else if (model.state == ViewState.Idle) {
-              return Container(
-                color: Theme.of(context).cardColor,
-                child: CupertinoScrollbar(
+            return Container(
+              color: Theme.of(context).cardColor,
+              child: CupertinoScrollbar(
+                controller: _controller,
+                child: CustomScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
                   controller: _controller,
-                  child: CustomScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    controller: _controller,
-                    slivers: <Widget>[
-                      DrawerSliverAppBar(),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            index = index - 2;
-                            if (index == -2) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20.0),
-                                child: GoToSubredditWidget(),
-                              );
-                            }
-                            if (index == -1) {
-                              return ListTile(
-                                title: Text(
-                                  'Frontpage',
-                                  style: Theme.of(context).textTheme.subhead,
-                                ),
-                                leading: CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('assets/default_icon.png'),
-                                  backgroundColor:
-                                      Theme.of(context).accentColor,
-                                  maxRadius: 16,
-                                ),
-                                subtitle: Text("Posts from your subscriptions"),
-                                dense: true,
-                                onTap: () {
-                                  Navigator.of(context, rootNavigator: false)
-                                      .pop();
-                                  return Navigator.of(
-                                    context,
-                                    rootNavigator: false,
-                                  ).push(
-                                    CupertinoPageRoute(
-                                      builder: (context) => SubredditFeedPage(
-                                        subreddit: "",
-                                      ),
-                                      fullscreenDialog: true,
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-                            return ListTile(
-                              dense: true,
-                              title: Text(
-                                model.userSubreddits.data.children[index]
-                                    .display_name,
-                                style: Theme.of(context).textTheme.subhead,
-                              ),
-                              leading: CircleAvatar(
-                                maxRadius: 16,
-                                backgroundImage: model.userSubreddits.data
-                                            .children[index].community_icon !=
-                                        ""
-                                    ? CachedNetworkImageProvider(
-                                        model.userSubreddits.data
-                                            .children[index].community_icon,
-                                      )
-                                    : model.userSubreddits.data.children[index]
-                                                .icon_img !=
+                  slivers: <Widget>[
+                    DrawerSliverAppBar(),
+                    GoToSubredditWidget(
+                      focusNode: focusNode,
+                    ),
+                    SliverList(
+                      delegate: model.state == ViewState.Idle
+                          ? SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                return ListTile(
+                                  dense: true,
+                                  title: Text(
+                                    model.userSubreddits.data.children[index]
+                                        .display_name,
+                                    style: Theme.of(context).textTheme.subhead,
+                                  ),
+                                  leading: CircleAvatar(
+                                    maxRadius: 16,
+                                    backgroundImage: model
+                                                .userSubreddits
+                                                .data
+                                                .children[index]
+                                                .community_icon !=
                                             ""
                                         ? CachedNetworkImageProvider(
                                             model.userSubreddits.data
-                                                .children[index].icon_img,
+                                                .children[index].community_icon,
                                           )
-                                        : AssetImage('assets/default_icon.png'),
-                                backgroundColor: model.userSubreddits.data
-                                            .children[index].primary_color ==
-                                        ""
-                                    ? Theme.of(context).accentColor
-                                    : HexColor(
-                                        model.userSubreddits.data
-                                            .children[index].primary_color,
-                                      ),
-                              ),
-                              onTap: () {
-                                Navigator.of(context, rootNavigator: false)
-                                    .pop();
-                                return Navigator.of(
-                                  context,
-                                  rootNavigator: false,
-                                ).push(
-                                  CupertinoPageRoute(
-                                    builder: (context) => SubredditFeedPage(
-                                      subreddit: model.userSubreddits.data
-                                          .children[index].display_name,
-                                    ),
-                                    fullscreenDialog: true,
+                                        : model.userSubreddits.data
+                                                    .children[index].icon_img !=
+                                                ""
+                                            ? CachedNetworkImageProvider(
+                                                model.userSubreddits.data
+                                                    .children[index].icon_img,
+                                              )
+                                            : AssetImage(
+                                                'assets/default_icon.png'),
+                                    backgroundColor: model
+                                                .userSubreddits
+                                                .data
+                                                .children[index]
+                                                .primary_color ==
+                                            ""
+                                        ? Theme.of(context).accentColor
+                                        : HexColor(
+                                            model.userSubreddits.data
+                                                .children[index].primary_color,
+                                          ),
                                   ),
+                                  onTap: () {
+                                    focusNode.unfocus();
+                                    return Navigator.of(
+                                      context,
+                                      rootNavigator: false,
+                                    ).push(
+                                      CupertinoPageRoute(
+                                        builder: (context) => SubredditFeedPage(
+                                          subreddit: model.userSubreddits.data
+                                              .children[index].display_name,
+                                        ),
+                                        fullscreenDialog: false,
+                                      ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                          childCount:
-                              model.userSubreddits.data.children.length + 2,
-                        ),
+                              childCount:
+                                  model.userSubreddits.data.children.length,
+                            )
+                          : SliverChildListDelegate([
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: LinearProgressIndicator(),
+                              ),
+                            ]),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          SizedBox(
+                              height: MediaQuery.of(context).padding.bottom)
+                        ],
                       ),
-                      SliverList(
-                        delegate: SliverChildListDelegate(
-                          [
-                            SizedBox(
-                                height: MediaQuery.of(context).padding.bottom)
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            }
+              ),
+            );
           } else {
             return CupertinoScrollbar(
               controller: _controller,
@@ -151,15 +147,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 controller: _controller,
                 slivers: <Widget>[
                   DrawerSliverAppBar(),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: GoToSubredditWidget(),
-                        ),
-                      ],
-                    ),
+                  GoToSubredditWidget(
+                    focusNode: focusNode,
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
@@ -174,7 +163,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                           mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
                             SizedBox(
-                              height: 150,
+                              height: 72,
                             ),
                             Text(
                               "Hello 🥳",
@@ -243,7 +232,7 @@ class DrawerSliverAppBar extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: Theme.of(context).colorScheme.secondary,
       automaticallyImplyLeading: true,
-      centerTitle: false,
+      centerTitle: true,
       expandedHeight: 170,
       brightness: MediaQuery.of(context).platformBrightness,
       iconTheme: Theme.of(context).iconTheme,

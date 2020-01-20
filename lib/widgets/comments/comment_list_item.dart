@@ -69,7 +69,7 @@ class _CommentItemState extends State<CommentItem>
                 duration: Duration(
                   milliseconds: 250,
                 ),
-                curve: Curves.easeInToLinear,
+                curve: Curves.linearToEaseOut,
               ),
             ),
           ],
@@ -356,7 +356,7 @@ class _CommentBodyState extends State<CommentBody> {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          fullscreenDialog: true,
+                          fullscreenDialog: false,
                           builder: (BuildContext context) {
                             return SubredditFeedPage(
                                 subreddit: url.startsWith("/r/")

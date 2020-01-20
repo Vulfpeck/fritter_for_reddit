@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/providers/search_provider.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
+import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
@@ -16,7 +16,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final ScrollController _scrollController = ScrollController();
-
+  final FocusNode focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -33,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
               _scrollController.animateTo(
                 0,
                 duration: Duration(milliseconds: 350),
-                curve: Curves.easeInToLinear,
+                curve: Curves.linearToEaseOut,
               );
             },
           ),
@@ -46,7 +46,9 @@ class _SearchPageState extends State<SearchPage> {
                 controller: _scrollController,
                 physics: AlwaysScrollableScrollPhysics(),
                 slivers: <Widget>[
-                  SearchBarWidget(),
+                  SearchBarWidget(
+                    focusNode: focusNode,
+                  ),
 
                   // subreddit headings
                   SliverList(
@@ -108,19 +110,23 @@ class _SearchPageState extends State<SearchPage> {
                                         )
                                       : Theme.of(context).accentColor,
                                 ),
-                                onTap: () =>
-                                    Navigator.of(context, rootNavigator: false)
-                                        .push(
-                                  CupertinoPageRoute(
-                                    fullscreenDialog: true,
-                                    builder: (BuildContext context) =>
-                                        SubredditFeedPage(
-                                      subreddit: model.subQueryResult.subreddits
-                                          .elementAt(index)
-                                          .name,
+                                onTap: () {
+                                  focusNode.unfocus();
+                                  return Navigator.of(context,
+                                          rootNavigator: false)
+                                      .push(
+                                    CupertinoPageRoute(
+                                      fullscreenDialog: false,
+                                      builder: (BuildContext context) =>
+                                          SubredditFeedPage(
+                                        subreddit: model
+                                            .subQueryResult.subreddits
+                                            .elementAt(index)
+                                            .name,
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
                             },
                             childCount: model.subQueryResult.subreddits.length,
@@ -166,6 +172,7 @@ class _SearchPageState extends State<SearchPage> {
                                     color: Theme.of(context).cardColor,
                                     child: InkWell(
                                       onTap: () {
+                                        focusNode.unfocus();
                                         Provider.of<CommentsProvider>(context)
                                             .fetchComments(
                                           requestingRefresh: false,
@@ -177,45 +184,49 @@ class _SearchPageState extends State<SearchPage> {
                                               : CommentSortTypes.Best,
                                         );
                                         Navigator.of(context).push(
-                                          PageRouteBuilder(
-                                            pageBuilder:
-                                                (BuildContext context, _, __) {
-                                              return CommentsSheet(item);
-                                            },
-                                            fullscreenDialog: true,
-                                            opaque: true,
-                                            transitionsBuilder: (context,
-                                                primaryanimation,
-                                                secondaryanimation,
-                                                child) {
-                                              return FadeTransition(
-                                                child: child,
-                                                opacity: CurvedAnimation(
-                                                  parent: primaryanimation,
-                                                  curve: Curves.easeInToLinear,
-                                                  reverseCurve:
-                                                      Curves.linearToEaseOut,
-                                                ),
+//                                          PageRouteBuilder(
+//                                            pageBuilder:
+//                                                (BuildContext context, _, __) {
+//                                              return CommentsSheet(item);
+//                                            },
+//                                            fullscreenDialog: false,
+//                                            opaque: true,
+//                                            transitionsBuilder: (context,
+//                                                primaryanimation,
+//                                                secondaryanimation,
+//                                                child) {
+//                                              return FadeTransition(
+//                                                child: child,
+//                                                opacity: CurvedAnimation(
+//                                                  parent: primaryanimation,
+//                                                  curve: Curves.easeInToLinear,
+//                                                  reverseCurve:
+//                                                      Curves.easeInToLinear,
+//                                                ),
+//                                              );
+//                                            },
+//                                            transitionDuration: Duration(
+//                                              milliseconds: 250,
+//                                            ),
+//                                          ),
+                                          CupertinoPageRoute(
+                                            builder: (BuildContext context) {
+                                              return CommentsScreen(
+                                                item: item,
                                               );
                                             },
-                                            transitionDuration: Duration(
-                                              milliseconds: 150,
-                                            ),
                                           ),
                                         );
                                       },
-                                      child: Hero(
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: <Widget>[
-                                              FeedCard(
-                                                item,
-                                              ),
-                                              PostControls(item),
-                                            ],
+                                      child: Column(
+                                        children: <Widget>[
+                                          FeedCard(
+                                            item,
                                           ),
-                                        ),
-                                        tag: item.id,
+                                          PostControls(
+                                            postData: item,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -309,13 +320,15 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class SearchBarWidget extends StatefulWidget {
+  final FocusNode focusNode;
+
+  SearchBarWidget({this.focusNode});
   @override
   _SearchBarWidgetState createState() => _SearchBarWidgetState();
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   TextEditingController controller = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -324,7 +337,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       elevation: 0,
       floating: true,
       stretch: false,
-      title: Text("Search"),
+      title: Text(
+        "Search",
+        style: Theme.of(context).textTheme.title,
+      ),
       textTheme: Theme.of(context).textTheme,
       brightness: MediaQuery.of(context).platformBrightness,
       backgroundColor: Theme.of(context).cardColor,
@@ -340,6 +356,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     (BuildContext context, SearchProvider model, Widget child) {
                   return TextField(
                     controller: controller,
+                    focusNode: widget.focusNode,
                     autocorrect: false,
                     enableSuggestions: true,
                     autofocus: false,

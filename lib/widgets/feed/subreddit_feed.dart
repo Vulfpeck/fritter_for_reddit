@@ -2,13 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_sheet.dart';
+import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
 import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
-import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
 class SubredditFeed extends StatefulWidget {
+  final String pageTitle;
+
+  SubredditFeed({this.pageTitle = ""});
+
   @override
   _SubredditFeedState createState() => _SubredditFeedState();
 }
@@ -122,17 +125,6 @@ class _SubredditFeedState extends State<SubredditFeed>
                   onCanceled: () {},
                   initialValue: sortSelectorValue,
                 ),
-                IconButton(
-                  icon: Icon(Icons.group_work),
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: false).push(
-                      CupertinoPageRoute(
-                        builder: (BuildContext context) => LeftDrawer(),
-                        fullscreenDialog: true,
-                      ),
-                    );
-                  },
-                ),
               ],
               pinned: true,
               snap: true,
@@ -161,17 +153,22 @@ class _SubredditFeedState extends State<SubredditFeed>
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            child: model.state == ViewState.Busy
+                            child: model.partialState == ViewState.Busy
                                 ? Center(
                                     child: CircularProgressIndicator(),
                                   )
-                                : TranslucentAppBarBackground(),
+                                : TranslucentAppBarBackground(
+                                    pageTitle: widget.pageTitle,
+                                  ),
                           ),
                         ],
                       ),
                     ),
-              expandedHeight:
-                  model.currentPage == CurrentPage.FrontPage ? 144 : 200,
+              expandedHeight: model.sub == "" ||
+                      model.sub == "popular" ||
+                      model.sub == "all"
+                  ? 128
+                  : 200,
             ),
 //          SliverPersistentHeader(
 //            delegate:
@@ -238,20 +235,17 @@ class _SubredditFeedState extends State<SubredditFeed>
                                   }
                                 },
                                 onTap: () {
-                                  _openComments(item, context);
+                                  _openComments(item, context, index);
                                 },
-                                child: Hero(
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: <Widget>[
-                                        FeedCard(
-                                          item,
-                                        ),
-                                        PostControls(item),
-                                      ],
+                                child: Column(
+                                  children: <Widget>[
+                                    FeedCard(
+                                      item,
                                     ),
-                                  ),
-                                  tag: item.id,
+                                    PostControls(
+                                      postData: item,
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
@@ -267,7 +261,8 @@ class _SubredditFeedState extends State<SubredditFeed>
     );
   }
 
-  void _openComments(PostsFeedDataChildrenData item, BuildContext context) {
+  void _openComments(
+      PostsFeedDataChildrenData item, BuildContext context, int index) {
     Provider.of<CommentsProvider>(context).fetchComments(
       requestingRefresh: false,
       subredditName: item.subreddit,
@@ -277,26 +272,34 @@ class _SubredditFeedState extends State<SubredditFeed>
           : CommentSortTypes.Best,
     );
     Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (BuildContext context, _, __) {
-          return CommentsSheet(item);
-        },
-        fullscreenDialog: false,
-        opaque: true,
-        transitionsBuilder:
-            (context, primaryanimation, secondaryanimation, child) {
-          return FadeTransition(
-            child: child,
-            opacity: CurvedAnimation(
-              parent: primaryanimation,
-              curve: Curves.easeInToLinear,
-              reverseCurve: Curves.linearToEaseOut,
-            ),
+//      PageRouteBuilder(
+//        pageBuilder: (BuildContext context, _, __) {
+//          return CommentsSheet(item);
+//        },
+//        fullscreenDialog: false,
+//        opaque: true,
+//        transitionsBuilder:
+//            (context, primaryanimation, secondaryanimation, child) {
+//          return FadeTransition(
+//            child: child,
+//            opacity: CurvedAnimation(
+//              parent: primaryanimation,
+//              curve: Curves.easeInToLinear,
+//              reverseCurve: Curves.linearToEaseOut,
+//            ),
+//          );
+//        },
+//        transitionDuration: Duration(
+//          milliseconds: 250,
+//        ),
+//      ),
+
+      CupertinoPageRoute(
+        builder: (BuildContext context) {
+          return CommentsScreen(
+            item: item,
           );
         },
-        transitionDuration: Duration(
-          milliseconds: 150,
-        ),
       ),
     );
   }

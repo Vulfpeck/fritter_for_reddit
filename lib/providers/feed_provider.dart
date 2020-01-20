@@ -248,39 +248,47 @@ class FeedProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> votePost({@required String id, @required int dir}) async {
+  Future<bool> votePost(
+      {@required PostsFeedDataChildrenData postItem, @required int dir}) async {
     await _storageHelper.init();
-    PostsFeedDatachild item = _postFeed.data.children.firstWhere((v) {
-      return v.data.id.compareTo(id) == 0 ? true : false;
-    });
     notifyListeners();
-    if (item.data.likes == true) {
-      item.data.score--;
-    } else if (item.data.likes == false) {
-      item.data.score++;
+    if (postItem.likes == true) {
+      postItem.score--;
+    } else if (postItem.likes == false) {
+      postItem.score++;
     }
     if (dir == 1) {
-      item.data.score++;
-      item.data.likes = true;
+      postItem.score++;
+      postItem.likes = true;
     } else if (dir == -1) {
-      item.data.score--;
-      item.data.likes = false;
+      postItem.score--;
+      postItem.likes = false;
     } else if (dir == 0) {
-      item.data.score =
-          item.data.likes == true ? item.data.score-- : item.data.score++;
-      item.data.likes = null;
+      postItem.score =
+          postItem.likes == true ? postItem.score-- : postItem.score++;
+      postItem.likes = null;
     }
     String url = "https://oauth.reddit.com/api/vote";
+    final Uri uri = Uri.https(
+      'oauth.reddit.com',
+      'api/vote',
+      {
+        'dir': dir.toString(),
+        'id': postItem.name.toString(),
+        'rank': '2',
+      },
+    );
+    print(uri);
     final String authToken = await _storageHelper.authToken;
     http.Response voteResponse;
     voteResponse = await http.post(
-      url + '?dir=$dir&id=$id&rank=2',
+      uri,
       headers: {
         'Authorization': 'bearer ' + authToken,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-
+    print("vote result" + voteResponse.statusCode.toString());
     notifyListeners();
     if (voteResponse.statusCode == 200) {
       return true;

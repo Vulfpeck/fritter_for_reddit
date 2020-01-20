@@ -4,18 +4,22 @@ String getTimePosted(double orig) {
     isUtc: true,
   );
   Duration difference = DateTime.now().toUtc().difference(postDate);
-  if (difference.inDays <= 0) {
-    if (difference.inHours <= 0) {
-      if (difference.inMinutes <= 0) {
-        return "Now";
+  if (difference.inDays ~/ 365 <= 0) {
+    if (difference.inDays <= 0) {
+      if (difference.inHours <= 0) {
+        if (difference.inMinutes <= 0) {
+          return "Now";
+        } else {
+          return difference.inMinutes.toString() + "m";
+        }
       } else {
-        return difference.inMinutes.toString() + "m";
+        return difference.inHours.toString() + "h";
       }
     } else {
-      return difference.inHours.toString() + "h";
+      return difference.inDays.toString() + "d";
     }
   } else {
-    return difference.inDays.toString() + "d";
+    return (difference.inDays ~/ 365).toString() + "y";
   }
 }
 

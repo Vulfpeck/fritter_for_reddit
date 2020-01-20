@@ -20,12 +20,14 @@ class Swiper extends StatefulWidget {
 
 class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
   AnimationController _controller;
-  bool isUpvoting = true;
+  bool isUpvoting = false;
+  bool thresholdCrossed = false;
   DismissDirection direction;
   Offset commentOffset = Offset.zero;
   MediaQueryData _mediaQuery;
   bool isDragging = false;
   double initialPosition = 0;
+  double finalPosition = 0;
   Animation<Alignment> _animation;
 
   /// Calculates and runs a [SpringSimulation].
@@ -83,31 +85,44 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
       },
       onHorizontalDragStart: (details) {
         initialPosition = details.localPosition.dx;
-        isDragging = false;
+        thresholdCrossed = false;
+        isUpvoting = false;
       },
       onHorizontalDragUpdate: (details) {
-        setState(() {
-          if (!isDragging) {
-            isDragging = true;
-            if (details.localPosition.dx - initialPosition > 0) {
-              direction = DismissDirection.startToEnd;
+        finalPosition = details.localPosition.dx;
+        setState(
+          () {
+            commentOffset += Offset(details.delta.dx, 0);
+            final double change = (finalPosition - initialPosition);
+            final double ratio =
+                change < 0 ? change * -1 / size.width : change / size.width;
+            print("Drag ratio : " + ratio.toString());
+            if (change < 0) {
+              if (ratio >= 0 && ratio < 0.2) {
+                isUpvoting = false;
+                thresholdCrossed = false;
+              }
+              if (ratio >= 0.2 && ratio <= 0.4) {
+                isUpvoting = true;
+                thresholdCrossed = true;
+              }
+              if (ratio > 0.4 && ratio < 1.0) {
+                isUpvoting = false;
+                thresholdCrossed = true;
+              }
             } else {
-              direction = DismissDirection.endToStart;
+              print("is opp dir");
+              isUpvoting = false;
+              thresholdCrossed = false;
             }
-          }
-          commentOffset += Offset(details.delta.dx, 0);
-          if ((-1 * commentOffset.dx) / size.width > 0.0 &&
-              (-1 * commentOffset.dx) / size.width < 0.40) {
-            isUpvoting = true;
-          } else {
-            isUpvoting = false;
-          }
-        });
+          },
+        );
       },
       onHorizontalDragEnd: (details) {
-        isDragging = false;
+        final double change = (finalPosition - initialPosition);
+        print(change);
         _runAnimation(details.velocity.pixelsPerSecond, size);
-        if (isUpvoting && direction == DismissDirection.endToStart) {
+        if (isUpvoting && thresholdCrossed) {
           if (Provider.of<UserInformationProvider>(context).signedIn) {
             if (widget.comment.data.likes == true) {
               Provider.of<CommentsProvider>(context).voteComment(
@@ -125,7 +140,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
           } else {
             buildSnackBar(context);
           }
-        } else if (!isUpvoting && direction == DismissDirection.endToStart) {
+        } else if (!isUpvoting && thresholdCrossed) {
           print("Downvote");
           if (Provider.of<UserInformationProvider>(context).signedIn) {
             if (widget.comment.data.likes == false) {
@@ -149,18 +164,23 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
             bottom: 0,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: isUpvoting
-                  ? Icon(
-                      Icons.arrow_upward,
-                      color: getColor(_mediaQuery.platformBrightness,
-                          ColorObjects.UpvoteColor),
-                    )
+              child: thresholdCrossed
+                  ? isUpvoting
+                      ? Icon(
+                          Icons.arrow_upward,
+                          color: getColor(_mediaQuery.platformBrightness,
+                              ColorObjects.UpvoteColor),
+                        )
+                      : Icon(
+                          Icons.arrow_downward,
+                          color: getColor(
+                            _mediaQuery.platformBrightness,
+                            ColorObjects.DownvoteColor,
+                          ),
+                        )
                   : Icon(
-                      Icons.arrow_downward,
-                      color: getColor(
-                        _mediaQuery.platformBrightness,
-                        ColorObjects.DownvoteColor,
-                      ),
+                      Icons.arrow_upward,
+                      color: Theme.of(context).dividerColor,
                     ),
             ),
           ),

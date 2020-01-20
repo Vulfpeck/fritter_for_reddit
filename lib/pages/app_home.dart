@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/pages/search_screen.dart';
 import 'package:flutter_provider_app/pages/user_profile.dart';
-import 'package:flutter_provider_app/widgets/feed/subreddit_feed.dart';
+import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -52,7 +52,9 @@ class _HomePageState extends State<HomePage> {
               {
                 return CupertinoTabView(
                   navigatorKey: firstTabNavKey,
-                  builder: (BuildContext context) => SubredditFeed(),
+                  builder: (BuildContext context) => LeftDrawer(
+                    firstLaunch: true,
+                  ),
                 );
               }
             case 1:
