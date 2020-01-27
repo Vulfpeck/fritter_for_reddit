@@ -68,7 +68,7 @@ class FeedProvider with ChangeNotifier {
     http.Response response;
     try {
       if (_storageHelper.signInStatus == false) {
-        print("fetch Posts: not signed in ");
+        // // print("fetch Posts: not signed in ");
         String url = "";
         if (this.sub != "") {
           _currentPage = CurrentPage.Other;
@@ -95,9 +95,9 @@ class FeedProvider with ChangeNotifier {
           }
         }
 
-        print(url);
+        // // print(url);
         response = await http.get(url).catchError((e) {
-          print("Feed fetch error");
+          // // print("Feed fetch error");
           notifyListeners();
           throw new Exception("Feed fetch error");
         });
@@ -117,11 +117,11 @@ class FeedProvider with ChangeNotifier {
                     json.decode(subInfoResponse.body));
             this.sub = _subredditInformationEntity.data.displayName;
           } else {
-            print(response.body);
+            // // print(response.body);
           }
         } else {
-          print("****************");
-          print(response.statusCode);
+          // // print("****************");
+          // // print(response.statusCode);
         }
       } else {
         if (await _storageHelper.needsTokenRefresh()) {
@@ -154,7 +154,7 @@ class FeedProvider with ChangeNotifier {
                 url + "/${currentSort.toString().toLowerCase()}.json?limit=10";
           }
         }
-        print("Feed fetch url is : " + url);
+        // // print("Feed fetch url is : " + url);
         response = await http.get(
           url,
           headers: {
@@ -174,7 +174,7 @@ class FeedProvider with ChangeNotifier {
           await fetchSubredditInformationOAuth(token, currentSubreddit);
       }
     } catch (e) {
-      print(e.toString());
+      // // print(e.toString());
     } finally {
       _state = ViewState.Idle;
       notifyListeners();
@@ -195,7 +195,7 @@ class FeedProvider with ChangeNotifier {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       ).catchError((e) {
-        print("Error fetching Subreddit information");
+        // // print("Error fetching Subreddit information");
         throw new Exception("Error");
       });
 
@@ -204,7 +204,7 @@ class FeedProvider with ChangeNotifier {
             json.decode(subInfoResponse.body));
         this.sub = _subredditInformationEntity.data.displayName;
 
-        print(json.decode((subInfoResponse.body).toString()));
+        // // print(json.decode((subInfoResponse.body).toString()));
         if (_subredditInformationEntity.data.title == null) {
           _subInformationLoadingError = true;
         }
@@ -212,7 +212,7 @@ class FeedProvider with ChangeNotifier {
         throw new Exception("Failed to get sub Information");
       }
     } catch (e) {
-      print(e.toString());
+      // // print(e.toString());
     }
   }
 
@@ -278,7 +278,7 @@ class FeedProvider with ChangeNotifier {
         'rank': '2',
       },
     );
-    print(uri);
+    // // print(uri);
     final String authToken = await _storageHelper.authToken;
     http.Response voteResponse;
     voteResponse = await http.post(
@@ -288,7 +288,7 @@ class FeedProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
-    print("vote result" + voteResponse.statusCode.toString());
+    // // print("vote result" + voteResponse.statusCode.toString());
     notifyListeners();
     if (voteResponse.statusCode == 200) {
       return true;
@@ -309,7 +309,7 @@ class FeedProvider with ChangeNotifier {
           await _storageHelper.performTokenRefresh();
         }
         url = subListingFetchUrl + "&after=${postFeed.data.after}";
-        print(url);
+        // // print(url);
         String token = await _storageHelper.authToken;
         http.Response subredditResponse = await http.get(
           url,
@@ -318,34 +318,34 @@ class FeedProvider with ChangeNotifier {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
         );
-        print(subredditResponse.statusCode.toString() +
-            subredditResponse.reasonPhrase);
+        // // print(subredditResponse.statusCode.toString() +
+//            subredditResponse.reasonPhrase);
         final PostsFeedEntity newData =
             new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
         _postFeed.data.children.addAll(newData.data.children);
-        print("previous after: " + _postFeed.data.after);
-        print("new after : " + newData.data.after);
+        // // print("previous after: " + _postFeed.data.after);
+        // // print("new after : " + newData.data.after);
         _postFeed.data.after = newData.data.after;
       } else {
         url = subListingFetchUrl + "&after=${postFeed.data.after}";
-        print(url);
+        // // print(url);
         http.Response subredditResponse = await http.get(
           url,
           headers: {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
         );
-        print(subredditResponse.statusCode.toString() +
-            subredditResponse.reasonPhrase);
+        // // print(subredditResponse.statusCode.toString() +
+//            subredditResponse.reasonPhrase);
         final PostsFeedEntity newData =
             new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
         _postFeed.data.children.addAll(newData.data.children);
-        print("previous after: " + _postFeed.data.after);
-        print("new after : " + newData.data.after);
+        // // print("previous after: " + _postFeed.data.after);
+        // // print("new after : " + newData.data.after);
         _postFeed.data.after = newData.data.after;
       }
     } catch (e) {
-      print("EXCEPTION : " + e.toString());
+      // // print("EXCEPTION : " + e.toString());
     }
     _loadMorePostsState = ViewState.Idle;
     notifyListeners();

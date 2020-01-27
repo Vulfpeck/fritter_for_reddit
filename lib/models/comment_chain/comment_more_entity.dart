@@ -2,7 +2,7 @@ class CommentMoreEntity {
   CommentMoreJson json;
 
   CommentMoreEntity.fromJson(Map<String, dynamic> json) {
-//    print(json);
+//    // print(json);
     this.json = json['json'] != null
         ? new CommentMoreJson.fromJson(json['json'])
         : null;
@@ -22,11 +22,11 @@ class CommentMoreJson {
   List<Null> errors;
 
   CommentMoreJson.fromJson(Map<String, dynamic> json) {
-//    print("data" + json["data"]);
+//    // print("data" + json["data"]);
     if (json['data'] != null) {
       data = CommentMoreJsonData.fromJson(json['data']);
     } else {
-      print('data is null');
+      // print('data is null');
     }
     if (json['errors'] != null) {
       errors = new List<Null>();

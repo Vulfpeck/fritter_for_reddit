@@ -18,7 +18,7 @@ class SecureStorageHelper {
     return map['authToken'];
   }
 
-  String get debugPrint => map.toString();
+  String get debugprint => map.toString();
 
   Future<String> get refreshToken async {
     await fetchData();
@@ -31,8 +31,8 @@ class SecureStorageHelper {
   }
 
   bool get signInStatus {
-    print("storage helper: signin status: map key check" +
-        map.containsKey('signedIn').toString());
+    // print("storage helper: signin status: map key check" +
+//        map.containsKey('signedIn').toString());
     if (map.containsKey('signedIn') && map['signedIn'] == "true") {
       return true;
     } else {
@@ -43,8 +43,8 @@ class SecureStorageHelper {
   Future<bool> needsTokenRefresh() async {
     Duration time =
         (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
-    print("Time since last token refresh: " + time.inMinutes.toString());
-    print(await authToken);
+    // print("Time since last token refresh: " + time.inMinutes.toString());
+    // print(await authToken);
     if (time.inMinutes > 30) {
       return true;
     } else {
@@ -65,9 +65,9 @@ class SecureStorageHelper {
       key: "lastTokenRefresh",
       value: DateTime.now().toIso8601String(),
     );
-    print("Storage helper: Update Credentials : " + map.toString());
+    // print("Storage helper: Update Credentials : " + map.toString());
     await fetchData();
-    print("Storage helper: Update Credentials : " + map.toString());
+    // print("Storage helper: Update Credentials : " + map.toString());
   }
 
   Future<void> updateAuthToken(String accessToken) async {
@@ -94,7 +94,7 @@ class SecureStorageHelper {
   }
 
   Future<void> performTokenRefresh() async {
-    print("******* PERFORMING A TOKEN REFRESH *****");
+    // print("******* PERFORMING A TOKEN REFRESH *****");
     String user = CLIENT_ID;
     String password = "";
     String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
@@ -111,14 +111,14 @@ class SecureStorageHelper {
       this.clearStorage();
     });
 
-    print("Token refresh status code: " + response.statusCode.toString());
+    // print("Token refresh status code: " + response.statusCode.toString());
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
-      print("Refreshed token: " + map.toString());
+      // print("Refreshed token: " + map.toString());
       await updateAuthToken(map['access_token']);
     } else {
-      print("Failed to refresh token");
-      print(json.decode(response.body));
+      // print("Failed to refresh token");
+      // print(json.decode(response.body));
     }
   }
 }

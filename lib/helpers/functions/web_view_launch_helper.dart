@@ -19,6 +19,6 @@ void launchURL(BuildContext context, String url) async {
     );
   } catch (e) {
     // An exception is thrown if browser app is not installed on Android device.
-    print(e.toString());
+    // print(e.toString());
   }
 }

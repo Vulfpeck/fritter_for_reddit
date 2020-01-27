@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class BlurredSliverAppBar extends StatelessWidget {
@@ -37,38 +35,33 @@ class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-        child: Container(
-          // Don't wrap this in any SafeArea widgets, use padding instead
-          padding: EdgeInsets.only(top: safeAreaPadding.top),
-          height: maxExtent,
-          color: Theme.of(context).cardColor.withOpacity(0.8),
-          // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
-          child: Stack(
-            overflow: Overflow.clip,
-            children: <Widget>[
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: AppBar(
-                  primary: false,
-                  brightness: MediaQuery.of(context).platformBrightness,
-                  automaticallyImplyLeading: true,
-                  elevation: 0,
-                  iconTheme: Theme.of(context).iconTheme,
-                  backgroundColor: Colors.transparent,
-                  title: Text(
-                    title,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ),
-              )
-            ],
+    return Container(
+      // Don't wrap this in any SafeArea widgets, use padding instead
+      padding: EdgeInsets.only(top: safeAreaPadding.top),
+      height: maxExtent,
+      color: Theme.of(context).cardColor.withOpacity(0.8),
+      // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
+      child: Stack(
+        overflow: Overflow.clip,
+        children: <Widget>[
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AppBar(
+              primary: false,
+              brightness: MediaQuery.of(context).platformBrightness,
+              automaticallyImplyLeading: true,
+              elevation: 0,
+              iconTheme: Theme.of(context).iconTheme,
+              backgroundColor: Colors.transparent,
+              title: Text(
+                title,
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

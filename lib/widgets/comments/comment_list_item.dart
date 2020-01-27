@@ -32,59 +32,49 @@ class _CommentItemState extends State<CommentItem>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisSize: MainAxisSize.max,
       children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            SizedBox(
-              width: 16.0 * widget._comment.data.depth,
-            ),
-            Expanded(
-              child: AnimatedSize(
-                vsync: this,
-                child: widget._comment.data.collapseParent == true
-                    ? CollapsedCommentParent(
-                        comment: widget._comment,
-                        postId: widget.postId,
-                        commentIndex: widget.commentIndex,
-                      )
-                    : widget._comment.data.collapse == true
-                        ? Container()
-                        : widget._comment.kind == CommentPojo.Kind.MORE
-                            ? MoreCommentKind(
-                                comment: widget._comment,
-                                postFullName: widget.name,
-                                id: widget.postId,
-                              )
-                            : Swiper(
-                                postId: widget.postId,
-                                comment: widget._comment,
-                                child: CommentBody(
-                                  commentIndex: widget.commentIndex,
+        SizedBox(
+          width: 16.0 * widget._comment.data.depth,
+        ),
+        Expanded(
+          child: widget._comment.data.collapseParent == true
+              ? CollapsedCommentParent(
+                  comment: widget._comment,
+                  postId: widget.postId,
+                  commentIndex: widget.commentIndex,
+                )
+              : AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.linearToEaseOut,
+                  child: widget._comment.data.collapse == true
+                      ? Container()
+                      : widget._comment.kind == CommentPojo.Kind.MORE
+                          ? MoreCommentKind(
+                              comment: widget._comment,
+                              postFullName: widget.name,
+                              id: widget.postId,
+                            )
+                          : Column(
+                              children: <Widget>[
+                                Swiper(
                                   comment: widget._comment,
                                   postId: widget.postId,
+                                  child: CommentBody(
+                                    context: context,
+                                    commentIndex: widget.commentIndex,
+                                    comment: widget._comment,
+                                    postId: widget.postId,
+                                  ),
                                 ),
-                              ),
-                duration: Duration(
-                  milliseconds: 250,
+                                Divider(
+                                  indent: 16,
+                                ),
+                              ],
+                            ),
                 ),
-                curve: Curves.linearToEaseOut,
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            SizedBox(
-              width: 16.0 * widget._comment.data.depth + 12,
-            ),
-            widget._comment.data.collapse == false
-                ? Expanded(
-                    child: Divider(),
-                  )
-                : Container(),
-          ],
         ),
       ],
     );
@@ -111,7 +101,7 @@ class CollapsedCommentParent extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6.0),
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
             ),
             child: ListTile(
               dense: true,
@@ -119,12 +109,9 @@ class CollapsedCommentParent extends StatelessWidget {
                 collapse(commentIndex, context);
               },
               title: Text(
-                'Comment Collapsed',
-                style: Theme.of(context).textTheme.caption,
-              ),
-              subtitle: Text(
-                model.collapsedChildrenCount[comment.data.id].toString() +
-                    " children",
+                comment.data.author +
+                    " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
+                style: Theme.of(context).textTheme.subtitle,
               ),
               trailing: Icon(Icons.expand_more),
             ),
@@ -135,7 +122,8 @@ class CollapsedCommentParent extends StatelessWidget {
   }
 
   void collapse(int commentIndex, BuildContext context) {
-    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
+    Provider.of<CommentsProvider>(context, listen: false)
+        .collapseUncollapseComment(
       collapse: false,
       postId: postId,
       parentCommentIndex: commentIndex,
@@ -143,317 +131,91 @@ class CollapsedCommentParent extends StatelessWidget {
   }
 }
 
-class CommentBody extends StatefulWidget {
+class CommentBody extends StatelessWidget {
   final CommentPojo.Child comment;
   final String postId;
   final int commentIndex;
-  CommentBody(
-      {@required this.comment,
-      @required this.postId,
-      @required this.commentIndex});
+  final Widget htmlCommentBody;
+  final BuildContext context;
 
-  @override
-  _CommentBodyState createState() => _CommentBodyState();
-}
+  static final HtmlUnescape _unescape = new HtmlUnescape();
 
-class _CommentBodyState extends State<CommentBody> {
-  final HtmlUnescape _unescape = new HtmlUnescape();
-  bool isExpanded = false;
+  CommentBody({
+    @required this.comment,
+    @required this.postId,
+    @required this.commentIndex,
+    @required this.context,
+  }) : htmlCommentBody = Html(
+            data: _unescape.convert(comment.data.bodyHtml),
+            useRichText: true,
+            showImages: false,
+            onLinkTap: (url) {
+              if (url.startsWith("/r/") || url.startsWith("r/")) {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    fullscreenDialog: false,
+                    builder: (BuildContext context) {
+                      return SubredditFeedPage(
+                          subreddit: url.startsWith("/r/")
+                              ? url.replaceFirst("/r/", "")
+                              : url.replaceFirst("r/", ""));
+                    },
+                  ),
+                );
+              } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+              } else {
+                launchURL(context, url);
+              }
+            });
+
   Brightness _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
+    String _htmlContent = _unescape.convert(comment.data.bodyHtml);
     _platformBrightness = MediaQuery.of(context).platformBrightness;
     return Material(
       color: Theme.of(context).cardColor,
       child: Container(
-        padding: EdgeInsets.only(top: 4.0),
+        padding: const EdgeInsets.only(top: 4.0),
         decoration: BoxDecoration(
           border: Border(
             left: BorderSide(
-              color: widget.comment.data.depth != 0
-                  ? colorsRainbow.elementAt(widget.comment.data.depth % 5)
+              color: comment.data.depth != 0
+                  ? colorsRainbow.elementAt(comment.data.depth % 5)
                   : Colors.transparent,
-              width: widget.comment.data.depth != 0 ? 2 : 0,
+              width: comment.data.depth != 0 ? 2 : 0,
             ),
           ),
         ),
         child: InkWell(
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
-          onLongPress: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
           onTap: () {
-            setState(() {
-              collapse(widget.comment, context);
-            });
+            collapse(comment, context);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              widget.comment.data.stickied
-                  ? Container(
-                      margin: EdgeInsets.only(
-                        left: 8,
-                        right: 8.0,
-                        bottom: 4.0,
-                        top: 4.0,
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: getColor(
-                          _platformBrightness,
-                          ColorObjects.TagColor,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(
-                            Icons.label_outline,
-                            color: Theme.of(context).textTheme.subtitle.color,
-                            size: Theme.of(context).textTheme.subtitle.fontSize,
-                          ),
-                          SizedBox(
-                            width: 4.0,
-                          ),
-                          Text(
-                            "Pinned",
-                            style: Theme.of(context).textTheme.subtitle,
-                          ),
-                        ],
-                      ),
-                    )
+              comment.data.stickied
+                  ? PinnedCommentTag(platformBrightness: _platformBrightness)
                   : Container(),
               Flexible(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 12.0, top: 4.0, right: 12.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      widget.comment.data.isSubmitter
-                          ? Padding(
-                              padding: const EdgeInsets.only(right: 4.0),
-                              child: widget.comment.data.isSubmitter
-                                  ? Icon(
-                                      Icons.person,
-                                      size: 16,
-                                      color: Theme.of(context).accentColor,
-                                    )
-                                  : Container(),
-                            )
-                          : Container(),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: widget.comment.data.author + " ",
-                              style: widget.comment.data.isSubmitter
-                                  ? Theme.of(context)
-                                      .textTheme
-                                      .caption
-                                      .copyWith(
-                                        color: Theme.of(context).accentColor,
-                                      )
-                                  : Theme.of(context).textTheme.caption,
-                            ),
-                            widget.comment.data.distinguished
-                                        .toString()
-                                        .compareTo("moderator") ==
-                                    0
-                                ? TextSpan(
-                                    text: "MOD",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .subtitle
-                                        .copyWith(
-                                          color: Theme.of(context).accentColor,
-                                          letterSpacing: 1,
-                                        ),
-                                  )
-                                : TextSpan(),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.arrow_upward,
-                            color: widget.comment.data.likes != null
-                                ? widget.comment.data.likes == true
-                                    ? getColor(_platformBrightness,
-                                        ColorObjects.UpvoteColor)
-                                    : getColor(_platformBrightness,
-                                        ColorObjects.DownvoteColor)
-                                : Theme.of(context).textTheme.subtitle.color,
-                            size: 14,
-                          ),
-                          Text(
-                            (widget.comment.data.scoreHidden
-                                ? " [?]"
-                                : " " +
-                                    getRoundedToThousand(
-                                        widget.comment.data.score)),
-                            style: widget.comment.data.likes != null
-                                ? widget.comment.data.likes == true
-                                    ? Theme.of(context)
-                                        .textTheme
-                                        .subtitle
-                                        .copyWith(
-                                          color: getColor(_platformBrightness,
-                                              ColorObjects.UpvoteColor),
-                                        )
-                                    : Theme.of(context)
-                                        .textTheme
-                                        .subtitle
-                                        .copyWith(
-                                          color: getColor(_platformBrightness,
-                                              ColorObjects.DownvoteColor),
-                                        )
-                                : Theme.of(context).textTheme.subtitle,
-                            softWrap: true,
-                            overflow: TextOverflow.clip,
-                            maxLines: 100,
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Text(
-                          " • " + getTimePosted(widget.comment.data.createdUtc),
-                          style: Theme.of(context).textTheme.subtitle,
-                          overflow: TextOverflow.fade,
-                          maxLines: 100,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: AuthorTag(
+                  comment: comment,
+                  platformBrightness: _platformBrightness,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(
                   left: 12.0,
                   right: 12.0,
+                  top: 0.0,
                 ),
-                child: Html(
-                  padding: EdgeInsets.all(0),
-                  defaultTextStyle: Theme.of(context).textTheme.body1,
-                  linkStyle: Theme.of(context).textTheme.body1.copyWith(
-                        color: Theme.of(context).accentColor,
-                      ),
-                  data:
-                      """${_unescape.convert(widget.comment.data.bodyHtml)}""",
-                  useRichText: true,
-                  showImages: false,
-                  renderNewlines: false,
-                  onLinkTap: (url) {
-                    if (url.startsWith("/r/") || url.startsWith("r/")) {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          fullscreenDialog: false,
-                          builder: (BuildContext context) {
-                            return SubredditFeedPage(
-                                subreddit: url.startsWith("/r/")
-                                    ? url.replaceFirst("/r/", "")
-                                    : url.replaceFirst("r/", ""));
-                          },
-                        ),
-                      );
-                    } else if (url.startsWith("/u/") || url.startsWith("u/")) {
-                    } else {
-                      print("launching web view");
-                      launchURL(context, url);
-                    }
-                  },
-                ),
+                child: htmlCommentBody,
               ),
-              isExpanded
-                  ? Container(
-                      child: Row(
-                        children: <Widget>[
-                          IconButton(
-                            icon: Icon(
-                              Icons.arrow_upward,
-                            ),
-                            onPressed: () {
-                              if (Provider.of<UserInformationProvider>(context)
-                                  .signedIn) {
-                                setState(() {
-                                  isExpanded = !isExpanded;
-                                });
-                                if (widget.comment.data.likes == true) {
-                                  Provider.of<CommentsProvider>(context)
-                                      .voteComment(
-                                          id: widget.comment.data.id,
-                                          dir: 0,
-                                          postId: widget.postId);
-                                } else {
-                                  Provider.of<CommentsProvider>(context)
-                                      .voteComment(
-                                          id: widget.comment.data.id,
-                                          dir: 1,
-                                          postId: widget.postId);
-                                }
-                              } else {
-                                buildSnackBar(context);
-                              }
-                            },
-                            color: widget.comment.data.likes == null ||
-                                    widget.comment.data.likes == false
-                                ? Theme.of(context).accentColor
-                                : getColor(_platformBrightness,
-                                    ColorObjects.UpvoteColor),
-                            splashColor: getColor(
-                                _platformBrightness, ColorObjects.UpvoteColor),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.arrow_downward),
-                            color: widget.comment.data.likes == null ||
-                                    widget.comment.data.likes == true
-                                ? Theme.of(context).accentColor
-                                : getColor(_platformBrightness,
-                                    ColorObjects.DownvoteColor),
-                            onPressed: () {
-                              setState(() {
-                                isExpanded = !isExpanded;
-                              });
-                              if (Provider.of<UserInformationProvider>(context)
-                                  .signedIn) {
-                                if (widget.comment.data.likes == false) {
-                                  Provider.of<CommentsProvider>(context)
-                                      .voteComment(
-                                          id: widget.comment.data.id,
-                                          dir: 0,
-                                          postId: widget.postId);
-                                } else {
-                                  Provider.of<CommentsProvider>(context)
-                                      .voteComment(
-                                          id: widget.comment.data.id,
-                                          dir: -1,
-                                          postId: widget.postId);
-                                }
-                              } else {
-                                buildSnackBar(context);
-                              }
-                            },
-                            splashColor: getColor(_platformBrightness,
-                                ColorObjects.DownvoteColor),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.account_circle),
-                            onPressed: () {},
-                            color: Theme.of(context).accentColor,
-                          )
-                        ],
-                      ),
-                    )
-                  : Container(),
             ],
           ),
         ),
@@ -462,10 +224,160 @@ class _CommentBodyState extends State<CommentBody> {
   }
 
   void collapse(CommentPojo.Child comment, BuildContext context) async {
-    Provider.of<CommentsProvider>(context).collapseUncollapseComment(
-      parentCommentIndex: widget.commentIndex,
+    Provider.of<CommentsProvider>(context, listen: false)
+        .collapseUncollapseComment(
+      parentCommentIndex: commentIndex,
       collapse: true,
-      postId: widget.postId,
+      postId: postId,
+    );
+  }
+}
+
+class AuthorTag extends StatelessWidget {
+  const AuthorTag({
+    Key key,
+    @required this.comment,
+    @required Brightness platformBrightness,
+  })  : _platformBrightness = platformBrightness,
+        super(key: key);
+
+  final CommentPojo.Child comment;
+  final Brightness _platformBrightness;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 4.0, right: 12.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          comment.data.isSubmitter
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: comment.data.isSubmitter
+                      ? Icon(
+                          Icons.person,
+                          size: 16,
+                          color: Theme.of(context).accentColor,
+                        )
+                      : Container(),
+                )
+              : Container(),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: comment.data.author + " ",
+                  style: comment.data.isSubmitter
+                      ? Theme.of(context).textTheme.caption.copyWith(
+                            color: Theme.of(context).accentColor,
+                          )
+                      : Theme.of(context).textTheme.caption,
+                ),
+                comment.data.distinguished.toString().compareTo("moderator") ==
+                        0
+                    ? TextSpan(
+                        text: "MOD",
+                        style: Theme.of(context).textTheme.subtitle.copyWith(
+                              color: Theme.of(context).accentColor,
+                              letterSpacing: 1,
+                            ),
+                      )
+                    : TextSpan(),
+              ],
+            ),
+          ),
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.arrow_upward,
+                color: comment.data.likes != null
+                    ? comment.data.likes == true
+                        ? getColor(
+                            _platformBrightness, ColorObjects.UpvoteColor)
+                        : getColor(
+                            _platformBrightness, ColorObjects.DownvoteColor)
+                    : Theme.of(context).textTheme.subtitle.color,
+                size: 14,
+              ),
+              Text(
+                (comment.data.scoreHidden
+                    ? " [?]"
+                    : " " + getRoundedToThousand(comment.data.score)),
+                style: comment.data.likes != null
+                    ? comment.data.likes == true
+                        ? Theme.of(context).textTheme.subtitle.copyWith(
+                              color: getColor(_platformBrightness,
+                                  ColorObjects.UpvoteColor),
+                            )
+                        : Theme.of(context).textTheme.subtitle.copyWith(
+                              color: getColor(_platformBrightness,
+                                  ColorObjects.DownvoteColor),
+                            )
+                    : Theme.of(context).textTheme.subtitle,
+                softWrap: true,
+                overflow: TextOverflow.clip,
+                maxLines: 100,
+              ),
+            ],
+          ),
+          Expanded(
+            child: Text(
+              " • " + getTimePosted(comment.data.createdUtc),
+              style: Theme.of(context).textTheme.subtitle,
+              overflow: TextOverflow.fade,
+              maxLines: 100,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PinnedCommentTag extends StatelessWidget {
+  const PinnedCommentTag({
+    Key key,
+    @required Brightness platformBrightness,
+  })  : _platformBrightness = platformBrightness,
+        super(key: key);
+
+  final Brightness _platformBrightness;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(
+        left: 12.0,
+        right: 12.0,
+        bottom: 4.0,
+        top: 4.0,
+      ),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: getColor(
+          _platformBrightness,
+          ColorObjects.TagColor,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(
+            Icons.label_outline,
+            color: Theme.of(context).textTheme.subtitle.color,
+            size: Theme.of(context).textTheme.subtitle.fontSize,
+          ),
+          SizedBox(
+            width: 4.0,
+          ),
+          Text(
+            "Pinned",
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -488,7 +400,7 @@ class MoreCommentKind extends StatelessWidget {
                 enableFeedback: true,
                 splashColor: Theme.of(context).accentColor.withOpacity(0.2),
                 onTap: () {
-                  Provider.of<CommentsProvider>(context).fetchChildren(
+                  model.fetchChildren(
                     children: comment.data.children,
                     postId: id,
                     postFullName: postFullName,

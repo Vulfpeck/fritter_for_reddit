@@ -20,7 +20,7 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("New scaffold from " + widget.subreddit);
+    // print("New scaffold from " + widget.subreddit);
     return CupertinoPageScaffold(
       child: ChangeNotifierProvider(
         builder: (context) => widget.frontPageLoad

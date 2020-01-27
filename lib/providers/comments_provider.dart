@@ -55,10 +55,8 @@ class CommentsProvider with ChangeNotifier {
               'Authorization': 'bearer ' + authToken,
             },
           );
-          print(url);
-          print(response.statusCode.toString() + "••••••••••••••");
           if (response.statusCode == 200) {
-//      print(json.decode(response.body));
+//      // // print(json.decode(response.body));
             final c =
                 CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
 
@@ -75,11 +73,11 @@ class CommentsProvider with ChangeNotifier {
 
             commentsMap[postId] = finalList;
           } else {
-            print(response.statusCode);
-            print('fetch failed');
+//            // // print(response.statusCode);
+//            // // print('fetch failed');
           }
         } catch (e) {
-          print('Exceptions ${e.toString()}');
+//          // // print('Exceptions ${e.toString()}');
         }
       } else {
         url =
@@ -91,10 +89,10 @@ class CommentsProvider with ChangeNotifier {
               'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
             },
           );
-          print(url);
-          print(response.statusCode.toString() + "••••••••••••••");
+//          // // print(url);
+//          // // print(response.statusCode.toString() + "••••••••••••••");
           if (response.statusCode == 200) {
-//      print(json.decode(response.body));
+//      // // print(json.decode(response.body));
             final c =
                 CommentPojo.Comment.fromMap(json.decode(response.body)[1]);
 
@@ -105,20 +103,20 @@ class CommentsProvider with ChangeNotifier {
               if (x.kind == CommentPojo.Kind.T1 ||
                   (x.kind == CommentPojo.Kind.MORE) &&
                       x.data.children.length != 0) {
-//          print(" | " * x.data.depth + "-" + x.data.author)
+//          // // print(" | " * x.data.depth + "-" + x.data.author)
                 finalList.add(x);
                 if (x.kind == CommentPojo.Kind.MORE) {
-//            print(x.data.children);
+//            // // print(x.data.children);
                 }
               }
             }
             commentsMap[postId] = finalList;
           } else {
-            print(response.statusCode);
-            print('fetch failed');
+            // // print(response.statusCode);
+            // // print('fetch failed');
           }
         } catch (e) {
-          print('Exceptions ${e.toString()}');
+          // // print('Exceptions ${e.toString()}');
         }
       }
     } else {}
@@ -145,7 +143,7 @@ class CommentsProvider with ChangeNotifier {
         childrenString += child + ",";
       }
     else
-      print('children is null');
+    // // print('children is null');
 
     if (childrenString != "") {
       childrenString = childrenString.substring(0, childrenString.length - 2);
@@ -153,10 +151,10 @@ class CommentsProvider with ChangeNotifier {
 
     if (_storageHelper.signInStatus) {
       String authToken = await _storageHelper.authToken;
-      print("User is auth so using oauth to get more comments");
+      // // print("User is auth so using oauth to get more comments");
       final url =
           'https://oauth.reddit.com/api/morechildren?link_id=$postFullName&api_type=json&children=$childrenString&sort=${changeCommentSortConvertToString[this.sort]}';
-      print(url);
+      // // print(url);
       try {
         final response = await http.get(
           url,
@@ -171,7 +169,7 @@ class CommentsProvider with ChangeNotifier {
               new CommentMoreEntity.fromJson(
             json.decode(response.body),
           );
-          print("comments saved in the entity");
+          // // print("comments saved in the entity");
           CommentPojo.Child parent = commentsMap[postId].firstWhere((ele) {
             if (ele.data.id.compareTo(moreParentId) == 0) {
               return true;
@@ -180,9 +178,9 @@ class CommentsProvider with ChangeNotifier {
             }
           });
           int parentIndex = commentsMap[postId].indexOf(parent);
-          print(parent.kind);
-          print(parent.data.children);
-          print(parentIndex);
+          // // print(parent.kind);
+          // // print(parent.data.children);
+          // // print(parentIndex);
           commentsMap[postId].remove(parent);
           for (var x in _moreComments.json.data.things) {
             commentsMap[postId].insert(
@@ -192,13 +190,13 @@ class CommentsProvider with ChangeNotifier {
               ),
             );
           }
-//        print(_moreComments.json);
+//        // // print(_moreComments.json);
         } else {
-          print(response.reasonPhrase);
-          print("there was an error fetching the comments");
+          // // print(response.reasonPhrase);
+          // // print("there was an error fetching the comments");
         }
       } catch (e) {
-        print(e.toString());
+        // // print(e.toString());
       }
     } else {
       final url =
@@ -216,9 +214,9 @@ class CommentsProvider with ChangeNotifier {
               new CommentMoreEntity.fromJson(
             json.decode(response.body),
           );
-          print("comments saved in the entity");
+          // // print("comments saved in the entity");
           CommentPojo.Child parent = commentsMap[postId].firstWhere((ele) {
-            print(ele.data.id);
+            // // print(ele.data.id);
             if (ele.data.id.compareTo(moreParentId) == 0) {
               return true;
             } else {
@@ -226,9 +224,9 @@ class CommentsProvider with ChangeNotifier {
             }
           });
           int parentIndex = commentsMap[postId].indexOf(parent);
-          print(parent.kind);
-          print(parent.data.children);
-          print(parentIndex);
+          // // print(parent.kind);
+          // // print(parent.data.children);
+          // // print(parentIndex);
           commentsMap[postId].remove(parent);
           for (var x in _moreComments.json.data.things) {
             commentsMap[postId].insert(
@@ -238,12 +236,12 @@ class CommentsProvider with ChangeNotifier {
               ),
             );
           }
-//        print(_moreComments.json);
+//        // // print(_moreComments.json);
         } else {
-          print("there was an error fetching the comments");
+          // // print("there was an error fetching the comments");
         }
       } catch (e) {
-        print(e.toString());
+        // // print(e.toString());
       }
     }
 
@@ -311,7 +309,7 @@ class CommentsProvider with ChangeNotifier {
     }
     String url = "https://oauth.reddit.com/api/vote";
     final String authToken = await _storageHelper.authToken;
-    print(authToken);
+    // // print(authToken);
     http.Response voteResponse;
     voteResponse = await http.post(
       url + '?dir=$dir&id=$id&rank=2',

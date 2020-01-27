@@ -47,10 +47,11 @@ class MyTestApp extends StatelessWidget {
         cardColor: Colors.white,
         textTheme: Theme.of(context).textTheme.copyWith(
               title: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
+                letterSpacing: 0,
                 fontWeight: FontWeight.w500,
               ),
-              body1: TextStyle(
+              body2: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey.shade800,
@@ -71,14 +72,14 @@ class MyTestApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         cardColor: Colors.black,
         dividerTheme: DividerThemeData(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withOpacity(0.12),
           thickness: 1,
         ),
         brightness: Brightness.dark,
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        accentColor: Colors.blueAccent,
+        accentColor: Colors.redAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
               surface: Colors.lightBlue.shade900,
@@ -87,11 +88,12 @@ class MyTestApp extends StatelessWidget {
             ),
         textTheme: ThemeData.dark().textTheme.copyWith(
               title: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w400,
+                letterSpacing: 0,
                 color: Colors.white.withOpacity(0.95),
               ),
-              body1: TextStyle(
+              body2: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withOpacity(0.8),

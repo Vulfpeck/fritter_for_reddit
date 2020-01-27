@@ -212,7 +212,7 @@ class _SearchPageState extends State<SearchPage> {
                                           CupertinoPageRoute(
                                             builder: (BuildContext context) {
                                               return CommentsScreen(
-                                                item: item,
+                                                postItem: item,
                                               );
                                             },
                                           ),
@@ -336,6 +336,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       snap: true,
       elevation: 0,
       floating: true,
+      centerTitle: true,
       stretch: false,
       title: Text(
         "Search",

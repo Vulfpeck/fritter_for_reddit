@@ -27,7 +27,7 @@ class UserInformationProvider with ChangeNotifier {
   ViewState get authenticationStatus => _authenticationStatus;
 
   UserInformationProvider() {
-//    print("*** Initializeding user information provider ****");
+//    // print("*** Initializeding user information provider ****");
     validateAuthentication();
   }
 
@@ -38,7 +38,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> validateAuthentication() async {
-//    print("*** Validating authentication ****");
+//    // print("*** Validating authentication ****");
     await _storageHelper.init();
     _state = ViewState.Busy;
     notifyListeners();
@@ -47,11 +47,11 @@ class UserInformationProvider with ChangeNotifier {
       await _storageHelper.performTokenRefresh();
       await loadUserInformation();
     } else {
-//      print("** user is not authenticated");
+//      // print("** user is not authenticated");
     }
 
     _state = ViewState.Idle;
-    print("validate authentication debug print" + _storageHelper.debugPrint);
+    // // print("validate authentication debug // // print" + _storageHelper.debug// // print);
     notifyListeners();
   }
 
@@ -63,19 +63,19 @@ class UserInformationProvider with ChangeNotifier {
       await server.close(force: true);
     }
     await _storageHelper.clearStorage();
-//    print("*** Performing authentication ****");
+//    // print("*** Performing authentication ****");
     // start a new instance of the server that listens to localhost requests
     Stream<String> onCode = await _server();
 
     // server returns the first access_code it receives
 
     final String accessCode = await onCode.first;
-//    print("local host response");
+//    // print("local host response");
 
     notifyListeners();
     _authenticationStatus = ViewState.Busy;
     if (accessCode == null) {
-//      print("isNull");
+//      // print("isNull");
       authResult = false;
     }
 
@@ -95,16 +95,16 @@ class UserInformationProvider with ChangeNotifier {
           "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
     );
 
-//    print(
+//    // print(
 //        "New authentication response code: " + response.statusCode.toString());
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
       await _storageHelper.updateCredentials(map['access_token'],
           map['refresh_token'], DateTime.now().toIso8601String(), true);
-//      print('authentication: token stored to secure storage');
+//      // print('authentication: token stored to secure storage');
       await loadUserInformation();
     } else {
-//      print("Authentication failed");
+//      // print("Authentication failed");
       authResult = false;
     }
 
@@ -118,9 +118,9 @@ class UserInformationProvider with ChangeNotifier {
     final StreamController<String> onCode = new StreamController();
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
-//      print("Server started");
+//      // print("Server started");
       final String code = request.uri.queryParameters["code"];
-//      print(request.uri.pathSegments);
+//      // print(request.uri.pathSegments);
       request.response
         ..statusCode = 200
         ..headers.set("Content-Type", ContentType.html.mimeType)
@@ -143,7 +143,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> loadUserInformation() async {
-//    print("*** Loading user information ****");
+//    // print("*** Loading user information ****");
 
     String token = await _storageHelper.authToken;
 
@@ -157,9 +157,9 @@ class UserInformationProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
-//    print("Loading user information response code: " +
+//    // print("Loading user information response code: " +
 //        response.statusCode.toString());
-//    print(json.decode(response.body));
+//    // print(json.decode(response.body));
 
     if (response.statusCode == 200)
       userInformation =
@@ -173,7 +173,7 @@ class UserInformationProvider with ChangeNotifier {
       },
     );
 
-//    print("Subreddit list request Response code: " +
+//    // print("Subreddit list request Response code: " +
 //        subredditResponse.statusCode.toString());
 
     if (subredditResponse.statusCode == 200) {
@@ -195,7 +195,7 @@ class UserInformationProvider with ChangeNotifier {
             CLIENT_ID +
             "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
     bool res = await this.performAuthentication();
-    print("final res: " + res.toString());
+    // print("final res: " + res.toString());
     if (res) {
       await Provider.of<FeedProvider>(context).fetchPostsListing();
       if (Navigator.canPop(context)) {

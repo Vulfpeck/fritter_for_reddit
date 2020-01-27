@@ -14,6 +14,7 @@ class PhotoViewerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: true,
       appBar: AppBar(
         brightness: MediaQuery.of(context).platformBrightness,
@@ -26,6 +27,8 @@ class PhotoViewerScreen extends StatelessWidget {
               url: mediaUrl,
             )
           : PhotoView(
+              backgroundDecoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor),
               imageProvider: CachedNetworkImageProvider(
                 mediaUrl,
               ),

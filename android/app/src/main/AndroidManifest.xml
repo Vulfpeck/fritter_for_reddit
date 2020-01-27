@@ -10,7 +10,7 @@
     <application
         android:usesCleartextTraffic="true"
         android:name="io.flutter.app.FlutterApplication"
-        android:label="flutter_provider_app"
+        android:label="Fritter"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

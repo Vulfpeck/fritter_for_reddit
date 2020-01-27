@@ -16,7 +16,7 @@ class _WebViewSignInState extends State<WebViewSignIn> {
             CLIENT_ID +
             "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
 
-    print(url);
+    // print(url);
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign in'),

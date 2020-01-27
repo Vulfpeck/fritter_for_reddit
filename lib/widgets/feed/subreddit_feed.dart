@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
+import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
-import 'package:flutter_provider_app/widgets/common/translucent_app_bar_bg.dart';
+import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
 import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
@@ -22,6 +25,7 @@ class _SubredditFeedState extends State<SubredditFeed>
   ScrollController _controller;
   String sortSelectorValue = "Best";
   GlobalKey key = GlobalKey();
+
   @override
   void initState() {
     _controller = new ScrollController();
@@ -29,12 +33,18 @@ class _SubredditFeedState extends State<SubredditFeed>
     super.initState();
   }
 
-  void _scrollListener() {
-    if (_controller.position.maxScrollExtent - _controller.offset <= 100 &&
-        Provider.of<FeedProvider>(context).loadMorePostsState !=
+  void _scrollListener() async {
+    if (_controller.position.maxScrollExtent - _controller.offset <= 400 &&
+        Provider.of<FeedProvider>(context, listen: false).loadMorePostsState !=
             ViewState.Busy) {
-      Provider.of<FeedProvider>(context).loadMorePosts();
+      Provider.of<FeedProvider>(context, listen: false).loadMorePosts();
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,11 +55,6 @@ class _SubredditFeedState extends State<SubredditFeed>
           controller: _controller,
           physics: AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
-//          CupertinoSliverNavigationBar(
-//            largeTitle: Text(
-//              'Feed',
-//            ),
-//          ),
             SliverAppBar(
               iconTheme: Theme.of(context).iconTheme,
               actions: <Widget>[
@@ -61,8 +66,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   onSelected: (value) {
                     final RenderBox box = key.currentContext.findRenderObject();
                     final positionDropDown = box.localToGlobal(Offset.zero);
-                    print(
-                        'position of dropdown: ' + positionDropDown.toString());
+                    // print(
                     if (value == "Top") {
                       sortSelectorValue = "Top";
                       showMenu(
@@ -125,6 +129,299 @@ class _SubredditFeedState extends State<SubredditFeed>
                   onCanceled: () {},
                   initialValue: sortSelectorValue,
                 ),
+                IconButton(
+                  icon: Icon(Icons.info_outline),
+                  color: Theme.of(context).iconTheme.color,
+                  onPressed: () {
+                    var prov = Provider.of<FeedProvider>(context);
+                    showCupertinoModalPopup(
+                        context: context,
+                        useRootNavigator: true,
+                        builder: (BuildContext context) {
+                          return DraggableScrollableSheet(builder:
+                              (BuildContext context,
+                                  ScrollController controller) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Theme.of(context)
+                                      .scaffoldBackgroundColor),
+                              padding: const EdgeInsets.all(8.0),
+                              child: Consumer(
+                                builder: (BuildContext context,
+                                    FeedProvider model, _) {
+                                  var headerColor = MediaQuery.of(context)
+                                              .platformBrightness ==
+                                          Brightness.dark
+                                      ? TransparentHexColor("#000000", "80")
+                                      : TransparentHexColor("#FFFFFF", "aa");
+
+                                  if (prov.subredditInformationEntity != null &&
+                                      prov.subredditInformationEntity.data
+                                              .bannerBackgroundColor !=
+                                          "") {
+                                    headerColor = TransparentHexColor(
+                                      prov.subredditInformationEntity.data
+                                          .bannerBackgroundColor,
+                                      "50",
+                                    );
+                                  }
+                                  return Container(
+                                    // Don't wrap this in any SafeArea widgets, use padding instead
+                                    padding: EdgeInsets.all(0),
+                                    color: headerColor,
+                                    // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
+                                    child: prov != null
+                                        ? prov.state == ViewState.Idle
+                                            ? prov.currentPage ==
+                                                    CurrentPage.FrontPage
+                                                ? Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Row(
+                                                        children: <Widget>[
+                                                          Text(
+                                                            'Front Page',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headline
+                                                                .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                          ),
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .chevron_right),
+                                                            onPressed: () {
+                                                              return Navigator.of(
+                                                                      context,
+                                                                      rootNavigator:
+                                                                          false)
+                                                                  .push(
+                                                                CupertinoPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          LeftDrawer(),
+                                                                  fullscreenDialog:
+                                                                      false,
+                                                                ),
+                                                              );
+                                                            },
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .accentColor,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 16.0,
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        SizedBox(
+                                                          height: 24,
+                                                        ),
+                                                        prov.subredditInformationEntity !=
+                                                                null
+                                                            ? CircleAvatar(
+                                                                maxRadius: 24,
+                                                                minRadius: 24,
+                                                                backgroundImage: prov
+                                                                            .subredditInformationEntity
+                                                                            .data
+                                                                            .communityIcon !=
+                                                                        ""
+                                                                    ? CachedNetworkImageProvider(
+                                                                        prov
+                                                                            .subredditInformationEntity
+                                                                            .data
+                                                                            .communityIcon,
+                                                                      )
+                                                                    : prov.subredditInformationEntity.data.iconImg !=
+                                                                            ""
+                                                                        ? CachedNetworkImageProvider(
+                                                                            prov.subredditInformationEntity.data.iconImg,
+                                                                          )
+                                                                        : AssetImage(
+                                                                            'assets/default_icon.png'),
+                                                                backgroundColor: prov
+                                                                            .subredditInformationEntity
+                                                                            .data
+                                                                            .primaryColor ==
+                                                                        ""
+                                                                    ? Theme.of(
+                                                                            context)
+                                                                        .accentColor
+                                                                    : HexColor(
+                                                                        prov
+                                                                            .subredditInformationEntity
+                                                                            .data
+                                                                            .primaryColor,
+                                                                      ),
+                                                              )
+                                                            : Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: <
+                                                                    Widget>[
+                                                                  Row(
+                                                                    children: <
+                                                                        Widget>[
+                                                                      Text(
+                                                                        widget
+                                                                            .pageTitle,
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .headline
+                                                                            .copyWith(fontWeight: FontWeight.bold),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                        prov.subredditInformationEntity !=
+                                                                null
+                                                            ? Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: <
+                                                                    Widget>[
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    prov
+                                                                        .subredditInformationEntity
+                                                                        .data
+                                                                        .displayNamePrefixed,
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .headline
+                                                                        .copyWith(
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .fade,
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    softWrap:
+                                                                        false,
+                                                                  ),
+                                                                  Text(
+                                                                    getRoundedToThousand(prov
+                                                                            .subredditInformationEntity
+                                                                            .data
+                                                                            .subscribers) +
+                                                                        " Subscribers",
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .subhead,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  prov.subredditInformationEntity.data
+                                                                              .userIsSubscriber !=
+                                                                          null
+                                                                      ? FlatButton(
+                                                                          textColor: Theme.of(context)
+                                                                              .textTheme
+                                                                              .body1
+                                                                              .color,
+                                                                          child: prov.partialState == ViewState.Busy
+                                                                              ? Container(
+                                                                                  width: 24.0,
+                                                                                  height: 24.0,
+                                                                                  child: Center(
+                                                                                    child: CircularProgressIndicator(),
+                                                                                  ),
+                                                                                )
+                                                                              : Text(prov.subredditInformationEntity.data.userIsSubscriber ? 'Subscribed' : 'Join'),
+                                                                          onPressed:
+                                                                              () {
+                                                                            prov.changeSubscriptionStatus(
+                                                                              prov.subredditInformationEntity.data.name,
+                                                                              !prov.subredditInformationEntity.data.userIsSubscriber,
+                                                                            );
+                                                                          },
+                                                                        )
+                                                                      : Container(),
+                                                                ],
+                                                              )
+                                                            : Container(),
+                                                        SizedBox(
+                                                          height: 24.0,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  )
+                                            : Center(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                              )
+                                        : Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 32, horizontal: 16),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Front Page',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                  );
+                                },
+                              ),
+                            );
+                          });
+                        });
+                  },
+                )
               ],
               pinned: true,
               snap: true,
@@ -132,51 +429,37 @@ class _SubredditFeedState extends State<SubredditFeed>
               primary: true,
               elevation: 0,
               brightness: MediaQuery.of(context).platformBrightness,
-              backgroundColor: Colors.transparent,
-              flexibleSpace: model.subredditInformationError
-                  ? FlexibleSpaceBar(
-                      background: Container(
-                        color: Theme.of(context).accentColor.withOpacity(0.2),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              textTheme: Theme.of(context).textTheme,
+              centerTitle: true,
+              title: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: model.currentPage != CurrentPage.FrontPage
+                        ? Text(
+                            '/r/' + model.sub,
+                            textAlign: TextAlign.center,
+                          )
+                        : Text('Frontpage', textAlign: TextAlign.center),
+                  ),
+                  Flexible(
+                    child: IconButton(
+                      icon: Icon(Icons.expand_more),
+                      onPressed: () =>
+                          Navigator.of(context, rootNavigator: false).push(
+                        CupertinoPageRoute(
+                          builder: (context) => LeftDrawer(),
+                          fullscreenDialog: true,
+                        ),
                       ),
-                    )
-                  : FlexibleSpaceBar(
-                      background: Stack(
-                        children: <Widget>[
-                          Container(
-                            color: MediaQuery.of(context).platformBrightness ==
-                                    Brightness.light
-                                ? Color.fromARGB(200, 255, 255, 255)
-                                : Color.fromARGB(100, 0, 0, 0),
-                          ),
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: model.partialState == ViewState.Busy
-                                ? Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : TranslucentAppBarBackground(
-                                    pageTitle: widget.pageTitle,
-                                  ),
-                          ),
-                        ],
-                      ),
+                      color: Theme.of(context).accentColor,
                     ),
-              expandedHeight: model.sub == "" ||
-                      model.sub == "popular" ||
-                      model.sub == "all"
-                  ? 128
-                  : 200,
+                  )
+                ],
+              ),
             ),
-//          SliverPersistentHeader(
-//            delegate:
-//                TranslucentSliverAppDelegate(MediaQuery.of(context).padding),
-//            pinned: false,
-//            floating: false,
-//          ),
-
             SliverList(
               delegate: (model.subredditInformationError ||
                       model.feedInformationError)
@@ -224,8 +507,6 @@ class _SubredditFeedState extends State<SubredditFeed>
                             var item =
                                 model.postFeed.data.children[(index ~/ 2)].data;
                             return Material(
-                              borderRadius: BorderRadius.circular(0.0),
-                              clipBehavior: Clip.antiAlias,
                               color: Theme.of(context).cardColor,
                               child: InkWell(
                                 enableFeedback: false,
@@ -253,10 +534,50 @@ class _SubredditFeedState extends State<SubredditFeed>
                           childCount:
                               model.postFeed.data.children.length * 2 + 1,
                         )
-                      : SliverChildListDelegate([]),
+                      : SliverChildListDelegate([
+                          Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: LinearProgressIndicator(),
+                          )
+                        ]),
             )
           ],
         );
+//        return ListView.builder(
+//          itemBuilder: (BuildContext context, int index) {
+//            var item = model.postFeed.data.children[index].data;
+//            return Material(
+//              borderRadius: BorderRadius.circular(0.0),
+//              clipBehavior: Clip.antiAlias,
+//              color: Theme.of(context).cardColor,
+//              child: InkWell(
+//                enableFeedback: false,
+//                onDoubleTap: () {
+//                  if (item.isSelf == false) {
+//                    launchURL(context, item.url);
+//                  }
+//                },
+//                onTap: () {
+//                  _openComments(item, context, index);
+//                },
+//                child: Column(
+//                  children: <Widget>[
+//                    FeedCard(
+//                      item,
+//                    ),
+//                    PostControls(
+//                      postData: item,
+//                    ),
+//                  ],
+//                ),
+//              ),
+//            );
+//          },
+//          controller: _controller,
+//          itemCount: model.postFeed.data.children.length,
+//          cacheExtent: 20,
+//          addAutomaticKeepAlives: false,
+//        );
       },
     );
   }
@@ -297,7 +618,7 @@ class _SubredditFeedState extends State<SubredditFeed>
       CupertinoPageRoute(
         builder: (BuildContext context) {
           return CommentsScreen(
-            item: item,
+            postItem: item,
           );
         },
       ),

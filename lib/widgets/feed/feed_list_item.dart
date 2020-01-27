@@ -5,88 +5,28 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/misc_functions.dart';
 import 'package:flutter_provider_app/helpers/media_type_enum.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
 import 'package:html_unescape/html_unescape.dart';
 
+import 'post_url_preview.dart';
+
 class FeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
-  FeedCard(this.data);
+  Map<String, dynamic> postMetaData;
+  final key;
 
-  Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
-    Map<String, dynamic> result = Map();
-    if (data.isRedditMediaDomain == null) {
-      data.isRedditMediaDomain = false;
-    }
-    switch (data.isRedditMediaDomain) {
-      case true:
-        {
-          if (data.media == null) {
-            result['media_type'] = MediaType.Image;
-            result['url'] = data.url;
-            return result;
-          } else {
-            result['media_type'] = MediaType.Video;
-            String url = data.media['reddit_video']['fallback_url']
-                .toString()
-                .replaceFirstMapped(RegExp(r'DASH_\d+'), (match) {
-              return 'DASH_240';
-            });
-            result['url'] = url;
-            return result;
-          }
-          break;
-        }
-      case false:
-        {
-          if (data.media == null) {
-            final Uri uri = Uri.parse(data.url);
-            if (uri.authority == 'imgur.com' ||
-                uri.authority == 'i.imgur.com' ||
-                uri.authority == 'm.imgur.com') {
-              if (uri.path.contains('/a/') || uri.path.contains('/gallery')) {
-                result['media_type'] = MediaType.ImgurGallery;
-                result['url'] = data.url;
-                return result;
-              } else if (uri.path.contains('mp4') ||
-                  uri.path.contains('gifv')) {
-                result['media_type'] = MediaType.Video;
-                result['url'] = data.url.replaceAll('gifv', 'mp4');
-                return result;
-              } else {
-                result['media_type'] = MediaType.Image;
-                result['url'] = data.url;
-                return result;
-              }
-            }
-          } else {
-            final Uri uri = Uri.parse(data.url);
-            if (uri.authority == 'gfycat.com') {
-              result['url'] = data.media['oembed']['thumbnail_url']
-                  .toString()
-                  .replaceAll(".gif", ".mp4")
-                  .replaceAll("thumbs", "giant")
-                  .replaceAll("-size_restricted", "");
-              result['media_type'] = MediaType.Video;
-              return result;
-            } else {
-              result['media_type'] = MediaType.Url;
-              result['url'] = data.url;
-              return result;
-            }
-          }
-          break;
-        }
-    }
-
-    return {'media_type': MediaType.Url, 'url': data.url};
+  FeedCard(this.data, {this.key}) : super(key: key) {
+    if (!data.isSelf)
+      postMetaData = getMediaType(data);
+    else
+      postMetaData = {'media_type': MediaType.None};
   }
-
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> postMetaData = getMediaType(data);
-    final _htmlUnescape = HtmlUnescape();
+    final _htmlUnescape = new HtmlUnescape();
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -124,50 +64,9 @@ class FeedCard extends StatelessWidget {
           ),
         ),
         postMetaData['media_type'] == MediaType.Url && data.isSelf == false
-            ? Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
-                  top: 12.0,
-                  bottom: 4.0,
-                ),
-                child: Container(
-                  foregroundDecoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: Theme.of(context).accentColor.withOpacity(0.10),
-                  ),
-                  child: ListTile(
-                    dense: false,
-                    onTap: () {
-                      launchURL(context, data.url);
-                    },
-                    title: Text(
-                      data.url,
-                      style: Theme.of(context).textTheme.subtitle,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      textAlign: TextAlign.left,
-                    ),
-                    trailing: data.preview != null
-                        ? CircleAvatar(
-                            radius: 16,
-                            backgroundImage: CachedNetworkImageProvider(
-                              _htmlUnescape.convert(
-                                data.preview.images.last.source.url,
-                              ),
-                            ),
-                          )
-                        : CircleAvatar(
-                            radius: 12,
-                            child: Icon(
-                              Icons.link,
-                              color: Colors.white,
-                            ),
-                            backgroundColor: Theme.of(context).accentColor,
-                          ),
-                  ),
-                ),
+            ? PostUrlPreview(
+                data: data,
+                htmlUnescape: _htmlUnescape,
               )
             : Container(),
         data.preview != null &&
@@ -179,6 +78,7 @@ class FeedCard extends StatelessWidget {
                   images: data.preview.images,
                   data: data,
                   postMetaData: postMetaData,
+                  deviceWidth: MediaQuery.of(context).size.width,
                 ),
               )
             : Container(),
@@ -194,15 +94,19 @@ class FeedCardTitle extends StatelessWidget {
   final bool nsfw;
   final bool locked;
 
+  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
+
+  String escapedTitle;
   FeedCardTitle({
     @required this.title,
     @required this.stickied,
     @required this.linkFlairText,
     @required this.nsfw,
     @required this.locked,
-  });
+  }) {
+    escapedTitle = _htmlUnescape.convert(title);
+  }
 
-  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -219,16 +123,7 @@ class FeedCardTitle extends StatelessWidget {
           StickyTag(stickied),
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
-            child: RichText(
-              text: TextSpan(
-                children: <TextSpan>[
-                  TextSpan(
-                    text: _htmlUnescape.convert(title) + "  ",
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ],
-              ),
-            ),
+            child: Text(escapedTitle),
           ),
           nsfw == true || linkFlairText != null
               ? RichText(
@@ -248,14 +143,21 @@ class FeedCardTitle extends StatelessWidget {
                       linkFlairText != null
                           ? TextSpan(
                               text: linkFlairText,
-                              style:
-                                  Theme.of(context).textTheme.subtitle.copyWith(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .subtitle
-                                            .color
-                                            .withOpacity(0.8),
-                                      ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .subtitle
+                                          .color
+                                          .withOpacity(0.8),
+                                      backgroundColor: Theme.of(context)
+                                          .textTheme
+                                          .subtitle
+                                          .color
+                                          .withOpacity(0.15),
+                                      decorationThickness: 2),
                             )
                           : TextSpan(),
                     ],
@@ -269,22 +171,42 @@ class FeedCardTitle extends StatelessWidget {
   }
 }
 
-class FeedCardBodyImage extends StatelessWidget {
+class FeedCardBodyImage extends StatefulWidget {
   final Map<String, dynamic> postMetaData;
-  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
   final List<PostsFeedDatachildDataPreviewImages> images;
   final PostsFeedDataChildrenData data;
+  final double deviceWidth;
 
-  FeedCardBodyImage(
-      {@required this.images, @required this.data, @required this.postMetaData})
-      : assert(postMetaData != null);
+  FeedCardBodyImage({
+    @required this.images,
+    @required this.data,
+    @required this.postMetaData,
+    @required this.deviceWidth,
+  }) : assert(postMetaData != null);
+
+  @override
+  _FeedCardBodyImageState createState() => _FeedCardBodyImageState();
+}
+
+class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
+  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
+  String url = "";
+  double ratio = 1;
+  @override
+  void initState() {
+    /// this is to select the best quality image
+    // TODO: Try to do this while parsing the json
+    ratio = (widget.deviceWidth) / widget.images.first.source.width;
+    for (var x in widget.images.first.resolutions) {
+      if (x.width < widget.deviceWidth) {
+        url = _htmlUnescape.convert(x.url);
+      }
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context).size;
-    final double ratio = (mq.width) / images.first.source.width;
-    String url = _htmlUnescape.convert(images.first.source.url);
-
     return Consumer(
       builder: (BuildContext context, FeedProvider model, _) {
         return Center(
@@ -292,24 +214,25 @@ class FeedCardBodyImage extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                if (postMetaData['media_type'] == MediaType.Video ||
-                    postMetaData['media_type'] == MediaType.Image) {
+                if (widget.postMetaData['media_type'] == MediaType.Video ||
+                    widget.postMetaData['media_type'] == MediaType.Image) {
                   Navigator.of(
                     context,
-                    rootNavigator: true,
+                    rootNavigator: false,
                   ).push(
                     CupertinoPageRoute(
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
-                          mediaUrl:
-                              postMetaData['media_type'] == MediaType.Image
-                                  ? url
-                                  : postMetaData['url'],
-                          isVideo:
-                              postMetaData['media_type'] == MediaType.Video,
+                          mediaUrl: widget.postMetaData['media_type'] ==
+                                  MediaType.Image
+                              ? _htmlUnescape
+                                  .convert(widget.images.first.source.url)
+                              : widget.postMetaData['url'],
+                          isVideo: widget.postMetaData['media_type'] ==
+                              MediaType.Video,
                         );
                       },
-                      fullscreenDialog: false,
+                      fullscreenDialog: true,
                     ),
                   );
                 } else {}
@@ -326,8 +249,8 @@ class FeedCardBodyImage extends StatelessWidget {
                   url,
                 ),
                 fit: BoxFit.fitWidth,
-                width: mq.width,
-                height: images.first.source.height.toDouble() * ratio,
+                width: widget.deviceWidth,
+                height: widget.images.first.source.height.toDouble() * ratio,
               ),
             ),
           ),
@@ -385,19 +308,36 @@ class StickyTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return _isStickied
         ? Padding(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0),
+            padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
             child: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Text(
-                  'Stickied',
-                  style: TextStyle(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    width: 4,
+                  ),
+                  Icon(
+                    Icons.turned_in,
+                    size: 12,
                     color: MediaQuery.of(context).platformBrightness ==
                             Brightness.dark
-                        ? Colors.green.shade50
-                        : Colors.green.shade900,
+                        ? Colors.green.shade50.withOpacity(0.7)
+                        : Colors.green.shade900.withOpacity(0.7),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 2, bottom: 2, left: 2, right: 4),
+                    child: Text(
+                      'Stickied',
+                      style: TextStyle(
+                          color: MediaQuery.of(context).platformBrightness ==
+                                  Brightness.dark
+                              ? Colors.green.shade50
+                              : Colors.green.shade900,
+                          fontSize: 12),
+                    ),
+                  ),
+                ],
               ),
               decoration: BoxDecoration(
                 color:

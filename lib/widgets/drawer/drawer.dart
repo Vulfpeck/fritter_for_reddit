@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -163,7 +165,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                           mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
                             SizedBox(
-                              height: 72,
+                              height: 48,
                             ),
                             Text(
                               "Hello 🥳",
@@ -210,6 +212,10 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                 },
                               ),
                             ),
+                            SizedBox(
+                              height:
+                                  MediaQuery.of(context).padding.bottom + 24,
+                            ),
                           ],
                         ),
                       ),
@@ -230,18 +236,23 @@ class DrawerSliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      automaticallyImplyLeading: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      textTheme: Theme.of(context).textTheme,
+      floating: true,
+      pinned: true,
+      snap: false,
       centerTitle: true,
-      expandedHeight: 170,
+      elevation: 0,
+      expandedHeight: 56,
+      title: Text(
+        "Subreddits",
+        style: Theme.of(context).textTheme.title,
+      ),
       brightness: MediaQuery.of(context).platformBrightness,
       iconTheme: Theme.of(context).iconTheme,
-      flexibleSpace: FlexibleSpaceBar(
-        centerTitle: false,
-        title: Text(
-          "Subreddits",
-        ),
-      ),
     );
+//    return BlurredSliverAppBar(
+//      title: "Subreddits",
+//    );
   }
 }

@@ -43,7 +43,7 @@ class SearchProvider with ChangeNotifier {
           'query': query,
         },
       );
-      print(uri);
+      // print(uri);
       http.Response response = await http.post(
         uri,
         headers: {
@@ -51,7 +51,7 @@ class SearchProvider with ChangeNotifier {
           'Authorization': 'bearer $authToken',
         },
       );
-      print("Subreddit search query status: " + response.statusCode.toString());
+      // print("Subreddit search query status: " + response.statusCode.toString());
 
       if (response.statusCode == 200) {
         _subQueryResult = _subQueryResult.fromJson(json.decode(response.body));
@@ -64,14 +64,14 @@ class SearchProvider with ChangeNotifier {
           'query': query,
         },
       );
-      print(uri);
+      // print(uri);
       http.Response response = await http.post(
         uri,
         headers: {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       );
-      print("Subreddit search query status: " + response.statusCode.toString());
+      // print("Subreddit search query status: " + response.statusCode.toString());
 
       if (response.statusCode == 200) {
         _subQueryResult = _subQueryResult.fromJson(json.decode(response.body));
@@ -99,7 +99,7 @@ class SearchProvider with ChangeNotifier {
           'q': query,
         },
       );
-      print(uri);
+      // print(uri);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -107,11 +107,11 @@ class SearchProvider with ChangeNotifier {
           'Authorization': 'bearer $authToken',
         },
       );
-      print("Signed in posts query status code: " +
-          response.statusCode.toString());
+      // print("Signed in posts query status code: " +
+//          response.statusCode.toString());
 
       if (response.statusCode == 200) {
-        print(json.decode(response.body));
+        // print(json.decode(response.body));
         _postsQueryResult =
             PostsFeedEntity.fromJson(json.decode(response.body));
       }
@@ -123,28 +123,28 @@ class SearchProvider with ChangeNotifier {
           'q': query,
         },
       );
-      print(uri);
+      // print(uri);
       http.Response response = await http.get(
         uri,
         headers: {
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
         },
       );
-      print("Signed out posts query status code" +
-          response.statusCode.toString());
+      // print("Signed out posts query status code" +
+//          response.statusCode.toString());
 
       if (response.statusCode == 200) {
         _postsQueryResult =
             PostsFeedEntity.fromJson(json.decode(response.body));
       }
 
-      print(_postsQueryResult.data.children.length);
+      // print(_postsQueryResult.data.children.length);
       for (var x in _postsQueryResult.data.children) {
-        print(x.data.title);
+        // print(x.data.title);
       }
     }
 
-    print(_postsQueryResult.toJson().toString());
+    // print(_postsQueryResult.toJson().toString());
     _postsQueryLoadingState = ViewState.Idle;
     notifyListeners();
   }

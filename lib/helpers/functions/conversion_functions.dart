@@ -25,7 +25,7 @@ String getTimePosted(double orig) {
 
 String getRoundedToThousand(int score) {
   if (score > 1000) {
-    return (score / 1000).toStringAsPrecision(2) + "K";
+    return (score / 1000).toStringAsFixed(0) + "K";
   } else {
     return score.toString();
   }

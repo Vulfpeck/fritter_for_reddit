@@ -96,13 +96,13 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
             final double change = (finalPosition - initialPosition);
             final double ratio =
                 change < 0 ? change * -1 / size.width : change / size.width;
-            print("Drag ratio : " + ratio.toString());
+            // print("Drag ratio : " + ratio.toString());
             if (change < 0) {
-              if (ratio >= 0 && ratio < 0.2) {
+              if (ratio >= 0 && ratio < 0.15) {
                 isUpvoting = false;
                 thresholdCrossed = false;
               }
-              if (ratio >= 0.2 && ratio <= 0.4) {
+              if (ratio >= 0.15 && ratio <= 0.4) {
                 isUpvoting = true;
                 thresholdCrossed = true;
               }
@@ -111,7 +111,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
                 thresholdCrossed = true;
               }
             } else {
-              print("is opp dir");
+              // print("is opp dir");
               isUpvoting = false;
               thresholdCrossed = false;
             }
@@ -120,7 +120,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
       },
       onHorizontalDragEnd: (details) {
         final double change = (finalPosition - initialPosition);
-        print(change);
+        // print(change);
         _runAnimation(details.velocity.pixelsPerSecond, size);
         if (isUpvoting && thresholdCrossed) {
           if (Provider.of<UserInformationProvider>(context).signedIn) {
@@ -141,7 +141,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
             buildSnackBar(context);
           }
         } else if (!isUpvoting && thresholdCrossed) {
-          print("Downvote");
+          // print("Downvote");
           if (Provider.of<UserInformationProvider>(context).signedIn) {
             if (widget.comment.data.likes == false) {
               Provider.of<CommentsProvider>(context).voteComment(
@@ -162,26 +162,35 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
             right: 0,
             top: 0,
             bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: thresholdCrossed
+            left: 0,
+            child: Container(
+              alignment: Alignment.centerRight,
+              color: thresholdCrossed
                   ? isUpvoting
-                      ? Icon(
-                          Icons.arrow_upward,
-                          color: getColor(_mediaQuery.platformBrightness,
-                              ColorObjects.UpvoteColor),
+                      ? getColor(_mediaQuery.platformBrightness,
+                          ColorObjects.UpvoteColor)
+                      : getColor(
+                          _mediaQuery.platformBrightness,
+                          ColorObjects.DownvoteColor,
                         )
-                      : Icon(
-                          Icons.arrow_downward,
-                          color: getColor(
-                            _mediaQuery.platformBrightness,
-                            ColorObjects.DownvoteColor,
-                          ),
-                        )
-                  : Icon(
-                      Icons.arrow_upward,
-                      color: Theme.of(context).dividerColor,
-                    ),
+                  : Theme.of(context).dividerColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: thresholdCrossed
+                    ? isUpvoting
+                        ? Icon(
+                            Icons.arrow_upward,
+                            color: Colors.white,
+                          )
+                        : Icon(
+                            Icons.arrow_downward,
+                            color: Colors.white,
+                          )
+                    : Icon(
+                        Icons.arrow_upward,
+                        color: Colors.white,
+                      ),
+              ),
             ),
           ),
           Positioned(

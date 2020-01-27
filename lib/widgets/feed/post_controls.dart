@@ -92,7 +92,7 @@ class PostControls extends StatelessWidget {
                       icon: Icon(
                         Icons.arrow_upward,
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (Provider.of<UserInformationProvider>(context)
                             .signedIn) {
                           if (postData.likes == true) {
@@ -117,7 +117,7 @@ class PostControls extends StatelessWidget {
                       color: postData.likes == null || postData.likes == true
                           ? Theme.of(context).dividerColor.withOpacity(0.5)
                           : Colors.purple,
-                      onPressed: () {
+                      onPressed: () async {
                         if (Provider.of<UserInformationProvider>(context)
                             .signedIn) {
                           if (postData.likes == false) {

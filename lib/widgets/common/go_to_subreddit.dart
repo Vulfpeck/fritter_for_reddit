@@ -31,6 +31,15 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
                 hintText: 'Goto subreddit',
                 filled: true,
                 isDense: true,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.arrow_forward,
+                  ),
+                  onPressed: () {
+                    widget.focusNode.unfocus();
+                    loadNewSubreddit(context, _subredditGoTextController.text);
+                  },
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
@@ -41,19 +50,10 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               autofocus: false,
               autocorrect: false,
               controller: _subredditGoTextController,
+              textInputAction: TextInputAction.go,
               onSubmitted: (value) {
                 widget.focusNode.unfocus();
                 loadNewSubreddit(context, value);
-              },
-            ),
-            trailing: IconButton(
-              tooltip: "Go",
-              icon: Icon(
-                Icons.arrow_forward,
-              ),
-              onPressed: () {
-                widget.focusNode.unfocus();
-                loadNewSubreddit(context, _subredditGoTextController.text);
               },
             ),
           ),
