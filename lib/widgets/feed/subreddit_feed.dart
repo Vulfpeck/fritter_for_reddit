@@ -154,7 +154,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   Expanded(
                     child: model.currentPage != CurrentPage.FrontPage
                         ? Text(
-                            '/r/' + model.sub,
+                            '/r/' + model.sub.toString(),
                             textAlign: TextAlign.center,
                           )
                         : Text('Frontpage', textAlign: TextAlign.center),
@@ -222,25 +222,25 @@ class _SubredditFeedState extends State<SubredditFeed>
                             }
                             var item =
                                 model.postFeed.data.children[(index ~/ 2)].data;
-                            return Column(
-                              children: <Widget>[
-                                GestureDetector(
-                                  onDoubleTap: () {
-                                    if (item.isSelf == false) {
-                                      launchURL(context, item.url);
-                                    }
-                                  },
-                                  onTap: () {
-                                    _openComments(item, context, index);
-                                  },
-                                  child: FeedCard(
+                            return InkWell(
+                              onDoubleTap: () {
+                                if (item.isSelf == false) {
+                                  launchURL(context, item.url);
+                                }
+                              },
+                              onTap: () {
+                                _openComments(item, context, index);
+                              },
+                              child: Column(
+                                children: <Widget>[
+                                  FeedCard(
                                     item,
                                   ),
-                                ),
-                                PostControls(
-                                  postData: item,
-                                ),
-                              ],
+                                  PostControls(
+                                    postData: item,
+                                  ),
+                                ],
+                              ),
                             );
                           },
                           childCount:
@@ -590,7 +590,7 @@ class _SubredditFeedState extends State<SubredditFeed>
         maintainState: true,
         builder: (BuildContext context) {
           return CommentsScreen(
-            postItem: item,
+            postData: item,
           );
         },
       ),

@@ -97,9 +97,11 @@ class FeedCardTitle extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           StickyTag(stickied),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Text(title),
+          Text(
+            title,
+          ),
+          SizedBox(
+            height: 4.0,
           ),
 //          nsfw == true || linkFlairText != null
 //              ? RichText(
@@ -147,36 +149,25 @@ class FeedCardTitle extends StatelessWidget {
   }
 }
 
-class FeedCardBodyImage extends StatefulWidget {
+class FeedCardBodyImage extends StatelessWidget {
   final Map<String, dynamic> postMetaData;
   final List<PostsFeedDatachildDataPreviewImages> images;
   final PostsFeedDataChildrenData data;
   final double deviceWidth;
+  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
+  String url = "";
+  double ratio = 1;
 
   FeedCardBodyImage({
     @required this.images,
     @required this.data,
     @required this.postMetaData,
     @required this.deviceWidth,
-  }) : assert(postMetaData != null);
-
-  @override
-  _FeedCardBodyImageState createState() => _FeedCardBodyImageState();
-}
-
-class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
-  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
-  String url = "";
-  double ratio = 1;
-  @override
-  void initState() {
-    /// this is to select the best quality image
-    // TODO: Try to do this while parsing the json
-    ratio = (widget.deviceWidth) / widget.images.first.source.width;
-    url = _htmlUnescape.convert(widget.images.first.resolutions
-        .elementAt(widget.images.first.resolutions.length ~/ 2)
+  }) : assert(postMetaData != null) {
+    ratio = (deviceWidth) / images.first.source.width;
+    url = _htmlUnescape.convert(images.first.resolutions
+        .elementAt(images.first.resolutions.length ~/ 2)
         .url);
-    super.initState();
   }
 
   @override
@@ -188,8 +179,8 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                if (widget.postMetaData['media_type'] == MediaType.Video ||
-                    widget.postMetaData['media_type'] == MediaType.Image) {
+                if (postMetaData['media_type'] == MediaType.Video ||
+                    postMetaData['media_type'] == MediaType.Image) {
                   Navigator.of(
                     context,
                     rootNavigator: false,
@@ -198,13 +189,12 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
                       maintainState: true,
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
-                          mediaUrl: widget.postMetaData['media_type'] ==
+                          mediaUrl: postMetaData['media_type'] ==
                                   MediaType.Image
-                              ? _htmlUnescape
-                                  .convert(widget.images.first.source.url)
-                              : widget.postMetaData['url'],
-                          isVideo: widget.postMetaData['media_type'] ==
-                              MediaType.Video,
+                              ? _htmlUnescape.convert(images.first.source.url)
+                              : postMetaData['url'],
+                          isVideo:
+                              postMetaData['media_type'] == MediaType.Video,
                         );
                       },
                       fullscreenDialog: true,
@@ -233,12 +223,12 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
                 placeholder: (context, url) => Container(
                   alignment: Alignment.center,
                   child: CircularProgressIndicator(),
-                  width: widget.deviceWidth,
-                  height: widget.images.first.source.height.toDouble() * ratio,
+                  width: deviceWidth,
+                  height: images.first.source.height.toDouble() * ratio,
                 ),
                 imageUrl: url,
-                width: widget.deviceWidth,
-                height: widget.images.first.source.height.toDouble() * ratio,
+                width: deviceWidth,
+                height: images.first.source.height.toDouble() * ratio,
                 fadeOutDuration: Duration(milliseconds: 300),
               ),
             ),

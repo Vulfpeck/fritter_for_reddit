@@ -213,7 +213,7 @@ class _SearchPageState extends State<SearchPage> {
                                             maintainState: true,
                                             builder: (BuildContext context) {
                                               return CommentsScreen(
-                                                postItem: item,
+                                                postData: item,
                                               );
                                             },
                                           ),

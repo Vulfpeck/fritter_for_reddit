@@ -32,18 +32,28 @@ class CommentItem extends StatelessWidget {
       ),
       Expanded(
         child: _comment.data.collapseParent == true
-            ? CollapsedCommentParent(
-                comment: _comment,
-                postId: postId,
-                commentIndex: commentIndex,
+            ? Column(
+                children: <Widget>[
+                  CollapsedCommentParent(
+                    comment: _comment,
+                    postId: postId,
+                    commentIndex: commentIndex,
+                  ),
+                  Divider(),
+                ],
               )
             : _comment.data.collapse == true
                 ? Container()
                 : _comment.kind == CommentPojo.Kind.MORE
-                    ? MoreCommentKind(
-                        comment: _comment,
-                        postFullName: name,
-                        id: postId,
+                    ? Column(
+                        children: <Widget>[
+                          MoreCommentKind(
+                            comment: _comment,
+                            postFullName: name,
+                            id: postId,
+                          ),
+                          Divider(),
+                        ],
                       )
                     : Column(
                         children: <Widget>[
@@ -56,6 +66,7 @@ class CommentItem extends StatelessWidget {
                               comment: _comment,
                               postId: postId,
                             ),
+                            commentIndex: commentIndex,
                           ),
                           Divider(
                             indent: 16,
@@ -80,34 +91,25 @@ class CollapsedCommentParent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, CommentsProvider model, _) {
-        return Material(
-          color: Theme.of(context).cardColor,
-          child: Container(
-            margin: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6.0),
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-            ),
-            child: ListTile(
-              dense: true,
-              onTap: () {
-                collapse(commentIndex, context);
-              },
-              title: Text(
-                comment.data.author +
-                    " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-              trailing: Icon(Icons.expand_more),
-            ),
+        return ListTile(
+          dense: true,
+          onTap: () {
+            collapse(commentIndex, context);
+          },
+          title: Text(
+            comment.data.author +
+                " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
+            style: Theme.of(context).textTheme.subtitle.copyWith(
+                  fontStyle: FontStyle.italic,
+                ),
           ),
+          trailing: Icon(Icons.expand_more),
         );
       },
     );
   }
 
-  void collapse(int commentIndex, BuildContext context) {
+  void collapse(int commentIndex, BuildContext context) async {
     Provider.of<CommentsProvider>(context, listen: false)
         .collapseUncollapseComment(
       collapse: false,
@@ -121,91 +123,84 @@ class CommentBody extends StatelessWidget {
   final CommentPojo.Child comment;
   final String postId;
   final int commentIndex;
-  final Widget htmlCommentBody;
   final BuildContext context;
-
   static final HtmlUnescape _unescape = new HtmlUnescape();
+
+  String _htmlContent = "";
 
   CommentBody({
     @required this.comment,
     @required this.postId,
     @required this.commentIndex,
     @required this.context,
-  }) : htmlCommentBody = Html(
-            data: _unescape.convert(comment.data.bodyHtml),
-            useRichText: true,
-            showImages: false,
-            onLinkTap: (url) {
-              if (url.startsWith("/r/") || url.startsWith("r/")) {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    maintainState: true,
-                    fullscreenDialog: false,
-                    builder: (BuildContext context) {
-                      return SubredditFeedPage(
-                        subreddit: url.startsWith("/r/")
-                            ? url.replaceFirst("/r/", "")
-                            : url.replaceFirst("r/", ""),
-                      );
-                    },
-                  ),
-                );
-              } else if (url.startsWith("/u/") || url.startsWith("u/")) {
-              } else {
-                launchURL(context, url);
-              }
-            });
+  }) {
+    _htmlContent = _unescape.convert(comment.data.bodyHtml);
+  }
 
   Brightness _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
-    String _htmlContent = _unescape.convert(comment.data.bodyHtml);
     _platformBrightness = MediaQuery.of(context).platformBrightness;
-    return Material(
-      color: Theme.of(context).cardColor,
-      child: Container(
-        padding: const EdgeInsets.only(top: 4.0),
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: comment.data.depth != 0
-                  ? colorsRainbow.elementAt(comment.data.depth % 5)
-                  : Colors.transparent,
-              width: comment.data.depth != 0 ? 2 : 0,
-            ),
+    return Container(
+      padding: const EdgeInsets.only(left: 12, right: 12.0, top: 4.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border(
+          left: BorderSide(
+            color: comment.data.depth != 0
+                ? colorsRainbow.elementAt(comment.data.depth % 5)
+                : Colors.transparent,
+            width: comment.data.depth != 0 ? 2 : 0,
           ),
         ),
-        child: InkWell(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          onTap: () {
-            collapse(comment, context);
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              comment.data.stickied
-                  ? PinnedCommentTag(platformBrightness: _platformBrightness)
-                  : Container(),
-              Flexible(
-                child: AuthorTag(
-                  comment: comment,
-                  platformBrightness: _platformBrightness,
-                ),
+      ),
+      child: InkWell(
+        enableFeedback: true,
+        onTap: () {
+          collapse(comment, context);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            comment.data.stickied
+                ? PinnedCommentTag(platformBrightness: _platformBrightness)
+                : Container(),
+            Flexible(
+              child: AuthorTag(
+                comment: comment,
+                platformBrightness: _platformBrightness,
               ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 12.0,
-                  right: 12.0,
-                  top: 0.0,
-                ),
-                child: htmlCommentBody,
-              ),
-            ],
-          ),
+            ),
+            Html(
+              data: _htmlContent,
+              useRichText: true,
+              showImages: false,
+              padding: const EdgeInsets.all(0),
+              onLinkTap: (url) {
+                if (url.startsWith("/r/") || url.startsWith("r/")) {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      maintainState: true,
+                      fullscreenDialog: false,
+                      builder: (BuildContext context) {
+                        return SubredditFeedPage(
+                          subreddit: url.startsWith("/r/")
+                              ? url.replaceFirst("/r/", "")
+                              : url.replaceFirst("r/", ""),
+                        );
+                      },
+                    ),
+                  );
+                } else if (url.startsWith("/u/") || url.startsWith("u/")) {
+                } else {
+                  launchURL(context, url);
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -231,91 +226,86 @@ class AuthorTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, top: 4.0, right: 12.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          comment.data.isSubmitter
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 4.0),
-                  child: comment.data.isSubmitter
-                      ? Icon(
-                          Icons.person,
-                          size: 16,
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        comment.data.isSubmitter
+            ? Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: comment.data.isSubmitter
+                    ? Icon(
+                        Icons.person,
+                        size: 16,
+                        color: Theme.of(context).accentColor,
+                      )
+                    : Container(),
+              )
+            : Container(),
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: comment.data.author + "  ",
+                style: comment.data.isSubmitter
+                    ? Theme.of(context).textTheme.caption.copyWith(
                           color: Theme.of(context).accentColor,
                         )
-                      : Container(),
-                )
-              : Container(),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: comment.data.author + " ",
-                  style: comment.data.isSubmitter
-                      ? Theme.of(context).textTheme.caption.copyWith(
+                    : Theme.of(context).textTheme.caption,
+              ),
+              comment.data.distinguished.toString().compareTo("moderator") == 0
+                  ? TextSpan(
+                      text: "MOD",
+                      style: Theme.of(context).textTheme.subtitle.copyWith(
                             color: Theme.of(context).accentColor,
-                          )
-                      : Theme.of(context).textTheme.caption,
-                ),
-                comment.data.distinguished.toString().compareTo("moderator") ==
-                        0
-                    ? TextSpan(
-                        text: "MOD",
-                        style: Theme.of(context).textTheme.subtitle.copyWith(
-                              color: Theme.of(context).accentColor,
-                              letterSpacing: 1,
-                            ),
-                      )
-                    : TextSpan(),
-              ],
-            ),
-          ),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.arrow_upward,
-                color: comment.data.likes != null
-                    ? comment.data.likes == true
-                        ? getColor(
-                            _platformBrightness, ColorObjects.UpvoteColor)
-                        : getColor(
-                            _platformBrightness, ColorObjects.DownvoteColor)
-                    : Theme.of(context).textTheme.subtitle.color,
-                size: 14,
-              ),
-              Text(
-                (comment.data.scoreHidden
-                    ? " [?]"
-                    : " " + getRoundedToThousand(comment.data.score)),
-                style: comment.data.likes != null
-                    ? comment.data.likes == true
-                        ? Theme.of(context).textTheme.subtitle.copyWith(
-                              color: getColor(_platformBrightness,
-                                  ColorObjects.UpvoteColor),
-                            )
-                        : Theme.of(context).textTheme.subtitle.copyWith(
-                              color: getColor(_platformBrightness,
-                                  ColorObjects.DownvoteColor),
-                            )
-                    : Theme.of(context).textTheme.subtitle,
-                softWrap: true,
-                overflow: TextOverflow.clip,
-                maxLines: 100,
-              ),
+                            letterSpacing: 1,
+                          ),
+                    )
+                  : TextSpan(),
             ],
           ),
-          Expanded(
-            child: Text(
-              " • " + getTimePosted(comment.data.createdUtc),
-              style: Theme.of(context).textTheme.subtitle,
-              overflow: TextOverflow.fade,
+        ),
+        Row(
+          children: <Widget>[
+            Icon(
+              Icons.arrow_upward,
+              color: comment.data.likes != null
+                  ? comment.data.likes == true
+                      ? getColor(_platformBrightness, ColorObjects.UpvoteColor)
+                      : getColor(
+                          _platformBrightness, ColorObjects.DownvoteColor)
+                  : Theme.of(context).textTheme.subtitle.color,
+              size: 14,
+            ),
+            Text(
+              (comment.data.scoreHidden
+                  ? " [?]"
+                  : " " + getRoundedToThousand(comment.data.score)),
+              style: comment.data.likes != null
+                  ? comment.data.likes == true
+                      ? Theme.of(context).textTheme.subtitle.copyWith(
+                            color: getColor(
+                                _platformBrightness, ColorObjects.UpvoteColor),
+                          )
+                      : Theme.of(context).textTheme.subtitle.copyWith(
+                            color: getColor(_platformBrightness,
+                                ColorObjects.DownvoteColor),
+                          )
+                  : Theme.of(context).textTheme.subtitle,
+              softWrap: true,
+              overflow: TextOverflow.clip,
               maxLines: 100,
             ),
+          ],
+        ),
+        Expanded(
+          child: Text(
+            " • " + getTimePosted(comment.data.createdUtc),
+            style: Theme.of(context).textTheme.subtitle,
+            overflow: TextOverflow.fade,
+            maxLines: 100,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -330,8 +320,6 @@ class PinnedCommentTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(
-        left: 12.0,
-        right: 12.0,
         bottom: 4.0,
         top: 4.0,
       ),
@@ -393,31 +381,24 @@ class MoreCommentKind extends StatelessWidget {
                   children: <Widget>[
                     // only change the state of the widget to loading only if
                     // this comment matches the id to the loading comment
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        'More',
-                        style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                        ),
+                    SizedBox(width: 16.0),
+                    Text(
+                      'More',
+                      style: TextStyle(
+                        color: Theme.of(context).accentColor,
                       ),
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                      height: 32.0,
                     ),
                     model.commentsMoreLoadingState == ViewState.Busy &&
                             model.moreParentLoadingId != "" &&
                             model.moreParentLoadingId == comment.data.id
-                        ? Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(),
-                              ),
-                              SizedBox(
-                                width: 16,
-                              ),
-                            ],
+                        ? Container(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(),
                           )
                         : Container(),
                   ],

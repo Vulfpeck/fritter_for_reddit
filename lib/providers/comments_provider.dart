@@ -139,15 +139,14 @@ class CommentsProvider with ChangeNotifier {
     }
     String childrenString = "";
     if (children != null)
-      for (String child in children) {
-        childrenString += child + ",";
+      for (int i = 0; i < children.length; i++) {
+        if (i != children.length - 1)
+          childrenString += children[i].toString() + ",";
+        else
+          childrenString += children[i].toString();
       }
-    else
+    else {}
     // // print('children is null');
-
-    if (childrenString != "") {
-      childrenString = childrenString.substring(0, childrenString.length - 2);
-    }
 
     if (_storageHelper.signInStatus) {
       String authToken = await _storageHelper.authToken;
@@ -163,6 +162,11 @@ class CommentsProvider with ChangeNotifier {
             'Authorization': 'bearer ' + authToken,
           },
         );
+
+        print("loading more children: " +
+            response.statusCode.toString() +
+            " " +
+            url);
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final CommentMoreEntity _moreComments =
@@ -208,6 +212,11 @@ class CommentsProvider with ChangeNotifier {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
         );
+
+        print("loading more children: " +
+            response.statusCode.toString() +
+            " " +
+            url);
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final CommentMoreEntity _moreComments =
@@ -285,11 +294,9 @@ class CommentsProvider with ChangeNotifier {
   }
 
   Future<bool> voteComment(
-      {@required String id, @required int dir, @required postId}) async {
+      {@required int index, @required int dir, @required postId}) async {
     await _storageHelper.fetchData();
-    CommentPojo.Child item = commentsMap[postId].firstWhere((v) {
-      return v.data.id.compareTo(id) == 0 ? true : false;
-    });
+    CommentPojo.Child item = commentsMap[postId].elementAt(index);
     notifyListeners();
     if (item.data.likes == true) {
       item.data.score--;
@@ -312,12 +319,16 @@ class CommentsProvider with ChangeNotifier {
     // // print(authToken);
     http.Response voteResponse;
     voteResponse = await http.post(
-      url + '?dir=$dir&id=$id&rank=2',
+      url + '?dir=$dir&id=${item.data.name}&rank=2',
       headers: {
         'Authorization': 'bearer ' + authToken,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
     );
+
+    print("coment vote url" + url + '?dir=$dir&id=${item.data.name}&rank=2');
+
+    print("Comment vote response" + voteResponse.statusCode.toString());
 
     notifyListeners();
     if (voteResponse.statusCode == 200) {

@@ -6,14 +6,15 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
+import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import 'comment_list_item.dart';
 
 class CommentsScreen extends StatelessWidget {
-  final PostsFeedDataChildrenData postItem;
+  final PostsFeedDataChildrenData postData;
   static final _unescape = HtmlUnescape();
-  CommentsScreen({@required this.postItem});
+  CommentsScreen({@required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -46,20 +47,23 @@ class CommentsScreen extends StatelessWidget {
                         color: Theme.of(context).cardColor,
                         child: InkWell(
                           onTap: () {
-                            if (postItem.isSelf == false) {
-                              launchURL(context, postItem.url);
+                            if (postData.isSelf == false) {
+                              launchURL(context, postData.url);
                             }
                           },
-                          child: FeedCard(postItem),
+                          child: FeedCard(postData),
                         ),
                       ),
-                      postItem.isSelf && postItem.selftextHtml != null
+                      postData.isSelf && postData.selftextHtml != null
                           ? FeedCardBodySelfText(
-                              selftextHtml: postItem.selftextHtml,
+                              selftextHtml: postData.selftextHtml,
                             )
                           : Container(),
+                      PostControls(
+                        postData: postData,
+                      ),
                       Divider(),
-                      CommentsControlBar(postItem),
+                      CommentsControlBar(postData),
                       Divider(),
                     ],
                   ),
@@ -80,8 +84,8 @@ class CommentsScreen extends StatelessWidget {
                           ),
                         ],
                       )
-                    : model.commentsMap[postItem.id] == null ||
-                            model.commentsMap[postItem.id].length == 0
+                    : model.commentsMap[postData.id] == null ||
+                            model.commentsMap[postData.id].length == 0
                         ? SliverChildListDelegate(
                             <Widget>[
                               SizedBox(
@@ -101,7 +105,7 @@ class CommentsScreen extends StatelessWidget {
                         : SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               var commentItem =
-                                  model.commentsMap[postItem.id].elementAt(
+                                  model.commentsMap[postData.id].elementAt(
                                 (index),
                               );
 //                                String _htmlContent = _unescape
@@ -121,8 +125,8 @@ class CommentsScreen extends StatelessWidget {
 //                                );
                               return CommentItem(
                                 commentItem,
-                                postItem.name,
-                                postItem.id,
+                                postData.name,
+                                postData.id,
                                 index,
                               );
 //                                return ListTile(
@@ -168,7 +172,7 @@ class CommentsScreen extends StatelessWidget {
 //                                  ),
 //                                );
                             },
-                            childCount: model.commentsMap[postItem.id].length,
+                            childCount: model.commentsMap[postData.id].length,
                           ),
 //
               ),
