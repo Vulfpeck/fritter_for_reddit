@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/misc_functions.dart';
 import 'package:flutter_provider_app/helpers/media_type_enum.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
@@ -15,18 +14,12 @@ import 'post_url_preview.dart';
 
 class FeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
-  Map<String, dynamic> postMetaData;
-  final key;
 
-  FeedCard(this.data, {this.key}) : super(key: key) {
-    if (!data.isSelf)
-      postMetaData = getMediaType(data);
-    else
-      postMetaData = {'media_type': MediaType.None};
-  }
+  FeedCard(this.data);
+  final _htmlUnescape = new HtmlUnescape();
+
   @override
   Widget build(BuildContext context) {
-    final _htmlUnescape = new HtmlUnescape();
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -41,29 +34,12 @@ class FeedCard extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: 'in '),
-                TextSpan(
-                  text: "r/" + data.subreddit,
-                  style: Theme.of(context).textTheme.subtitle.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                TextSpan(text: " by "),
-                TextSpan(
-                  text: "u/" + data.author + " ",
-                  style: Theme.of(context).textTheme.subtitle.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-              ],
-              style: Theme.of(context).textTheme.subtitle,
-            ),
+          child: Text(
+            'in r/' + data.subreddit + ' by ' + data.author,
+            style: Theme.of(context).textTheme.subtitle,
           ),
         ),
-        postMetaData['media_type'] == MediaType.Url && data.isSelf == false
+        data.isSelf == false && data.postType == MediaType.Url
             ? PostUrlPreview(
                 data: data,
                 htmlUnescape: _htmlUnescape,
@@ -71,13 +47,13 @@ class FeedCard extends StatelessWidget {
             : Container(),
         data.preview != null &&
                 data.isSelf == false &&
-                postMetaData['media_type'] != MediaType.Url
+                data.postType != MediaType.Url
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
                 child: FeedCardBodyImage(
                   images: data.preview.images,
                   data: data,
-                  postMetaData: postMetaData,
+                  postMetaData: {'media_type': data.postType, 'url': data.url},
                   deviceWidth: MediaQuery.of(context).size.width,
                 ),
               )
@@ -104,7 +80,7 @@ class FeedCardTitle extends StatelessWidget {
     @required this.nsfw,
     @required this.locked,
   }) {
-    escapedTitle = _htmlUnescape.convert(title);
+//    escapedTitle = _htmlUnescape.convert(title);
   }
 
   @override
@@ -123,48 +99,48 @@ class FeedCardTitle extends StatelessWidget {
           StickyTag(stickied),
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
-            child: Text(escapedTitle),
+            child: Text(title),
           ),
-          nsfw == true || linkFlairText != null
-              ? RichText(
-                  textScaleFactor: 0.9,
-                  text: TextSpan(
-                    children: <TextSpan>[
-                      nsfw != null && nsfw
-                          ? TextSpan(
-                              text: "NSFW ",
-                              style: TextStyle(
-                                color: Colors.red.withOpacity(
-                                  0.9,
-                                ),
-                              ),
-                            )
-                          : TextSpan(),
-                      linkFlairText != null
-                          ? TextSpan(
-                              text: linkFlairText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .subtitle
-                                          .color
-                                          .withOpacity(0.8),
-                                      backgroundColor: Theme.of(context)
-                                          .textTheme
-                                          .subtitle
-                                          .color
-                                          .withOpacity(0.15),
-                                      decorationThickness: 2),
-                            )
-                          : TextSpan(),
-                    ],
-                    style: Theme.of(context).textTheme.subtitle,
-                  ),
-                )
-              : Container(),
+//          nsfw == true || linkFlairText != null
+//              ? RichText(
+//                  textScaleFactor: 0.9,
+//                  text: TextSpan(
+//                    children: <TextSpan>[
+//                      nsfw != null && nsfw
+//                          ? TextSpan(
+//                              text: "NSFW ",
+//                              style: TextStyle(
+//                                color: Colors.red.withOpacity(
+//                                  0.9,
+//                                ),
+//                              ),
+//                            )
+//                          : TextSpan(),
+//                      linkFlairText != null
+//                          ? TextSpan(
+//                              text: linkFlairText,
+//                              style: Theme.of(context)
+//                                  .textTheme
+//                                  .subtitle
+//                                  .copyWith(
+//                                      color: Theme.of(context)
+//                                          .textTheme
+//                                          .subtitle
+//                                          .color
+//                                          .withOpacity(0.8),
+//                                      backgroundColor: Theme.of(context)
+//                                          .textTheme
+//                                          .subtitle
+//                                          .color
+//                                          .withOpacity(0.15),
+//                                      decorationThickness: 2),
+//                            )
+//                          : TextSpan(),
+//                    ],
+//                    style: Theme.of(context).textTheme.subtitle,
+//                  ),
+//                )
+//              : Container(),
         ],
       ),
     );
@@ -197,11 +173,9 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
     /// this is to select the best quality image
     // TODO: Try to do this while parsing the json
     ratio = (widget.deviceWidth) / widget.images.first.source.width;
-    for (var x in widget.images.first.resolutions) {
-      if (x.width < widget.deviceWidth) {
-        url = _htmlUnescape.convert(x.url);
-      }
-    }
+    url = _htmlUnescape.convert(widget.images.first.resolutions
+        .elementAt(widget.images.first.resolutions.length ~/ 2)
+        .url);
     super.initState();
   }
 
@@ -221,6 +195,7 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
                     rootNavigator: false,
                   ).push(
                     CupertinoPageRoute(
+                      maintainState: true,
                       builder: (BuildContext context) {
                         return PhotoViewerScreen(
                           mediaUrl: widget.postMetaData['media_type'] ==
@@ -244,13 +219,27 @@ class _FeedCardBodyImageState extends State<FeedCardBodyImage> {
 //                        data.media['oembed']['thumbnail_url']),
 //                  )
 //                :
-                  Image(
-                image: CachedNetworkImageProvider(
-                  url,
+
+//                  Image(
+//
+//                image: CachedNetworkImageProvider(
+//                  url,
+//                ),
+//                fit: BoxFit.fitWidth,
+//                width: widget.deviceWidth,
+//                height: widget.images.first.source.height.toDouble() * ratio,
+//              ),
+                  CachedNetworkImage(
+                placeholder: (context, url) => Container(
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(),
+                  width: widget.deviceWidth,
+                  height: widget.images.first.source.height.toDouble() * ratio,
                 ),
-                fit: BoxFit.fitWidth,
+                imageUrl: url,
                 width: widget.deviceWidth,
                 height: widget.images.first.source.height.toDouble() * ratio,
+                fadeOutDuration: Duration(milliseconds: 300),
               ),
             ),
           ),
@@ -275,12 +264,13 @@ class FeedCardBodySelfText extends StatelessWidget {
           ),
       padding: EdgeInsets.all(16),
       data: """${_htmlUnescape.convert(selftextHtml)}""",
-      useRichText: true,
+      useRichText: false,
       onLinkTap: (url) {
         if (url.startsWith("/r/") || url.startsWith("r/")) {
           Navigator.push(
             context,
             CupertinoPageRoute(
+              maintainState: true,
               fullscreenDialog: false,
               builder: (BuildContext context) {
                 return SubredditFeedPage(

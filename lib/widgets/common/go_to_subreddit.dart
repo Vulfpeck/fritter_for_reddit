@@ -76,6 +76,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
                 rootNavigator: false,
               ).push(
                 CupertinoPageRoute(
+                  maintainState: true,
                   builder: (context) => SubredditFeedPage(
                     subreddit: "",
                     frontPageLoad: true,
@@ -104,6 +105,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
                 rootNavigator: false,
               ).push(
                 CupertinoPageRoute(
+                  maintainState: true,
                   builder: (context) => SubredditFeedPage(
                     subreddit: "popular",
                   ),
@@ -131,6 +133,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
                 rootNavigator: false,
               ).push(
                 CupertinoPageRoute(
+                  maintainState: true,
                   builder: (context) => SubredditFeedPage(
                     subreddit: "all",
                   ),
@@ -155,6 +158,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
       rootNavigator: false,
     ).push(
       CupertinoPageRoute(
+        maintainState: true,
         builder: (context) => SubredditFeedPage(
           subreddit: text,
         ),

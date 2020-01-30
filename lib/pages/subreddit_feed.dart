@@ -21,14 +21,16 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
   @override
   Widget build(BuildContext context) {
     // print("New scaffold from " + widget.subreddit);
-    return CupertinoPageScaffold(
-      child: ChangeNotifierProvider(
-        builder: (context) => widget.frontPageLoad
-            ? FeedProvider()
-            : FeedProvider.openFromName(widget.subreddit),
-        child: Scaffold(
-          body: SubredditFeed(
-            pageTitle: widget.subreddit,
+    return Scaffold(
+      body: CupertinoPageScaffold(
+        child: ChangeNotifierProvider(
+          builder: (context) => widget.frontPageLoad
+              ? FeedProvider()
+              : FeedProvider.openFromName(widget.subreddit),
+          child: CupertinoPageScaffold(
+            child: SubredditFeed(
+              pageTitle: widget.subreddit,
+            ),
           ),
         ),
       ),

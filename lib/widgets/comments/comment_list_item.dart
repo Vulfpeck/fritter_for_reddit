@@ -16,7 +16,7 @@ import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
 
-class CommentItem extends StatefulWidget {
+class CommentItem extends StatelessWidget {
   final CommentPojo.Child _comment;
   final String name;
   final String postId;
@@ -25,59 +25,45 @@ class CommentItem extends StatefulWidget {
   CommentItem(this._comment, this.name, this.postId, this.commentIndex);
 
   @override
-  _CommentItemState createState() => _CommentItemState();
-}
-
-class _CommentItemState extends State<CommentItem>
-    with TickerProviderStateMixin {
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        SizedBox(
-          width: 16.0 * widget._comment.data.depth,
-        ),
-        Expanded(
-          child: widget._comment.data.collapseParent == true
-              ? CollapsedCommentParent(
-                  comment: widget._comment,
-                  postId: widget.postId,
-                  commentIndex: widget.commentIndex,
-                )
-              : AnimatedSize(
-                  vsync: this,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.linearToEaseOut,
-                  child: widget._comment.data.collapse == true
-                      ? Container()
-                      : widget._comment.kind == CommentPojo.Kind.MORE
-                          ? MoreCommentKind(
-                              comment: widget._comment,
-                              postFullName: widget.name,
-                              id: widget.postId,
-                            )
-                          : Column(
-                              children: <Widget>[
-                                Swiper(
-                                  comment: widget._comment,
-                                  postId: widget.postId,
-                                  child: CommentBody(
-                                    context: context,
-                                    commentIndex: widget.commentIndex,
-                                    comment: widget._comment,
-                                    postId: widget.postId,
-                                  ),
-                                ),
-                                Divider(
-                                  indent: 16,
-                                ),
-                              ],
+    return Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
+      SizedBox(
+        width: 16.0 * _comment.data.depth,
+      ),
+      Expanded(
+        child: _comment.data.collapseParent == true
+            ? CollapsedCommentParent(
+                comment: _comment,
+                postId: postId,
+                commentIndex: commentIndex,
+              )
+            : _comment.data.collapse == true
+                ? Container()
+                : _comment.kind == CommentPojo.Kind.MORE
+                    ? MoreCommentKind(
+                        comment: _comment,
+                        postFullName: name,
+                        id: postId,
+                      )
+                    : Column(
+                        children: <Widget>[
+                          Swiper(
+                            comment: _comment,
+                            postId: postId,
+                            child: CommentBody(
+                              context: context,
+                              commentIndex: commentIndex,
+                              comment: _comment,
+                              postId: postId,
                             ),
-                ),
-        ),
-      ],
-    );
+                          ),
+                          Divider(
+                            indent: 16,
+                          ),
+                        ],
+                      ),
+      ),
+    ]);
   }
 }
 
@@ -154,12 +140,14 @@ class CommentBody extends StatelessWidget {
                 Navigator.push(
                   context,
                   CupertinoPageRoute(
+                    maintainState: true,
                     fullscreenDialog: false,
                     builder: (BuildContext context) {
                       return SubredditFeedPage(
-                          subreddit: url.startsWith("/r/")
-                              ? url.replaceFirst("/r/", "")
-                              : url.replaceFirst("r/", ""));
+                        subreddit: url.startsWith("/r/")
+                            ? url.replaceFirst("/r/", "")
+                            : url.replaceFirst("r/", ""),
+                      );
                     },
                   ),
                 );
@@ -235,12 +223,9 @@ class CommentBody extends StatelessWidget {
 
 class AuthorTag extends StatelessWidget {
   const AuthorTag({
-    Key key,
     @required this.comment,
     @required Brightness platformBrightness,
-  })  : _platformBrightness = platformBrightness,
-        super(key: key);
-
+  }) : _platformBrightness = platformBrightness;
   final CommentPojo.Child comment;
   final Brightness _platformBrightness;
 
@@ -337,11 +322,8 @@ class AuthorTag extends StatelessWidget {
 
 class PinnedCommentTag extends StatelessWidget {
   const PinnedCommentTag({
-    Key key,
     @required Brightness platformBrightness,
-  })  : _platformBrightness = platformBrightness,
-        super(key: key);
-
+  }) : _platformBrightness = platformBrightness;
   final Brightness _platformBrightness;
 
   @override

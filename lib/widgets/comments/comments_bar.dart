@@ -24,8 +24,6 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
     super.initState();
   }
 
-  GlobalKey key = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -33,7 +31,6 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
       child: Container(
         padding: EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
-          key: key,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             FlatButton.icon(

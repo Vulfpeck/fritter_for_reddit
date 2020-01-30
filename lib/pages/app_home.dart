@@ -20,15 +20,7 @@ class HomePage extends StatelessWidget {
       child: CupertinoTabScaffold(
         controller: _tabController,
         tabBar: CupertinoTabBar(
-          border: Border.fromBorderSide(
-            BorderSide(
-              color: CupertinoDynamicColor.resolve(
-                Theme.of(context).dividerColor,
-                context,
-              ),
-            ),
-          ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Theme.of(context).cardColor,
           activeColor: Theme.of(context).accentColor,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -57,32 +49,31 @@ class HomePage extends StatelessWidget {
         tabBuilder: (BuildContext context, int index) {
           switch (index) {
             case 0:
-              {
-                return CupertinoTabView(
-                  navigatorKey: firstTabNavKey,
-                  builder: (BuildContext context) => LeftDrawer(
-                    firstLaunch: true,
-                  ),
-                );
-              }
+              return CupertinoTabView(
+                navigatorKey: firstTabNavKey,
+                builder: (BuildContext context) => LeftDrawer(
+                  firstLaunch: true,
+                ),
+                defaultTitle: 'Feed',
+              );
+              break;
             case 1:
-              {
-                return CupertinoTabView(
-                  navigatorKey: secondTabNavKey,
-                  builder: (BuildContext context) => SearchPage(),
-                );
-              }
+              return CupertinoTabView(
+                navigatorKey: secondTabNavKey,
+                builder: (BuildContext context) => SearchPage(),
+                defaultTitle: 'Search',
+              );
+              break;
             case 2:
-              {
-                return CupertinoTabView(
-                  navigatorKey: thirdTabNavKey,
-                  builder: (BuildContext context) => UserProfileScreen(),
-                );
-              }
+              return CupertinoTabView(
+                navigatorKey: thirdTabNavKey,
+                builder: (BuildContext context) => UserProfileScreen(),
+                defaultTitle: 'Profile',
+              );
+              break;
             default:
-              {
-                return Container();
-              }
+              return Container();
+              break;
           }
         },
       ),
@@ -104,7 +95,6 @@ class HomePage extends StatelessWidget {
         return thirdTabNavKey;
         break;
     }
-
     return null;
   }
 }

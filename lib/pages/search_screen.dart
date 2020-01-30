@@ -5,7 +5,6 @@ import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/providers/search_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
-import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 
 import '../exports.dart';
 
@@ -116,6 +115,7 @@ class _SearchPageState extends State<SearchPage> {
                                           rootNavigator: false)
                                       .push(
                                     CupertinoPageRoute(
+                                      maintainState: true,
                                       fullscreenDialog: false,
                                       builder: (BuildContext context) =>
                                           SubredditFeedPage(
@@ -210,6 +210,7 @@ class _SearchPageState extends State<SearchPage> {
 //                                            ),
 //                                          ),
                                           CupertinoPageRoute(
+                                            maintainState: true,
                                             builder: (BuildContext context) {
                                               return CommentsScreen(
                                                 postItem: item,
@@ -222,9 +223,6 @@ class _SearchPageState extends State<SearchPage> {
                                         children: <Widget>[
                                           FeedCard(
                                             item,
-                                          ),
-                                          PostControls(
-                                            postData: item,
                                           ),
                                         ],
                                       ),

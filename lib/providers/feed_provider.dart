@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/misc_functions.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:http/http.dart' as http;
@@ -104,6 +105,7 @@ class FeedProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           subListingFetchUrl = url;
           _postFeed = PostsFeedEntity.fromJson(json.decode(response.body));
+          appendMediaType(_postFeed);
           final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
           final subInfoResponse = await http.get(
             infoUrl,
@@ -166,6 +168,7 @@ class FeedProvider with ChangeNotifier {
         });
         if (response.statusCode == 200) {
           _postFeed = new PostsFeedEntity.fromJson(json.decode(response.body));
+          appendMediaType(_postFeed);
           subListingFetchUrl = url;
         } else
           throw new Exception("Failed to load data: " + response.reasonPhrase);
@@ -323,6 +326,7 @@ class FeedProvider with ChangeNotifier {
         final PostsFeedEntity newData =
             new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
         _postFeed.data.children.addAll(newData.data.children);
+        appendMediaType(newData);
         // // print("previous after: " + _postFeed.data.after);
         // // print("new after : " + newData.data.after);
         _postFeed.data.after = newData.data.after;
@@ -339,6 +343,7 @@ class FeedProvider with ChangeNotifier {
 //            subredditResponse.reasonPhrase);
         final PostsFeedEntity newData =
             new PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+        appendMediaType(newData);
         _postFeed.data.children.addAll(newData.data.children);
         // // print("previous after: " + _postFeed.data.after);
         // // print("new after : " + newData.data.after);
@@ -359,4 +364,12 @@ class FeedProvider with ChangeNotifier {
     _state = ViewState.Idle;
     notifyListeners();
   }
+
+  void appendMediaType(PostsFeedEntity postFeed) {
+    for (var x in _postFeed.data.children) {
+      x.data.postType = getMediaType(x.data)['media_type'];
+    }
+  }
+
+  void selectProperPreviewImage() {}
 }

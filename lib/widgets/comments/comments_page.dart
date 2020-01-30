@@ -6,7 +6,6 @@ import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/providers/comments_provider.dart';
 import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
 import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
-import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import 'comment_list_item.dart';
@@ -18,103 +17,93 @@ class CommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (BuildContext context, CommentsProvider model, _) {
-        return Scaffold(
-          body: Material(
-            color: Theme.of(context).cardColor,
-            child: CustomScrollView(
-              cacheExtent: 200,
-            
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                SliverAppBar(
-                  title: Text("Comments"),
-                  automaticallyImplyLeading: true,
-                  iconTheme: Theme.of(context).iconTheme,
-                  backgroundColor: Theme.of(context).cardColor,
-                  floating: true,
-                  brightness: MediaQuery.of(context).platformBrightness,
-                  pinned: false,
-                  snap: true,
-                  elevation: 0,
-                  textTheme: Theme.of(context).textTheme,
-                ),
+    return Scaffold(
+      body: Consumer(
+        builder: (BuildContext context, CommentsProvider model, _) {
+          return CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverAppBar(
+                title: Text("Comments"),
+                automaticallyImplyLeading: true,
+                iconTheme: Theme.of(context).iconTheme,
+                backgroundColor: Theme.of(context).cardColor,
+                floating: true,
+                brightness: MediaQuery.of(context).platformBrightness,
+                pinned: false,
+                snap: true,
+                elevation: 0,
+                textTheme: Theme.of(context).textTheme,
+              ),
 //                BlurredSliverAppBar(
 //                  title: "Comments",
 //                ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 16.0,
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Column(
+                    children: <Widget>[
+                      Material(
+                        color: Theme.of(context).cardColor,
+                        child: InkWell(
+                          onTap: () {
+                            if (postItem.isSelf == false) {
+                              launchURL(context, postItem.url);
+                            }
+                          },
+                          child: FeedCard(postItem),
                         ),
-                        Material(
-                          color: Theme.of(context).cardColor,
-                          child: InkWell(
-                            onTap: () {
-                              if (postItem.isSelf == false) {
-                                launchURL(context, postItem.url);
-                              }
-                            },
-                            child: FeedCard(postItem),
-                          ),
-                        ),
-                        postItem.isSelf && postItem.selftextHtml != null
-                            ? FeedCardBodySelfText(
-                                selftextHtml: postItem.selftextHtml,
-                              )
-                            : Container(),
-                        PostControls(
-                          postData: postItem,
-                        ),
-                        Divider(),
-                        CommentsControlBar(postItem),
-                        Divider(),
-                      ],
-                    ),
-                  ]),
-                ),
-                SliverList(
-                  delegate: model.commentsLoadingState == ViewState.Busy
-                      ? SliverChildListDelegate(
-                          <Widget>[
-                            SizedBox(
-                              height: 64.0,
-                            ),
-                            Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            SizedBox(
-                              height: 32.0,
-                            ),
-                          ],
-                        )
-                      : model.commentsMap[postItem.id] == null ||
-                              model.commentsMap[postItem.id].length == 0
-                          ? SliverChildListDelegate(
-                              <Widget>[
-                                SizedBox(
-                                  height: 64.0,
-                                ),
-                                Center(
-                                  child: Icon(Icons.info_outline),
-                                ),
-                                Center(
-                                  child: Text("No Comments"),
-                                ),
-                                SizedBox(
-                                  height: 32.0,
-                                ),
-                              ],
+                      ),
+                      postItem.isSelf && postItem.selftextHtml != null
+                          ? FeedCardBodySelfText(
+                              selftextHtml: postItem.selftextHtml,
                             )
-                          : SliverChildBuilderDelegate(
-                              (BuildContext context, int index) {
-                                var commentItem =
-                                    model.commentsMap[postItem.id].elementAt(
-                                  (index),
-                                );
+                          : Container(),
+                      Divider(),
+                      CommentsControlBar(postItem),
+                      Divider(),
+                    ],
+                  ),
+                ]),
+              ),
+              SliverList(
+                delegate: model.commentsLoadingState == ViewState.Busy
+                    ? SliverChildListDelegate(
+                        <Widget>[
+                          SizedBox(
+                            height: 64.0,
+                          ),
+                          Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          SizedBox(
+                            height: 32.0,
+                          ),
+                        ],
+                      )
+                    : model.commentsMap[postItem.id] == null ||
+                            model.commentsMap[postItem.id].length == 0
+                        ? SliverChildListDelegate(
+                            <Widget>[
+                              SizedBox(
+                                height: 64.0,
+                              ),
+                              Center(
+                                child: Icon(Icons.info_outline),
+                              ),
+                              Center(
+                                child: Text("No Comments"),
+                              ),
+                              SizedBox(
+                                height: 32.0,
+                              ),
+                            ],
+                          )
+                        : SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              var commentItem =
+                                  model.commentsMap[postItem.id].elementAt(
+                                (index),
+                              );
 //                                String _htmlContent = _unescape
 //                                    .convert(commentItem.data.bodyHtml);
 //                                return ListTile(
@@ -130,12 +119,12 @@ class CommentsScreen extends StatelessWidget {
 //                                    ],
 //                                  ),
 //                                );
-                                return CommentItem(
-                                  commentItem,
-                                  postItem.name,
-                                  postItem.id,
-                                  index,
-                                );
+                              return CommentItem(
+                                commentItem,
+                                postItem.name,
+                                postItem.id,
+                                index,
+                              );
 //                                return ListTile(
 //                                  title: Html(
 //                                    padding: EdgeInsets.all(0),
@@ -178,27 +167,24 @@ class CommentsScreen extends StatelessWidget {
 //                                    },
 //                                  ),
 //                                );
-                              },
-                              childCount: model.commentsMap[postItem.id].length,
-                              addAutomaticKeepAlives: true,
-                          
-                            ),
+                            },
+                            childCount: model.commentsMap[postItem.id].length,
+                          ),
 //
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    SizedBox(
+                      height: MediaQuery.of(context).padding.bottom,
+                    ),
+                  ],
                 ),
-                SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.bottom,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

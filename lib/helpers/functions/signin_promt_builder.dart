@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 
 void buildSnackBar(BuildContext context) {
+  Scaffold.of(context).hideCurrentSnackBar();
   Scaffold.of(context).showSnackBar(SnackBar(
     content: Text('Please sign-in to vote'),
     action: SnackBarAction(
