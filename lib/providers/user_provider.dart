@@ -142,6 +142,7 @@ class UserInformationProvider with ChangeNotifier {
     _state = ViewState.Busy;
     notifyListeners();
     await _storageHelper.clearStorage();
+    userInformation = null;
     _state = ViewState.Idle;
     notifyListeners();
   }
@@ -192,18 +193,31 @@ class UserInformationProvider with ChangeNotifier {
     }
   }
 
+  @override
+  void notifyListeners() {
+    runAssertions();
+    super.notifyListeners();
+  }
+
+  void runAssertions() {
+    // if signed in, make sure that userInformation isn't null
+    assert(!(signedIn && userInformation == null));
+    // and vice versa
+    assert(!(!signedIn && userInformation != null));
+  }
+
   Future<void> authenticateUser(BuildContext context) async {
-    launchURL(
-        Theme.of(context).primaryColor,
-        "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
-            CLIENT_ID +
-            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+    const url = "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
+        CLIENT_ID +
+        "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
+    // TODO: Embed a WebView for macOS when this is supported.
+    launchURL(Theme.of(context).primaryColor, url);
     bool res = await this.performAuthentication();
     // print("final res: " + res.toString());
     if (res) {
       await Provider.of<FeedProvider>(context, listen: false)
           .navigateToSubreddit('');
-      if (Navigator.canPop(context)) {
+      if (Navigator.canPop(context) && !Platform.isMacOS) {
         Navigator.pop(context);
       }
     } else {

@@ -4,6 +4,7 @@ import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 class PostUrlPreview extends StatelessWidget {
   const PostUrlPreview({
@@ -51,9 +52,7 @@ class PostUrlPreview extends StatelessWidget {
               ? CircleAvatar(
                   radius: 16,
                   backgroundImage: CachedNetworkImageProvider(
-                    htmlUnescape.convert(
-                      data.preview.images.last.source.url,
-                    ),
+                    data.preview.images.last.source.url.asSanitizedImageUrl,
                   ),
                 )
               : CircleAvatar(

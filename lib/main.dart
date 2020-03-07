@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/pages/app_home.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_layout.dart';
@@ -40,6 +42,9 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => SearchProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => SettingsNotifier(),
+        )
       ],
       child: Fritter(),
     ),
@@ -138,6 +143,10 @@ class Fritter extends StatelessWidget {
                 ),
               ),
             ),
+        primaryIconTheme: IconThemeData(color: Colors.grey),
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.grey),
+        ),
       ),
     );
   }
@@ -161,20 +170,21 @@ class DesktopHome extends StatelessWidget {
           }
           return Scaffold(
             body: DesktopLayout(
-                leftPanel: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(color: Colors.grey),
-                    ),
-                  ),
-                  child: LeftDrawer(
-                    mode: Mode.desktop,
+              leftPanel: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(color: Colors.grey),
                   ),
                 ),
-                content: DesktopSubredditFeed(),
-                rightPanel: SubredditSidePanel(
-                  subredditInformation: subredditInformationData,
-                )),
+                child: LeftDrawer(
+                  mode: Mode.desktop,
+                ),
+              ),
+              content: DesktopSubredditFeed(),
+              rightPanel: SubredditSidePanel(
+                subredditInformation: subredditInformationData,
+              ),
+            ),
           );
         });
   }

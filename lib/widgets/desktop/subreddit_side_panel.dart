@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
+import 'package:sticky_headers/sticky_headers.dart';
 
 class SubredditSidePanel extends StatelessWidget {
   final SubredditInformationEntity subredditInformation;
@@ -56,20 +57,22 @@ class AboutCommunity extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          CupertinoNavigationBar(
-            middle: Text(
-              'About Community',
-              style: Theme.of(context).primaryTextTheme.bodyText1.copyWith(),
+          StickyHeader(
+            header: CupertinoNavigationBar(
+              middle: Text(
+                'About Community',
+                style: Theme.of(context).primaryTextTheme.bodyText1.copyWith(),
+              ),
+              automaticallyImplyLeading: false,
+              backgroundColor: Theme.of(context).secondaryHeaderColor,
             ),
-            automaticallyImplyLeading: false,
-            backgroundColor: Theme.of(context).secondaryHeaderColor,
-          ),
-          Markdown(
-            physics: NeverScrollableScrollPhysics(),
-            data: description.withSubredditLinksAsMarkdownLinks,
-            shrinkWrap: true,
-            onTapLink: (link) =>
-                FeedProvider.of(context).navigateToSubreddit(link),
+            content: Markdown(
+              physics: NeverScrollableScrollPhysics(),
+              data: description.withSubredditLinksAsMarkdownLinks,
+              shrinkWrap: true,
+              onTapLink: (link) =>
+                  FeedProvider.of(context).navigateToSubreddit(link),
+            ),
           ),
         ],
       ),

@@ -30,7 +30,7 @@ class FeedProvider with ChangeNotifier {
   String get currentSubreddit => currentSubredditStream.value;
 
   BehaviorSubject<SubredditInformationEntity>
-      currentSubredditInformationStream = BehaviorSubject();
+      currentSubredditInformationStream = BehaviorSubject.seeded(null);
   BehaviorSubject<SubredditInfo> subStream;
   bool subLoadingError = false;
 
@@ -57,9 +57,10 @@ class FeedProvider with ChangeNotifier {
   SubredditInformationEntity get subredditInformationEntity =>
       currentSubredditInformationStream.value;
 
-  FeedProvider(
-      {this.currentPage = CurrentPage.frontPage,
-      String currentSubreddit = ''}) {
+  FeedProvider({
+    this.currentPage = CurrentPage.frontPage,
+    String currentSubreddit = '',
+  }) {
     _init();
   }
 
@@ -72,6 +73,9 @@ class FeedProvider with ChangeNotifier {
     });
     _postFeedStream.listen((feed) {
       debugPrint('updating postFeedStream');
+      final posts = feed.data.children;
+      assert(posts.map((post) => post.data.id).toSet().length == posts.length,
+          'Duplicate posts have been detected.');
     });
     currentSubredditInformationStream.listen((subredditInformation) {
       debugPrint('updating currentSubredditStream to '
@@ -283,8 +287,6 @@ class FeedProvider with ChangeNotifier {
         } else {
           throw Exception("Failed to load data: " + response.reasonPhrase);
         }
-
-        await fetchSubredditInformationOAuth(token, currentSubreddit);
       }
     } catch (e) {
       // // print(e.toString());
@@ -394,7 +396,10 @@ class FeedProvider with ChangeNotifier {
       debugPrint('updating currentSubredditStream');
 
       currentSubredditStream.value = strippedSubreddit;
-      return _fetchPostsListing(currentSubreddit: strippedSubreddit);
+      await _fetchPostsListing(currentSubreddit: strippedSubreddit);
+
+      String token = await _storageHelper.authToken;
+      await fetchSubredditInformationOAuth(token, currentSubreddit);
     } else {
       debugPrint('Requesting the same subreddit. Ignoring');
       assert(subStream.value.name == strippedSubreddit,
@@ -526,10 +531,12 @@ class FeedProvider with ChangeNotifier {
         currentSort: sortBy,
         loadingTop: loadingTop);
   }
-  
+
   Future<void> refresh() =>
       _fetchPostsListing(currentSubreddit: currentSubreddit);
 }
+
+enum QueryType { subreddit, user, post }
 
 @HiveType(typeId: 1)
 class SubredditInfo {

@@ -6,11 +6,25 @@ import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 import 'search_screen.dart';
 import 'user_profile.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final GlobalKey<NavigatorState> firstTabNavKey = GlobalKey<NavigatorState>();
+
   final GlobalKey<NavigatorState> secondTabNavKey = GlobalKey<NavigatorState>();
+
   final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
+
   final CupertinoTabController _tabController = CupertinoTabController();
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

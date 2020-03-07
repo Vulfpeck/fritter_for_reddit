@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:hive/hive.dart';
 import 'package:html_unescape/html_unescape.dart';
-
+import 'package:fritter_for_reddit/utils/extensions.dart';
 part 'posts_feed_entity.g.dart';
 
 @HiveType(typeId: 2)
@@ -235,6 +235,8 @@ class PostsFeedDataChildrenData {
   MediaType postType;
 
   bool get hasLinkFlairText => linkFlairText != null;
+  bool get hasPreview => preview?.images?.isNotEmpty ?? false;
+  String get previewUrl => preview.images.first.source.url.asSanitizedImageUrl;
 
   PostsFeedDataChildrenData({
     this.secureMedia,
@@ -600,7 +602,8 @@ class PostsFeedDataChildrenData {
     return data;
   }
 
-  bool get hasImage => preview?.images?.isNotEmpty ?? false;
+  bool get hasImage =>
+      postType == MediaType.Image || postType == MediaType.Video;
 
   List<PostsFeedDataChildDataPreviewImages> get images {
     if (!hasImage) {

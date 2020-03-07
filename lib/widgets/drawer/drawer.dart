@@ -1,12 +1,18 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
-import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
-import 'package:flutter_provider_app/widgets/drawer/list_header.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
+import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/widgets/common/expansion_tile.dart';
+import 'package:fritter_for_reddit/widgets/common/filtered_dropdown_search.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
+import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
@@ -44,140 +50,91 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CupertinoPageScaffold(
+    return Material(
+      child: CupertinoPageScaffold(
         child: Consumer<UserInformationProvider>(
             builder: (BuildContext context, UserInformationProvider model, _) {
-          if (model.signedIn) {
-            return CupertinoScrollbar(
-              controller: _controller,
-              child: CustomScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                slivers: <Widget>[
-                  DrawerSliverAppBar(),
-                  GoToSubredditWidget(
-                    focusNode: focusNode,
-                  ),
-                  SliverListHeader(title: 'Subscribed Subreddits'),
-                  SliverList(
-                    delegate: model.state == ViewState.Idle
-                        ? SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return ListTile(
-                                dense: true,
-                                title: Text(
-                                  model.userSubreddits.data.children[index]
-                                      .display_name,
-                                  style: Theme.of(context).textTheme.subhead,
-                                ),
-                                leading: CircleAvatar(
-                                  maxRadius: 16,
-                                  backgroundImage: model.userSubreddits.data
-                                              .children[index].community_icon !=
-                                          ""
-                                      ? CachedNetworkImageProvider(
-                                          model.userSubreddits.data
-                                              .children[index].community_icon,
-                                        )
-                                      : model.userSubreddits.data
-                                                  .children[index].icon_img !=
-                                              ""
-                                          ? CachedNetworkImageProvider(
-                                              model.userSubreddits.data
-                                                  .children[index].icon_img,
-                                            )
-                                          : AssetImage(
-                                              'assets/default_icon.png'),
-                                  backgroundColor: model.userSubreddits.data
-                                              .children[index].primary_color ==
-                                          ""
-                                      ? Theme.of(context).accentColor
-                                      : HexColor(
-                                          model.userSubreddits.data
-                                              .children[index].primary_color,
-                                        ),
-                                ),
-                                onTap: () {
-                                  focusNode.unfocus();
-                                  return Navigator.of(
-                                    context,
-                                    rootNavigator: false,
-                                  ).push(
-                                    CupertinoPageRoute(
-                                      builder: (context) => SubredditFeedPage(
-                                        subreddit: model.userSubreddits.data
-                                            .children[index].display_name,
-                                      ),
-                                      fullscreenDialog: false,
-                                    ),
+          return CupertinoScrollbar(
+            controller: _controller,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: CustomScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    controller: _controller,
+                    slivers: <Widget>[
+                      DrawerSliverAppBar(),
+                      SliverToBoxAdapter(
+                        child: FutureBuilder<List>(
+                            future: SearchProvider.of(context)
+                                .searchPosts(query: null),
+                            initialData: [],
+                            builder: (context, snapshot) {
+                              return FilteredDropdownSearch(
+                                onChanged: (value) {},
+                                asSliver: true,
+                                options: snapshot.data,
+                                itemBuilder:
+                                    (BuildContext context, dynamic item) {
+                                  return ListTile(
+                                    title: Text(item),
                                   );
                                 },
+                                verticalOffset: 20,
                               );
-                            },
-                            childCount:
-                                model.userSubreddits.data.children.length,
-                          )
-                        : SliverChildListDelegate([
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: LinearProgressIndicator(),
-                            ),
-                          ]),
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [SizedBox(height: MediaQuery.of(context).padding.bottom)],
-                    ),
-                    if (!model.signedIn)
-                      Login()
-                    else ...[
-                      SliverListHeader(title: 'Subscribed Subreddits'),
-                      SliverList(
-                        delegate: model.state == ViewState.Idle
-                            ? SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                                  if (widget.mode == Mode.mobile) {
-                                    return SubredditDrawerTile(
-                                      focusNode: focusNode,
-                                      child: model
-                                          .userSubreddits.data.children[index],
-                                    );
-                                  } else {
-                                    return DesktopSubredditDrawerTile(
-                                      subreddit: model
-                                          .userSubreddits.data.children[index],
-                                    );
-                                  }
-                                },
-                                childCount:
-                                    model.userSubreddits.data.children.length,
-                              )
-                            : SliverChildListDelegate([
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: LinearProgressIndicator(),
-                                ),
-                              ]),
+                            }),
                       ),
-                      SliverPadding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).padding.bottom,
+                      if (!model.signedIn)
+                        Login()
+                      else ...[
+                        SliverListHeader(title: 'Subscribed Subreddits'),
+                        SliverList(
+                          delegate: model.state == ViewState.Idle
+                              ? SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    if (widget.mode == Mode.mobile) {
+                                      return SubredditDrawerTile(
+                                        focusNode: focusNode,
+                                        child: model.userSubreddits.data
+                                            .children[index],
+                                      );
+                                    } else {
+                                      return DesktopSubredditDrawerTile(
+                                        subreddit: model.userSubreddits.data
+                                            .children[index],
+                                      );
+                                    }
+                                  },
+                                  childCount:
+                                      model.userSubreddits.data.children.length,
+                                )
+                              : SliverChildListDelegate([
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: LinearProgressIndicator(),
+                                  ),
+                                ]),
                         ),
-                      ),
+                        SliverPadding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).padding.bottom,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              if (model.userInformation != null)
-                ProfileListTile(
-                  name: model.userInformation.name,
-                  imageUrl: model.userInformation.iconImg,
-                ),
-            ],
-          ),
-        );
-      }),
+                if (model.userInformation != null)
+                  ProfileListTile(
+                    name: model.userInformation.name,
+                    imageUrl: model.userInformation.iconImg,
+                  ),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -205,12 +162,14 @@ class SubredditDrawerTile extends StatelessWidget {
         maxRadius: 16,
         backgroundImage: child.community_icon != ""
             ? CachedNetworkImageProvider(
-                child.community_icon,
-              )
+                child.community_icon.asSanitizedImageUrl, errorListener: () {
+                debugger();
+              })
             : child.icon_img != ""
-                ? CachedNetworkImageProvider(
-                    child.icon_img.asSanitizedImageUrl,
-                  )
+                ? CachedNetworkImageProvider(child.icon_img.asSanitizedImageUrl,
+                    errorListener: () {
+                    debugger();
+                  })
                 : AssetImage('assets/default_icon.png'),
         backgroundColor: child.primary_color == ""
             ? Theme.of(context).accentColor
@@ -344,10 +303,13 @@ class ProfileListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      leading: CircleAvatar(
-        backgroundImage: CachedNetworkImageProvider(
-          imageUrl.asSanitizedImageUrl,
+    return RestrictedExpansionTile(
+      leading: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 50),
+        child: CircleAvatar(
+          backgroundImage: CachedNetworkImageProvider(
+            imageUrl.asSanitizedImageUrl,
+          ),
         ),
       ),
       title: Text(name),

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fritter_for_reddit/exports.dart';
 
 class DesktopMainSubredditTile extends StatelessWidget {
   final String subreddit;
