@@ -16,6 +16,7 @@ class FeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
 
   FeedCard(this.data);
+
   final _htmlUnescape = new HtmlUnescape();
 
   @override
@@ -73,6 +74,7 @@ class FeedCardTitle extends StatelessWidget {
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
 
   String escapedTitle;
+
   FeedCardTitle({
     @required this.title,
     @required this.stickied,
@@ -151,24 +153,23 @@ class FeedCardTitle extends StatelessWidget {
 
 class FeedCardBodyImage extends StatelessWidget {
   final Map<String, dynamic> postMetaData;
-  final List<PostsFeedDatachildDataPreviewImages> images;
+  final List<PostsFeedDataChildDataPreviewImages> images;
   final PostsFeedDataChildrenData data;
   final double deviceWidth;
-  final HtmlUnescape _htmlUnescape = new HtmlUnescape();
-  String url = "";
-  double ratio = 1;
+  static final HtmlUnescape _htmlUnescape = new HtmlUnescape();
+  final String url;
+  final double ratio;
 
   FeedCardBodyImage({
     @required this.images,
     @required this.data,
     @required this.postMetaData,
     @required this.deviceWidth,
-  }) : assert(postMetaData != null) {
-    ratio = (deviceWidth) / images.first.source.width;
-    url = _htmlUnescape.convert(images.first.resolutions
-        .elementAt(images.first.resolutions.length ~/ 2)
-        .url);
-  }
+  })  : url = _htmlUnescape.convert(images.first.resolutions
+            .elementAt(images.first.resolutions.length ~/ 2)
+            .url),
+        ratio = (deviceWidth) / images.first.source.width,
+        assert(postMetaData != null);
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +242,9 @@ class FeedCardBodyImage extends StatelessWidget {
 
 class FeedCardBodySelfText extends StatelessWidget {
   final String selftextHtml;
+
   FeedCardBodySelfText({this.selftextHtml});
+
   final HtmlUnescape _htmlUnescape = new HtmlUnescape();
 
   @override

@@ -8,24 +8,24 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          builder: (_) => UserInformationProvider(),
+          create: (_) => UserInformationProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => FeedProvider(),
+          create: (_) => FeedProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => CommentsProvider(),
+          create: (_) => CommentsProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => SearchProvider(),
+          create: (_) => SearchProvider(),
         ),
       ],
-      child: MyTestApp(),
+      child: Fritter(),
     ),
   );
 }
 
-class MyTestApp extends StatelessWidget {
+class Fritter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,9 +1,12 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
 import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
+import 'package:flutter_provider_app/widgets/drawer/list_header.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
@@ -55,6 +58,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   GoToSubredditWidget(
                     focusNode: focusNode,
                   ),
+                  SliverListHeader(title: 'Subscribed Subreddits'),
                   SliverList(
                     delegate: model.state == ViewState.Idle
                         ? SliverChildBuilderDelegate(
@@ -66,33 +70,33 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                       .display_name,
                                   style: Theme.of(context).textTheme.subhead,
                                 ),
-//                                leading: CircleAvatar(
-//                                  maxRadius: 16,
-//                                  backgroundImage: model.userSubreddits.data
-//                                              .children[index].community_icon !=
-//                                          ""
-//                                      ? CachedNetworkImageProvider(
-//                                          model.userSubreddits.data
-//                                              .children[index].community_icon,
-//                                        )
-//                                      : model.userSubreddits.data
-//                                                  .children[index].icon_img !=
-//                                              ""
-//                                          ? CachedNetworkImageProvider(
-//                                              model.userSubreddits.data
-//                                                  .children[index].icon_img,
-//                                            )
-//                                          : AssetImage(
-//                                              'assets/default_icon.png'),
-//                                  backgroundColor: model.userSubreddits.data
-//                                              .children[index].primary_color ==
-//                                          ""
-//                                      ? Theme.of(context).accentColor
-//                                      : HexColor(
-//                                          model.userSubreddits.data
-//                                              .children[index].primary_color,
-//                                        ),
-//                                ),
+                                leading: CircleAvatar(
+                                  maxRadius: 16,
+                                  backgroundImage: model.userSubreddits.data
+                                              .children[index].community_icon !=
+                                          ""
+                                      ? CachedNetworkImageProvider(
+                                          model.userSubreddits.data
+                                              .children[index].community_icon,
+                                        )
+                                      : model.userSubreddits.data
+                                                  .children[index].icon_img !=
+                                              ""
+                                          ? CachedNetworkImageProvider(
+                                              model.userSubreddits.data
+                                                  .children[index].icon_img,
+                                            )
+                                          : AssetImage(
+                                              'assets/default_icon.png'),
+                                  backgroundColor: model.userSubreddits.data
+                                              .children[index].primary_color ==
+                                          ""
+                                      ? Theme.of(context).accentColor
+                                      : HexColor(
+                                          model.userSubreddits.data
+                                              .children[index].primary_color,
+                                        ),
+                                ),
                                 onTap: () {
                                   focusNode.unfocus();
                                   return Navigator.of(
