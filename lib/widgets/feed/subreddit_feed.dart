@@ -331,7 +331,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
                   child: feedProvider != null
                       ? feedProvider.state == ViewState.Idle
-                          ? feedProvider.currentPage == CurrentPage.frontPage
+                          ? feedProvider.currentPage == CurrentPage.FrontPage
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,

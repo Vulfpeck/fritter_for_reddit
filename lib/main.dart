@@ -32,10 +32,10 @@ void main() async {
           create: (_) => UserInformationProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => CommentsProvider(),
+          create: (_) => FeedProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => FeedProvider(),
+          create: (_) => CommentsProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => SearchProvider(),

@@ -3,12 +3,10 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fritter_for_reddit/exports.dart';
-import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
-import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
-import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
-import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
-import 'package:fritter_for_reddit/utils/extensions.dart';
+import 'package:flutter_provider_app/exports.dart';
+import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
+import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
+import 'package:flutter_provider_app/widgets/drawer/list_header.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
@@ -46,23 +44,90 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: Consumer<UserInformationProvider>(
-          builder: (BuildContext context, UserInformationProvider model, _) {
-        return CupertinoScrollbar(
-          controller: _controller,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Expanded(
-                child: CustomScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  controller: _controller,
-                  slivers: <Widget>[
-                    DrawerSliverAppBar(),
-                    GoToSubredditWidget(
-                      focusNode: focusNode,
-                      mode: widget.mode,
+    return Scaffold(
+      body: CupertinoPageScaffold(
+        child: Consumer<UserInformationProvider>(
+            builder: (BuildContext context, UserInformationProvider model, _) {
+          if (model.signedIn) {
+            return CupertinoScrollbar(
+              controller: _controller,
+              child: CustomScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                controller: _controller,
+                slivers: <Widget>[
+                  DrawerSliverAppBar(),
+                  GoToSubredditWidget(
+                    focusNode: focusNode,
+                  ),
+                  SliverListHeader(title: 'Subscribed Subreddits'),
+                  SliverList(
+                    delegate: model.state == ViewState.Idle
+                        ? SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return ListTile(
+                                dense: true,
+                                title: Text(
+                                  model.userSubreddits.data.children[index]
+                                      .display_name,
+                                  style: Theme.of(context).textTheme.subhead,
+                                ),
+                                leading: CircleAvatar(
+                                  maxRadius: 16,
+                                  backgroundImage: model.userSubreddits.data
+                                              .children[index].community_icon !=
+                                          ""
+                                      ? CachedNetworkImageProvider(
+                                          model.userSubreddits.data
+                                              .children[index].community_icon,
+                                        )
+                                      : model.userSubreddits.data
+                                                  .children[index].icon_img !=
+                                              ""
+                                          ? CachedNetworkImageProvider(
+                                              model.userSubreddits.data
+                                                  .children[index].icon_img,
+                                            )
+                                          : AssetImage(
+                                              'assets/default_icon.png'),
+                                  backgroundColor: model.userSubreddits.data
+                                              .children[index].primary_color ==
+                                          ""
+                                      ? Theme.of(context).accentColor
+                                      : HexColor(
+                                          model.userSubreddits.data
+                                              .children[index].primary_color,
+                                        ),
+                                ),
+                                onTap: () {
+                                  focusNode.unfocus();
+                                  return Navigator.of(
+                                    context,
+                                    rootNavigator: false,
+                                  ).push(
+                                    CupertinoPageRoute(
+                                      builder: (context) => SubredditFeedPage(
+                                        subreddit: model.userSubreddits.data
+                                            .children[index].display_name,
+                                      ),
+                                      fullscreenDialog: false,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            childCount:
+                                model.userSubreddits.data.children.length,
+                          )
+                        : SliverChildListDelegate([
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: LinearProgressIndicator(),
+                            ),
+                          ]),
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                      [SizedBox(height: MediaQuery.of(context).padding.bottom)],
                     ),
                     if (!model.signedIn)
                       Login()

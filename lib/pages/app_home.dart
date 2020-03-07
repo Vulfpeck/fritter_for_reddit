@@ -51,7 +51,7 @@ class HomePage extends StatelessWidget {
           switch (index) {
             case 0:
               return CupertinoTabView(
-//                navigatorKey: firstTabNavKey,
+                navigatorKey: firstTabNavKey,
                 builder: (BuildContext context) => LeftDrawer(
                   mode: Mode.mobile,
                   firstLaunch: true,
@@ -61,14 +61,14 @@ class HomePage extends StatelessWidget {
               break;
             case 1:
               return CupertinoTabView(
-//                navigatorKey: secondTabNavKey,
+                navigatorKey: secondTabNavKey,
                 builder: (BuildContext context) => SearchPage(),
                 defaultTitle: 'Search',
               );
               break;
             case 2:
               return CupertinoTabView(
-//                navigatorKey: thirdTabNavKey,
+                navigatorKey: thirdTabNavKey,
                 builder: (BuildContext context) => UserProfileScreen(),
                 defaultTitle: 'Profile',
               );

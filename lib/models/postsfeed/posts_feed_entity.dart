@@ -675,7 +675,7 @@ class PostsFeedDataChildDataPreviewImages {
   PostsFeedDataChildDataPreviewImages(
       {this.resolutions, this.source, this.variants, this.id});
 
-  PostsFeedDataChildDataPreviewImages.fromJson(Map json) {
+  PostsFeedDataChildDataPreviewImages.fromJson(Map<String, dynamic> json) {
     if (json['resolutions'] != null) {
       resolutions = new List<PostsFeedDataChildDataPreviewImagesResolutions>();
       (json['resolutions'] as List).forEach((v) {
@@ -718,7 +718,8 @@ class PostsFeedDataChildDataPreviewImagesResolutions {
   PostsFeedDataChildDataPreviewImagesResolutions(
       {this.width, this.url, this.height});
 
-  PostsFeedDataChildDataPreviewImagesResolutions.fromJson(Map json) {
+  PostsFeedDataChildDataPreviewImagesResolutions.fromJson(
+      Map<String, dynamic> json) {
     width = json['width'];
     url = HtmlUnescape().convert(json['url']);
     height = json['height'];
