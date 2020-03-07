@@ -581,16 +581,16 @@ class PostsFeedDataChildrenDataGildings {
 }
 
 class PostsFeedDataChildrenDataPreview {
-  List<PostsFeedDatachildDataPreviewImages> images;
+  List<PostsFeedDataChildDataPreviewImages> images;
   bool enabled;
 
   PostsFeedDataChildrenDataPreview({this.images, this.enabled});
 
   PostsFeedDataChildrenDataPreview.fromJson(Map<String, dynamic> json) {
     if (json['images'] != null) {
-      images = new List<PostsFeedDatachildDataPreviewImages>();
+      images = new List<PostsFeedDataChildDataPreviewImages>();
       (json['images'] as List).forEach((v) {
-        images.add(new PostsFeedDatachildDataPreviewImages.fromJson(v));
+        images.add(new PostsFeedDataChildDataPreviewImages.fromJson(v));
       });
     }
     enabled = json['enabled'];
@@ -606,21 +606,21 @@ class PostsFeedDataChildrenDataPreview {
   }
 }
 
-class PostsFeedDatachildDataPreviewImages {
-  List<PostsFeedDatachildDataPreviewImagesResolutions> resolutions;
+class PostsFeedDataChildDataPreviewImages {
+  List<PostsFeedDataChildDataPreviewImagesResolutions> resolutions;
   PostsFeedDataChildrenDataPreviewImagesSource source;
   PostsFeedDataChildrenDataPreviewImagesVariants variants;
   String id;
 
-  PostsFeedDatachildDataPreviewImages(
+  PostsFeedDataChildDataPreviewImages(
       {this.resolutions, this.source, this.variants, this.id});
 
-  PostsFeedDatachildDataPreviewImages.fromJson(Map<String, dynamic> json) {
+  PostsFeedDataChildDataPreviewImages.fromJson(Map<String, dynamic> json) {
     if (json['resolutions'] != null) {
-      resolutions = new List<PostsFeedDatachildDataPreviewImagesResolutions>();
+      resolutions = new List<PostsFeedDataChildDataPreviewImagesResolutions>();
       (json['resolutions'] as List).forEach((v) {
         resolutions.add(
-            new PostsFeedDatachildDataPreviewImagesResolutions.fromJson(v));
+            new PostsFeedDataChildDataPreviewImagesResolutions.fromJson(v));
       });
     }
     source = json['source'] != null
@@ -650,15 +650,15 @@ class PostsFeedDatachildDataPreviewImages {
   }
 }
 
-class PostsFeedDatachildDataPreviewImagesResolutions {
+class PostsFeedDataChildDataPreviewImagesResolutions {
   int width;
   String url;
   int height;
 
-  PostsFeedDatachildDataPreviewImagesResolutions(
+  PostsFeedDataChildDataPreviewImagesResolutions(
       {this.width, this.url, this.height});
 
-  PostsFeedDatachildDataPreviewImagesResolutions.fromJson(
+  PostsFeedDataChildDataPreviewImagesResolutions.fromJson(
       Map<String, dynamic> json) {
     width = json['width'];
     url = json['url'];

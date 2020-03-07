@@ -134,7 +134,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   icon: Icon(Icons.info_outline),
                   color: Theme.of(context).iconTheme.color,
                   onPressed: () {
-                    ShowSubInformationSheet(context);
+                    showSubInformationSheet(context);
                   },
                 )
               ],
@@ -294,8 +294,8 @@ class _SubredditFeedState extends State<SubredditFeed>
     );
   }
 
-  void ShowSubInformationSheet(BuildContext context) {
-    var prov = Provider.of<FeedProvider>(context, listen: false);
+  void showSubInformationSheet(BuildContext context) {
+    final feedProvider = Provider.of<FeedProvider>(context, listen: false);
     showCupertinoModalPopup(
       context: context,
       useRootNavigator: true,
@@ -314,12 +314,13 @@ class _SubredditFeedState extends State<SubredditFeed>
                         ? TransparentHexColor("#000000", "80")
                         : TransparentHexColor("#FFFFFF", "aa");
 
-                if (prov.subredditInformationEntity != null &&
-                    prov.subredditInformationEntity.data
+                if (feedProvider.subredditInformationEntity != null &&
+                    feedProvider.subredditInformationEntity.data
                             .bannerBackgroundColor !=
                         "") {
                   headerColor = TransparentHexColor(
-                    prov.subredditInformationEntity.data.bannerBackgroundColor,
+                    feedProvider
+                        .subredditInformationEntity.data.bannerBackgroundColor,
                     "50",
                   );
                 }
@@ -328,9 +329,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                   padding: EdgeInsets.all(0),
                   color: headerColor,
                   // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
-                  child: prov != null
-                      ? prov.state == ViewState.Idle
-                          ? prov.currentPage == CurrentPage.FrontPage
+                  child: feedProvider != null
+                      ? feedProvider.state == ViewState.Idle
+                          ? feedProvider.currentPage == CurrentPage.FrontPage
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,40 +378,48 @@ class _SubredditFeedState extends State<SubredditFeed>
                                       SizedBox(
                                         height: 24,
                                       ),
-                                      prov.subredditInformationEntity != null
+                                      feedProvider.subredditInformationEntity !=
+                                              null
                                           ? CircleAvatar(
                                               maxRadius: 24,
                                               minRadius: 24,
-                                              backgroundImage: prov
+                                              backgroundImage: feedProvider
                                                           .subredditInformationEntity
                                                           .data
                                                           .communityIcon !=
                                                       ""
                                                   ? CachedNetworkImageProvider(
-                                                      prov.subredditInformationEntity
-                                                          .data.communityIcon,
+                                                      feedProvider
+                                                          .subredditInformationEntity
+                                                          .data
+                                                          .communityIcon,
                                                     )
-                                                  : prov.subredditInformationEntity
-                                                              .data.iconImg !=
+                                                  : feedProvider
+                                                              .subredditInformationEntity
+                                                              .data
+                                                              .iconImg !=
                                                           ""
                                                       ? CachedNetworkImageProvider(
-                                                          prov.subredditInformationEntity
-                                                              .data.iconImg,
+                                                          feedProvider
+                                                              .subredditInformationEntity
+                                                              .data
+                                                              .iconImg,
                                                         )
                                                       : AssetImage(
                                                           'assets/default_icon.png'),
-                                              backgroundColor:
-                                                  prov.subredditInformationEntity
-                                                              .data.primaryColor ==
-                                                          ""
-                                                      ? Theme.of(context)
-                                                          .accentColor
-                                                      : HexColor(
-                                                          prov
-                                                              .subredditInformationEntity
-                                                              .data
-                                                              .primaryColor,
-                                                        ),
+                                              backgroundColor: feedProvider
+                                                          .subredditInformationEntity
+                                                          .data
+                                                          .primaryColor ==
+                                                      ""
+                                                  ? Theme.of(context)
+                                                      .accentColor
+                                                  : HexColor(
+                                                      feedProvider
+                                                          .subredditInformationEntity
+                                                          .data
+                                                          .primaryColor,
+                                                    ),
                                             )
                                           : Column(
                                               mainAxisAlignment:
@@ -434,7 +443,8 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                 ),
                                               ],
                                             ),
-                                      prov.subredditInformationEntity != null
+                                      feedProvider.subredditInformationEntity !=
+                                              null
                                           ? Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -445,8 +455,10 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                   height: 8,
                                                 ),
                                                 Text(
-                                                  prov.subredditInformationEntity
-                                                      .data.displayNamePrefixed,
+                                                  feedProvider
+                                                      .subredditInformationEntity
+                                                      .data
+                                                      .displayNamePrefixed,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headline
@@ -459,7 +471,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                   softWrap: false,
                                                 ),
                                                 Text(
-                                                  getRoundedToThousand(prov
+                                                  getRoundedToThousand(feedProvider
                                                           .subredditInformationEntity
                                                           .data
                                                           .subscribers) +
@@ -471,7 +483,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                 SizedBox(
                                                   height: 8,
                                                 ),
-                                                prov.subredditInformationEntity.data
+                                                feedProvider
+                                                            .subredditInformationEntity
+                                                            .data
                                                             .userIsSubscriber !=
                                                         null
                                                     ? FlatButton(
@@ -480,31 +494,33 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                                 .textTheme
                                                                 .body1
                                                                 .color,
-                                                        child:
-                                                            prov.partialState ==
-                                                                    ViewState
-                                                                        .Busy
-                                                                ? Container(
-                                                                    width: 24.0,
-                                                                    height:
-                                                                        24.0,
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          CircularProgressIndicator(),
-                                                                    ),
-                                                                  )
-                                                                : Text(
-                                                                    prov.subredditInformationEntity.data
-                                                                            .userIsSubscriber
-                                                                        ? 'Subscribed'
-                                                                        : 'Join',
-                                                                  ),
+                                                        child: feedProvider
+                                                                    .partialState ==
+                                                                ViewState.Busy
+                                                            ? Container(
+                                                                width: 24.0,
+                                                                height: 24.0,
+                                                                child: Center(
+                                                                  child:
+                                                                      CircularProgressIndicator(),
+                                                                ),
+                                                              )
+                                                            : Text(
+                                                                feedProvider
+                                                                        .subredditInformationEntity
+                                                                        .data
+                                                                        .userIsSubscriber
+                                                                    ? 'Subscribed'
+                                                                    : 'Join',
+                                                              ),
                                                         onPressed: () {
-                                                          prov.changeSubscriptionStatus(
-                                                            prov.subredditInformationEntity
-                                                                .data.name,
-                                                            !prov
+                                                          feedProvider
+                                                              .changeSubscriptionStatus(
+                                                            feedProvider
+                                                                .subredditInformationEntity
+                                                                .data
+                                                                .name,
+                                                            !feedProvider
                                                                 .subredditInformationEntity
                                                                 .data
                                                                 .userIsSubscriber,

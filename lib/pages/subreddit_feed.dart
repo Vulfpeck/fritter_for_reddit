@@ -24,7 +24,7 @@ class _SubredditFeedPageState extends State<SubredditFeedPage> {
     return Scaffold(
       body: CupertinoPageScaffold(
         child: ChangeNotifierProvider(
-          builder: (context) => widget.frontPageLoad
+          create: (context) => widget.frontPageLoad
               ? FeedProvider()
               : FeedProvider.openFromName(widget.subreddit),
           child: CupertinoPageScaffold(
