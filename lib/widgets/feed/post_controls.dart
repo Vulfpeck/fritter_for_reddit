@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:conditional_wrapper/conditional_wrapper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
@@ -16,7 +19,7 @@ class PostControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
+      padding: const EdgeInsets.only(left: 16.0, right: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -201,7 +204,28 @@ class PostVoteControls extends StatelessWidget {
                             }
                           },
                         ),
-                      )
+                      ),
+                      if (kDebugMode) ...[
+                        ListTile(
+                          title: Text('Open in Chrome'),
+                          leading: CircleAvatar(
+                            child: Icon(Icons.open_in_browser),
+                          ),
+                          onTap: () {
+                            launchURL(Colors.blue, postData.url);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Pause Debugger'),
+                          leading: CircleAvatar(
+                            child: Icon(Icons.open_in_browser),
+                          ),
+                          onTap: () {
+                            final currentPostData = postData;
+                            debugger();
+                          },
+                        )
+                      ]
                     ]),
                   ),
                 ],

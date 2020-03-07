@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:conditional_builder/conditional_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -7,6 +8,7 @@ import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/pages/photo_viewer_screen.dart';
+import 'package:fritter_for_reddit/widgets/common/expansion_tile.dart';
 import 'package:fritter_for_reddit/widgets/feed/post_url_preview.dart';
 import 'package:fritter_for_reddit/widgets/feed/reddit_video_player.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -21,12 +23,15 @@ class DesktopFeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (post.hasImage) {
-      return ExpansionTile(
+    return ConditionalBuilder(
+      condition: post.hasPreview,
+      builder: (_) => RestrictedExpansionTile(
         leading: Card(
           child: CachedNetworkImage(
-            imageUrl: post.preview.images.first.source.url.asSanitizedImageUrl,
+            imageUrl: post.previewUrl,
             width: 50,
+            fit: BoxFit.cover,
+            errorWidget: (context, url, error) => ErrorWidget(url),
           ),
         ),
         title: FeedCardTitle(
@@ -67,36 +72,37 @@ class DesktopFeedCard extends StatelessWidget {
               ],
             ),
           ),
-          post.isSelf == false && post.postType == MediaType.Url
-              ? PostUrlPreview(
-                  data: post,
-                  htmlUnescape: _htmlUnescape,
-                )
-              : Container(),
-          post.preview != null &&
-                  post.isSelf == false &&
-                  post.postType != MediaType.Url
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                  child: FeedCardBodyImage(
-                    images: post.preview.images,
-                    data: post,
-                    postMetaData: {
-                      'media_type': post.postType,
-                      'url': post.url
-                    },
-                    deviceWidth: MediaQuery.of(context).size.width,
-                  ),
-                )
-              : Container(),
+          if (post.isSelf == false && post.postType == MediaType.Url)
+            PostUrlPreview(
+              data: post,
+              htmlUnescape: _htmlUnescape,
+            ),
+          if (post.preview != null &&
+              post.isSelf == false &&
+              post.postType != MediaType.Url)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+              child: FeedCardBodyImage(
+                images: post.preview.images,
+                data: post,
+                postMetaData: {'media_type': post.postType, 'url': post.url},
+                deviceWidth: MediaQuery.of(context).size.width,
+              ),
+            ),
         ],
-      );
-    } else {
-      return ListTile(
+      ),
+      fallback: (_) => ListTile(
         leading: Card(
-          child: Chip(
-            label: Text(post.linkFlairText ?? ''),
-            backgroundColor: HexColor(post.linkFlairBackgroundColor),
+          child: ConditionalBuilder(
+            condition: post.linkFlairText != null,
+            builder: (_) => Chip(
+              label: Text(post.linkFlairText),
+              backgroundColor: HexColor(post.linkFlairBackgroundColor),
+            ),
+            fallback: (_) => Icon(
+              Icons.message,
+              size: 60,
+            ),
           ),
         ),
         title: FeedCardTitle(
@@ -163,8 +169,8 @@ class DesktopFeedCard extends StatelessWidget {
                 : Container(),
           ],
         ),
-      );
-    }
+      ),
+    );
   }
 }
 
@@ -175,6 +181,7 @@ class FeedCardTitle extends StatelessWidget {
   final bool nsfw;
   final bool locked;
   final String author;
+  final bool isCrossPost;
 
   final String escapedTitle;
 
@@ -185,7 +192,10 @@ class FeedCardTitle extends StatelessWidget {
     @required this.nsfw,
     @required this.locked,
     @required this.author,
+    this.isCrossPost = false,
   }) : escapedTitle = HtmlUnescape().convert(title);
+
+  String get postSuffix => isCrossPost ? 'Crossposted' : 'Posted';
 
   @override
   Widget build(BuildContext context) {
@@ -201,13 +211,13 @@ class FeedCardTitle extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Posted by u/$author',
+            '$postSuffix by u/$author',
             style: TextStyle(
                 fontWeight: FontWeight.w300, fontSize: 12, color: Colors.grey),
           ),
           StickyTag(stickied),
           Text(
-            title,
+            title.htmlUnescaped,
           ),
           SizedBox(
             height: 4.0,
@@ -272,9 +282,9 @@ class FeedCardBodyImage extends StatelessWidget {
     @required this.data,
     @required this.postMetaData,
     @required this.deviceWidth,
-  })  : url = _htmlUnescape.convert(images.first.resolutions
-            .elementAt(images.first.resolutions.length ~/ 2)
-            .url),
+  })  : url = _htmlUnescape.convert(
+          images.first.source.url,
+        ),
         ratio = (deviceWidth) / images.first.source.width,
         assert(postMetaData != null);
 
@@ -333,6 +343,7 @@ class FeedCardBodyImage extends StatelessWidget {
                       imageUrl:
                           (postMetaData['url'] as String).asSanitizedImageUrl,
                       fadeOutDuration: Duration(milliseconds: 300),
+                      errorWidget: (context, url, error) => ErrorWidget(url),
                     ),
             ),
           ),

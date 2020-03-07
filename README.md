@@ -13,3 +13,7 @@
 
 ### Images
 ![](/images/img.png)
+
+Desktop View
+
+![](/images/mac-desktop-gallery-view.png)

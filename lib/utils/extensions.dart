@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:html_unescape/html_unescape.dart';
@@ -19,8 +20,20 @@ extension StringX on String {
       });
 
   String get asSanitizedImageUrl {
-    return HtmlUnescape().convert(this);
+    if (contains('.html')) {
+      debugger();
+    }
+    var convertedString = HtmlUnescape().convert(this);
+    if (!startsWith('https://external-preview.redd.it/') &&
+        !startsWith('https://preview.redd.it/')) {
+      if (contains('?')) {
+        convertedString = convertedString.substring(0, indexOf('?'));
+      }
+    }
+    return convertedString;
   }
+
+  String get htmlUnescaped => HtmlUnescape().convert(this);
 }
 
 extension StreamX<T> on Stream<T> {

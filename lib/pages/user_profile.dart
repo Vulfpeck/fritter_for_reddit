@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 import '../exports.dart';
 
@@ -146,7 +147,7 @@ class SignedInProfileContent extends StatelessWidget {
               ),
               CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(
-                  model.userInformation.iconImg,
+                  model.userInformation.iconImg.asSanitizedImageUrl,
                 ),
                 minRadius: 56,
                 maxRadius: 56,
