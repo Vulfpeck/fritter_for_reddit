@@ -8,6 +8,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/media_type_enum.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/photo_viewer_screen.dart';
+import 'package:flutter_provider_app/widgets/feed/reddit_video_player.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import 'post_url_preview.dart';
@@ -35,9 +36,35 @@ class FeedCard extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-          child: Text(
-            'in r/' + data.subreddit + ' by ' + data.author,
-            style: Theme.of(context).textTheme.subtitle,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'in r/' + data.subreddit + ' by ' + data.author,
+                style: Theme.of(context).textTheme.subtitle,
+              ),
+              if (data.over18)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.warning,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Text(
+                        'NSFW',
+                        style: TextStyle(color: Colors.red),
+                      )
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
         data.isSelf == false && data.postType == MediaType.Url
@@ -203,6 +230,19 @@ class FeedCardBodyImage extends StatelessWidget {
                   );
                 } else {}
               },
+              onLongPress: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) => PhotoViewerScreen(
+                    fullScreen: false,
+                    mediaUrl: postMetaData['media_type'] == MediaType.Image
+                        ? _htmlUnescape.convert(images.first.source.url)
+                        : postMetaData['url'],
+                    isVideo: postMetaData['media_type'] == MediaType.Video,
+                  ),
+                );
+              },
               child:
 //            data.media != null
 //                ? Image(
@@ -220,18 +260,21 @@ class FeedCardBodyImage extends StatelessWidget {
 //                width: widget.deviceWidth,
 //                height: widget.images.first.source.height.toDouble() * ratio,
 //              ),
-                  CachedNetworkImage(
-                placeholder: (context, url) => Container(
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(),
-                  width: deviceWidth,
-                  height: images.first.source.height.toDouble() * ratio,
-                ),
-                imageUrl: url,
-                width: deviceWidth,
-                height: images.first.source.height.toDouble() * ratio,
-                fadeOutDuration: Duration(milliseconds: 300),
-              ),
+                  postMetaData['media_type'] == MediaType.Video
+                      ? RedditVideoPlayer(uri: postMetaData['url'])
+                      : CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(),
+                            width: deviceWidth,
+                            height:
+                                images.first.source.height.toDouble() * ratio,
+                          ),
+                          imageUrl: postMetaData['url'],
+                          width: deviceWidth,
+                          height: images.first.source.height.toDouble() * ratio,
+                          fadeOutDuration: Duration(milliseconds: 300),
+                        ),
             ),
           ),
         );

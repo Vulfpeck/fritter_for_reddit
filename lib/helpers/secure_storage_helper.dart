@@ -1,15 +1,28 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../secrets.dart';
 
 class SecureStorageHelper {
-  final _storage = new FlutterSecureStorage();
-  Map<String, dynamic> map = new Map();
+  SecureStorage _storage;
+  Map<String, dynamic> map = Map();
 
-  SecureStorageHelper();
+  SecureStorageHelper() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      _storage = MobileSecureStorage();
+    } else if (Platform.isMacOS) {
+      _storage = MacOSSecureStorage();
+    } else {
+      throw UnsupportedError(
+          '${Platform.operatingSystem} is not currently supported');
+    }
+  }
+
   Future<void> init() async {
     await fetchData();
   }
@@ -18,7 +31,7 @@ class SecureStorageHelper {
     return map['authToken'];
   }
 
-  String get debugprint => map.toString();
+  String get debugPrint => map.toString();
 
   Future<String> get refreshToken async {
     await fetchData();
@@ -121,4 +134,59 @@ class SecureStorageHelper {
       // print(json.decode(response.body));
     }
   }
+}
+
+abstract class SecureStorage {
+  Future<void> write({
+    @required String key,
+    @required String value,
+  });
+
+  Future<Map<String, String>> readAll();
+
+  Future<void> deleteAll();
+}
+
+class MobileSecureStorage extends SecureStorage {
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  @override
+  Future<void> deleteAll() => _storage.deleteAll();
+
+  @override
+  Future<Map<String, String>> readAll() => _storage.readAll();
+
+  @override
+  Future<void> write({String key, String value}) =>
+      _storage.write(key: key, value: value);
+}
+
+/// This is actually not secure at all. It's just sharedPreferences. This will
+/// change once Keychain support is added for macOS.
+class MacOSSecureStorage extends SecureStorage {
+  @override
+  Future<void> deleteAll() async {
+    final prefs = await sharedPreferences;
+    return prefs.clear();
+  }
+
+  @override
+  Future<Map<String, String>> readAll() async {
+    final prefs = await sharedPreferences;
+    return {
+      "authToken": prefs.getString("authToken"),
+      "refreshToken": prefs.getString("refreshToken"),
+      "signedIn": prefs.getString("signedIn"),
+      "lastTokenRefresh": prefs.getString("lastTokenRefresh"),
+    };
+  }
+
+  @override
+  Future<void> write({String key, String value}) async {
+    final prefs = await sharedPreferences;
+    prefs.setString(key, value);
+  }
+
+  Future<SharedPreferences> get sharedPreferences async =>
+      await SharedPreferences.getInstance();
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_provider_app/helpers/media_type_enum.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 class PostsFeedEntity {
   PostsFeedData data;
@@ -176,7 +177,7 @@ class PostsFeedDataChildrenData {
   dynamic distinguished;
   int thumbnailHeight;
   String linkFlairType;
-  List<PostsFeedDatachildDataAllAwardings> allAwardings;
+  List<PostsFeedDataChildDataAllAwardings> allAwardings;
   bool visited;
   int pwls;
   dynamic category;
@@ -407,9 +408,9 @@ class PostsFeedDataChildrenData {
     thumbnailHeight = json['thumbnail_height'];
     linkFlairType = json['link_flair_type'];
     if (json['all_awardings'] != null) {
-      allAwardings = new List<PostsFeedDatachildDataAllAwardings>();
+      allAwardings = new List<PostsFeedDataChildDataAllAwardings>();
       (json['all_awardings'] as List).forEach((v) {
-        allAwardings.add(new PostsFeedDatachildDataAllAwardings.fromJson(v));
+        allAwardings.add(new PostsFeedDataChildDataAllAwardings.fromJson(v));
       });
     }
     visited = json['visited'];
@@ -548,6 +549,15 @@ class PostsFeedDataChildrenData {
     data['is_reddit_media_domain'] = this.isRedditMediaDomain;
     return data;
   }
+
+  bool get hasImage => preview?.images?.isNotEmpty ?? false;
+
+  List<PostsFeedDataChildDataPreviewImages> get images {
+    if (!hasImage) {
+      return [];
+    }
+    return preview.images;
+  }
 }
 
 class PostsFeedDataChildrenDataMediaEmbed {
@@ -661,7 +671,7 @@ class PostsFeedDataChildDataPreviewImagesResolutions {
   PostsFeedDataChildDataPreviewImagesResolutions.fromJson(
       Map<String, dynamic> json) {
     width = json['width'];
-    url = json['url'];
+    url = HtmlUnescape().convert(json['url']);
     height = json['height'];
   }
 
@@ -685,7 +695,7 @@ class PostsFeedDataChildrenDataPreviewImagesSource {
   PostsFeedDataChildrenDataPreviewImagesSource.fromJson(
       Map<String, dynamic> json) {
     width = json['width'];
-    url = json['url'];
+    url = HtmlUnescape().convert(json['url']);
     height = json['height'];
   }
 
@@ -722,7 +732,7 @@ class PostsFeedDataChildrenDataSecureMediaEmbed {
   }
 }
 
-class PostsFeedDatachildDataAllAwardings {
+class PostsFeedDataChildDataAllAwardings {
   dynamic endDate;
   String iconUrl;
   int iconWidth;
@@ -742,7 +752,7 @@ class PostsFeedDatachildDataAllAwardings {
   int daysOfPremium;
   dynamic startDate;
 
-  PostsFeedDatachildDataAllAwardings(
+  PostsFeedDataChildDataAllAwardings(
       {this.endDate,
       this.iconUrl,
       this.iconWidth,
@@ -762,7 +772,7 @@ class PostsFeedDatachildDataAllAwardings {
       this.daysOfPremium,
       this.startDate});
 
-  PostsFeedDatachildDataAllAwardings.fromJson(Map<String, dynamic> json) {
+  PostsFeedDataChildDataAllAwardings.fromJson(Map<String, dynamic> json) {
     endDate = json['end_date'];
     iconUrl = json['icon_url'];
     iconWidth = json['icon_width'];

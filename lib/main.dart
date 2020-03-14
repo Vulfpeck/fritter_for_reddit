@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/pages/app_home.dart';
+import 'package:flutter_provider_app/pages/desktop_layout.dart';
 import 'package:flutter_provider_app/providers/search_provider.dart';
+import 'package:flutter_provider_app/widgets/common/platform_builder.dart';
+import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
 
 void main() {
   runApp(
@@ -29,7 +32,12 @@ class Fritter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomePage(),
+      home: PlatformBuilder(
+        macOS: (context) {
+          return DesktopHome();
+        },
+        fallback: (context) => HomePage(),
+      ),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         brightness: Brightness.light,
@@ -112,6 +120,20 @@ class Fritter extends StatelessWidget {
               ),
             ),
       ),
+    );
+  }
+}
+
+class DesktopHome extends StatelessWidget {
+  const DesktopHome({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DesktopLayout(
+      leftPanel: LeftDrawer(),
+      content: SubredditFeedPage(),
     );
   }
 }
