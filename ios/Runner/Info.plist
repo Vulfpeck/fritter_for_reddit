@@ -43,6 +43,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string> Allows us to save media to the gallery</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string> Allows us to save media to the gallery</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

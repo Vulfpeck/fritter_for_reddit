@@ -4,6 +4,7 @@ import 'package:flutter_provider_app/exports.dart';
 import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
 import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
 import 'package:flutter_provider_app/pages/subreddit_feed.dart';
+import 'package:image_downloader/image_downloader.dart';
 
 class PostControls extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
@@ -154,13 +155,38 @@ class PostVoteControls extends StatelessWidget {
                             context,
                             rootNavigator: false,
                           ).push(
-                            CupertinoPageRoute(maintainState: true,
+                            CupertinoPageRoute(
+                              maintainState: true,
                               builder: (context) => SubredditFeedPage(
                                 subreddit: postData.subreddit,
                               ),
                               fullscreenDialog: false,
                             ),
                           );
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Download'),
+                        leading: CircleAvatar(
+                          child: Icon(Icons.file_download),
+                        ),
+                        onTap: () async {
+                          if (postData.hasImage) {
+                            await Future.forEach(
+                              postData.images,
+                              (image) async {
+                                String downloadPath =
+                                    await ImageDownloader.downloadImage(
+                                  image.source.url,
+                                  destination:
+                                      AndroidDestinationType.directoryPictures,
+                                );
+
+                                debugPrint('Downloading ${image.source.url}');
+                              },
+                            );
+                            Navigator.pop(context);
+                          }
                         },
                       )
                     ]),
@@ -177,7 +203,9 @@ class PostVoteControls extends StatelessWidget {
 
 class VotesCountWidget extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
+
   VotesCountWidget({@required this.postData});
+
   @override
   Widget build(BuildContext context) {
     return Row(

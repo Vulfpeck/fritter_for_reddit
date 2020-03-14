@@ -256,7 +256,7 @@ class SignedInProfileContent extends StatelessWidget {
                   subtitle: Text("Leaving already?"),
                   onTap: () async {
                     FeedProvider feedProvider =
-                        Provider.of<FeedProvider>(context);
+                        Provider.of<FeedProvider>(context, listen: false);
                     await model.signOutUser();
                     await feedProvider.fetchPostsListing(
                       currentSort: "hot",

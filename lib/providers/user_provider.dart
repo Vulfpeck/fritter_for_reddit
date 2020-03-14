@@ -27,7 +27,7 @@ class UserInformationProvider with ChangeNotifier {
   ViewState get authenticationStatus => _authenticationStatus;
 
   UserInformationProvider() {
-//    // print("*** Initializeding user information provider ****");
+//    // print("*** Initializing user information provider ****");
     validateAuthentication();
   }
 
@@ -197,7 +197,8 @@ class UserInformationProvider with ChangeNotifier {
     bool res = await this.performAuthentication();
     // print("final res: " + res.toString());
     if (res) {
-      await Provider.of<FeedProvider>(context).fetchPostsListing();
+      await Provider.of<FeedProvider>(context, listen: false)
+          .fetchPostsListing();
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
