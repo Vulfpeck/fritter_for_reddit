@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/providers/comments_provider.dart';
 
 class CommentsControlBar extends StatefulWidget {
   final PostsFeedDataChildrenData item;

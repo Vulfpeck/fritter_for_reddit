@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/widgets/feed/subreddit_feed.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/widgets/feed/subreddit_feed.dart';
 
 class SubredditFeedPage extends StatefulWidget {
   final String subreddit;

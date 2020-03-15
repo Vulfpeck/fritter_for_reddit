@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
-import 'package:flutter_provider_app/providers/search_provider.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
+import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
+import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/widgets/comments/comments_page.dart';
+import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
 
 import '../exports.dart';
 

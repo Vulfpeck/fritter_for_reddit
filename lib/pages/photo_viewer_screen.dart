@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/widgets/common/optional_wrapper.dart';
+import 'package:fritter_for_reddit/widgets/common/optional_wrapper.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 

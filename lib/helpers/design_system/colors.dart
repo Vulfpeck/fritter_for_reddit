@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/helpers/design_system/color_enums.dart';
+import 'package:fritter_for_reddit/helpers/design_system/color_enums.dart';
 
 Color getColor(Brightness platformBrightness, ColorObjects obj) {
   if (platformBrightness == Brightness.light) {

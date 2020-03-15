@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 
-void launchURL(BuildContext context, String url) async {
+void launchURL(Color toolBarColor, String url) async {
   if (Platform.isMacOS) {
     Process.run('open', [url]);
   } else
@@ -11,7 +11,7 @@ void launchURL(BuildContext context, String url) async {
       await launch(
         url,
         option: new CustomTabsOption(
-          toolbarColor: Theme.of(context).primaryColor,
+          toolbarColor: toolBarColor,
           enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: true,

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,21 +6,28 @@ import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/pages/photo_viewer_screen.dart';
+import 'package:fritter_for_reddit/widgets/feed/post_url_preview.dart';
 import 'package:fritter_for_reddit/widgets/feed/reddit_video_player.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-import 'post_url_preview.dart';
-
-class FeedCard extends StatelessWidget {
+class DesktopFeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData data;
 
-  FeedCard(this.data);
+  DesktopFeedCard(this.data);
 
   final _htmlUnescape = new HtmlUnescape();
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return ExpansionTile(
+      leading: Card(
+        child: data.hasImage
+            ? CachedNetworkImage(
+                imageUrl: data.preview.images.first.source.url,
+                width: 50,
+              )
+            : Text(data.subredditNamePrefixed),
+      ),
       title: FeedCardTitle(
         title: data.title,
         stickied: data.stickied,
@@ -30,68 +35,60 @@ class FeedCard extends StatelessWidget {
         nsfw: data.over18,
         locked: data.locked,
       ),
-      subtitle: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'in r/' + data.subreddit + ' by ' + data.author,
-                  style: Theme.of(context).textTheme.subtitle,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'in r/' + data.subreddit + ' by ' + data.author,
+                style: Theme.of(context).textTheme.subtitle,
+              ),
+              if (data.over18)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.warning,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Text(
+                        'NSFW',
+                        style: TextStyle(color: Colors.red),
+                      )
+                    ],
+                  ),
                 ),
-                if (data.over18)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          'NSFW',
-                          style: TextStyle(color: Colors.red),
-                        )
-                      ],
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
-          data.isSelf == false && data.postType == MediaType.Url
-              ? PostUrlPreview(
+        ),
+        data.isSelf == false && data.postType == MediaType.Url
+            ? PostUrlPreview(
+                data: data,
+                htmlUnescape: _htmlUnescape,
+              )
+            : Container(),
+        data.preview != null &&
+                data.isSelf == false &&
+                data.postType != MediaType.Url
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+                child: FeedCardBodyImage(
+                  images: data.preview.images,
                   data: data,
-                  htmlUnescape: _htmlUnescape,
-                )
-              : Container(),
-          data.preview != null &&
-                  data.isSelf == false &&
-                  data.postType != MediaType.Url
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                  child: FeedCardBodyImage(
-                    images: data.preview.images,
-                    data: data,
-                    postMetaData: {
-                      'media_type': data.postType,
-                      'url': data.url
-                    },
-                    deviceWidth: MediaQuery.of(context).size.width,
-                  ),
-                )
-              : Container(),
-        ],
-      ),
+                  postMetaData: {'media_type': data.postType, 'url': data.url},
+                  deviceWidth: MediaQuery.of(context).size.width,
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 }
@@ -244,38 +241,16 @@ class FeedCardBodyImage extends StatelessWidget {
                   ),
                 );
               },
-              child:
-//            data.media != null
-//                ? Image(
-//                    image: CachedNetworkImageProvider(
-//                        data.media['oembed']['thumbnail_url']),
-//                  )
-//                :
-
-//                  Image(
-//
-//                image: CachedNetworkImageProvider(
-//                  url,
-//                ),
-//                fit: BoxFit.fitWidth,
-//                width: widget.deviceWidth,
-//                height: widget.images.first.source.height.toDouble() * ratio,
-//              ),
-                  postMetaData['media_type'] == MediaType.Video
-                      ? RedditVideoPlayer(uri: postMetaData['url'])
-                      : CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator(),
-                              width: deviceWidth,
-                              height: 100
-//                                images.first.source.height.toDouble() * ratio,
-                              ),
-                          imageUrl: postMetaData['url'],
-//                          width: deviceWidth,
-//                          height: images.first.source.height.toDouble() * ratio,
-                          fadeOutDuration: Duration(milliseconds: 300),
-                        ),
+              child: postMetaData['media_type'] == MediaType.Video
+                  ? RedditVideoPlayer(uri: postMetaData['url'])
+                  : CachedNetworkImage(
+                      placeholder: (context, url) => Container(
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(),
+                      ),
+                      imageUrl: postMetaData['url'],
+                      fadeOutDuration: Duration(milliseconds: 300),
+                    ),
             ),
           ),
         );

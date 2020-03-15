@@ -1,13 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
-import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_page.dart';
-import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
+import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/widgets/comments/comments_page.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
+import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
 
 import 'post_controls.dart';
 
@@ -48,10 +49,15 @@ class _SubredditFeedState extends State<SubredditFeed>
     super.dispose();
   }
 
+  FeedProvider get feedProvider =>
+      Provider.of<FeedProvider>(context, listen: false);
+
   @override
   Widget build(BuildContext context) {
     return Consumer<FeedProvider>(
       builder: (BuildContext context, FeedProvider model, _) {
+        bool hasError =
+            model.subredditInformationError || model.feedInformationError;
         return CustomScrollView(
           controller: _controller,
           physics: AlwaysScrollableScrollPhysics(),
@@ -92,6 +98,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                               onTap: () {
                                 Navigator.of(context, rootNavigator: false)
                                     .pop();
+
                                 model.fetchPostsListing(
                                   currentSort: "/top/.json?sort=top&t=$value",
                                   currentSubreddit: model.sub,
@@ -105,7 +112,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                     } else if (value == 'Close' || value == sortSelectorValue) {
                     } else {
                       sortSelectorValue = value;
-                      Provider.of<FeedProvider>(context).fetchPostsListing(
+                      feedProvider.fetchPostsListing(
                         currentSort: value,
                         currentSubreddit: model.sub,
                         loadingTop: false,
@@ -166,7 +173,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                           Navigator.of(context, rootNavigator: false).push(
                         CupertinoPageRoute(
                           maintainState: true,
-                          builder: (context) => LeftDrawer(),
+                          builder: (context) => LeftDrawer(
+                            mode: Mode.mobile,
+                          ),
                           fullscreenDialog: true,
                         ),
                       ),
@@ -177,8 +186,7 @@ class _SubredditFeedState extends State<SubredditFeed>
               ),
             ),
             SliverList(
-              delegate: (model.subredditInformationError ||
-                      model.feedInformationError)
+              delegate: (hasError)
                   ? SliverChildListDelegate([
                       Column(
                         mainAxisSize: MainAxisSize.max,
@@ -189,7 +197,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                       )
                     ])
                   : model.state == ViewState.Idle &&
-                          Provider.of<UserInformationProvider>(context).state ==
+                          Provider.of<UserInformationProvider>(context,
+                                      listen: false)
+                                  .state ==
                               ViewState.Idle
                       ? SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
@@ -225,22 +235,14 @@ class _SubredditFeedState extends State<SubredditFeed>
                             return InkWell(
                               onDoubleTap: () {
                                 if (item.isSelf == false) {
-                                  launchURL(context, item.url);
+                                  launchURL(
+                                      Theme.of(context).primaryColor, item.url);
                                 }
                               },
                               onTap: () {
                                 _openComments(item, context, index);
                               },
-                              child: Column(
-                                children: <Widget>[
-                                  FeedCard(
-                                    item,
-                                  ),
-                                  PostControls(
-                                    postData: item,
-                                  ),
-                                ],
-                              ),
+                              child: PostCard(item: item),
                             );
                           },
                           childCount:
@@ -266,7 +268,7 @@ class _SubredditFeedState extends State<SubredditFeed>
 //                enableFeedback: false,
 //                onDoubleTap: () {
 //                  if (item.isSelf == false) {
-//                    launchURL(context, item.url);
+//                    launchURL(Theme.of(context).primaryColor, item.url);
 //                  }
 //                },
 //                onTap: () {
@@ -355,7 +357,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                                               CupertinoPageRoute(
                                                 maintainState: true,
                                                 builder: (context) =>
-                                                    LeftDrawer(),
+                                                    LeftDrawer(
+                                                  mode: Mode.mobile,
+                                                ),
                                                 fullscreenDialog: false,
                                               ),
                                             );
@@ -571,7 +575,7 @@ class _SubredditFeedState extends State<SubredditFeed>
 
   void _openComments(
       PostsFeedDataChildrenData item, BuildContext context, int index) {
-    Provider.of<CommentsProvider>(context).fetchComments(
+    Provider.of<CommentsProvider>(context, listen: false).fetchComments(
       requestingRefresh: false,
       subredditName: item.subreddit,
       postId: item.id,
@@ -610,6 +614,29 @@ class _SubredditFeedState extends State<SubredditFeed>
           );
         },
       ),
+    );
+  }
+}
+
+class PostCard extends StatelessWidget {
+  const PostCard({
+    Key key,
+    @required this.item,
+  }) : super(key: key);
+
+  final PostsFeedDataChildrenData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        FeedCard(
+          item,
+        ),
+        PostControls(
+          postData: item,
+        ),
+      ],
     );
   }
 }

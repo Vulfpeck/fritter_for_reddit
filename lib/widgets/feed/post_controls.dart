@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/pages/subreddit_feed.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/pages/subreddit_feed_page.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class PostControls extends StatelessWidget {
@@ -73,12 +73,12 @@ class PostVoteControls extends StatelessWidget {
             Icons.arrow_upward,
           ),
           onPressed: () async {
-            if (Provider.of<UserInformationProvider>(context).signedIn) {
+            if (Provider.of<UserInformationProvider>(context, listen: false)
+                .signedIn) {
               if (postData.likes == true) {
-                Provider.of<FeedProvider>(context)
-                    .votePost(postItem: postData, dir: 0);
+                feedProvider(context).votePost(postItem: postData, dir: 0);
               } else {
-                Provider.of<FeedProvider>(context).votePost(
+                feedProvider(context).votePost(
                   postItem: postData,
                   dir: 1,
                 );
@@ -100,13 +100,12 @@ class PostVoteControls extends StatelessWidget {
           onPressed: () async {
             if (Provider.of<UserInformationProvider>(context).signedIn) {
               if (postData.likes == false) {
-                Provider.of<FeedProvider>(context).votePost(
+                feedProvider(context).votePost(
                   postItem: postData,
                   dir: 0,
                 );
               } else {
-                Provider.of<FeedProvider>(context)
-                    .votePost(postItem: postData, dir: -1);
+                feedProvider(context).votePost(postItem: postData, dir: -1);
               }
             } else {
               buildSnackBar(context);
@@ -117,6 +116,9 @@ class PostVoteControls extends StatelessWidget {
       ],
     );
   }
+
+  FeedProvider feedProvider(BuildContext context) =>
+      Provider.of<FeedProvider>(context, listen: false);
 
   void showPostOptions(BuildContext context) {
     showCupertinoModalPopup(

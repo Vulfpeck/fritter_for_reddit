@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/pages/app_home.dart';
-import 'package:flutter_provider_app/pages/desktop_layout.dart';
-import 'package:flutter_provider_app/providers/search_provider.dart';
-import 'package:flutter_provider_app/widgets/common/platform_builder.dart';
-import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/pages/app_home.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_layout.dart';
+import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed_page.dart';
+import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 
 void main() {
   runApp(
@@ -14,10 +16,10 @@ void main() {
           create: (_) => UserInformationProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => FeedProvider(),
+          create: (_) => CommentsProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => CommentsProvider(),
+          create: (_) => FeedProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => SearchProvider(),
@@ -132,8 +134,14 @@ class DesktopHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DesktopLayout(
-      leftPanel: LeftDrawer(),
-      content: SubredditFeedPage(),
+      leftPanel: Container(
+        decoration: BoxDecoration(
+            border: Border(right: BorderSide(color: Colors.grey))),
+        child: LeftDrawer(
+          mode: Mode.desktop,
+        ),
+      ),
+      content: DesktopSubredditFeedPage(),
     );
   }
 }

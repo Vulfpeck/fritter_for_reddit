@@ -1,4 +1,4 @@
-import 'package:flutter_provider_app/helpers/media_type_enum.dart';
+import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class PostsFeedEntity {

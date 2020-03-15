@@ -1,4 +1,4 @@
-import 'package:flutter_provider_app/models/subreddits/children.dart';
+import 'package:fritter_for_reddit/models/subreddits/children.dart';
 
 class SubredditsSubscribed {
   final String kind;

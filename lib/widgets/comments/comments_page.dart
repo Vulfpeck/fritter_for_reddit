@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
-import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/providers/comments_provider.dart';
+import 'package:fritter_for_reddit/widgets/comments/comments_bar.dart';
+import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
+import 'package:fritter_for_reddit/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import 'comment_list_item.dart';
@@ -48,7 +48,8 @@ class CommentsScreen extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             if (postData.isSelf == false) {
-                              launchURL(context, postData.url);
+                              launchURL(
+                                  Theme.of(context).primaryColor, postData.url);
                             }
                           },
                           child: FeedCard(postData),
@@ -166,7 +167,7 @@ class CommentsScreen extends StatelessWidget {
 //                                      } else if (url.startsWith("/u/") ||
 //                                          url.startsWith("u/")) {
 //                                      } else {
-//                                        launchURL(context, url);
+//                                        launchURL(Theme.of(context).primaryColor, url);
 //                                      }
 //                                    },
 //                                  ),

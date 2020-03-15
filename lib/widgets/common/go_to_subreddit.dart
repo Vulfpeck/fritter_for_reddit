@@ -1,12 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
+import 'package:fritter_for_reddit/widgets/feed/main_subreddit_tile.dart';
 
 import '../../exports.dart';
 
+enum Mode { desktop, mobile }
+
 class GoToSubredditWidget extends StatefulWidget {
   final FocusNode focusNode;
+  final Mode mode;
 
-  GoToSubredditWidget({this.focusNode});
+  GoToSubredditWidget({this.focusNode, @required this.mode});
+
   @override
   _GoToSubredditWidgetState createState() => _GoToSubredditWidgetState();
 }
@@ -28,7 +36,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               keyboardAppearance: MediaQuery.of(context).platformBrightness,
               focusNode: widget.focusNode,
               decoration: InputDecoration(
-                hintText: 'Goto subreddit',
+                hintText: 'Go to subreddit',
                 filled: true,
                 isDense: true,
                 suffixIcon: IconButton(
@@ -57,91 +65,42 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               },
             ),
           ),
-          ListTile(
-            title: Text(
-              'Frontpage',
-              style: Theme.of(context).textTheme.subhead,
+          if (widget.mode == Mode.mobile)
+            MainSubredditTile(
+              title: 'Frontpage',
+              subreddit: '',
+              description: "Posts from subscriptions",
+            )
+          else
+            DesktopMainSubredditTile(
+              title: 'Frontpage',
+              subreddit: '',
+              description: "Posts from subscriptions",
             ),
-            leading: CircleAvatar(
-              backgroundImage: AssetImage('assets/default_icon.png'),
-              backgroundColor: Theme.of(context).accentColor,
-              maxRadius: 16,
+          if (widget.mode == Mode.mobile)
+            MainSubredditTile(
+              title: 'Popular',
+              subreddit: 'popular',
+              description: "Trending posts from subreddits",
+            )
+          else
+            DesktopMainSubredditTile(
+              title: 'Popular',
+              subreddit: 'popular',
+              description: "Trending posts from subreddits",
             ),
-            subtitle: Text("Posts from subscriptions"),
-            dense: true,
-            onTap: () {
-              widget.focusNode.unfocus();
-              return Navigator.of(
-                context,
-                rootNavigator: false,
-              ).push(
-                CupertinoPageRoute(
-                  maintainState: true,
-                  builder: (context) => SubredditFeedPage(
-                    subreddit: "",
-                    frontPageLoad: true,
-                  ),
-                  fullscreenDialog: false,
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Popular',
-              style: Theme.of(context).textTheme.subhead,
+          if (widget.mode == Mode.mobile)
+            MainSubredditTile(
+              title: 'All',
+              subreddit: 'all',
+              description: "Trending posts from all of Reddit",
+            )
+          else
+            DesktopMainSubredditTile(
+              title: 'All',
+              subreddit: 'all',
+              description: "Trending posts from all of Reddit",
             ),
-            leading: CircleAvatar(
-              backgroundImage: AssetImage('assets/default_icon.png'),
-              backgroundColor: Theme.of(context).accentColor,
-              maxRadius: 16,
-            ),
-            subtitle: Text("Trending posts from subreddits"),
-            dense: true,
-            onTap: () {
-              widget.focusNode.unfocus();
-              return Navigator.of(
-                context,
-                rootNavigator: false,
-              ).push(
-                CupertinoPageRoute(
-                  maintainState: true,
-                  builder: (context) => SubredditFeedPage(
-                    subreddit: "popular",
-                  ),
-                  fullscreenDialog: false,
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
-              'All',
-              style: Theme.of(context).textTheme.subhead,
-            ),
-            leading: CircleAvatar(
-              backgroundImage: AssetImage('assets/default_icon.png'),
-              backgroundColor: Theme.of(context).accentColor,
-              maxRadius: 16,
-            ),
-            subtitle: Text("Trending posts from all of Reddit"),
-            dense: true,
-            onTap: () {
-              widget.focusNode.unfocus();
-              return Navigator.of(
-                context,
-                rootNavigator: false,
-              ).push(
-                CupertinoPageRoute(
-                  maintainState: true,
-                  builder: (context) => SubredditFeedPage(
-                    subreddit: "all",
-                  ),
-                  fullscreenDialog: false,
-                ),
-              );
-            },
-          )
         ],
       ),
     );

@@ -27,9 +27,7 @@ class SecureStorageHelper {
     await fetchData();
   }
 
-  Future<String> get authToken async {
-    return map['authToken'];
-  }
+  Future<String> get authToken => _storage.read('authToken');
 
   String get debugPrint => map.toString();
 
@@ -145,6 +143,8 @@ abstract class SecureStorage {
   Future<Map<String, String>> readAll();
 
   Future<void> deleteAll();
+
+  Future<String> read(String s);
 }
 
 class MobileSecureStorage extends SecureStorage {
@@ -159,6 +159,11 @@ class MobileSecureStorage extends SecureStorage {
   @override
   Future<void> write({String key, String value}) =>
       _storage.write(key: key, value: value);
+
+  @override
+  Future<String> read(String key) {
+    return _storage.read(key: key);
+  }
 }
 
 /// This is actually not secure at all. It's just sharedPreferences. This will
@@ -189,4 +194,10 @@ class MacOSSecureStorage extends SecureStorage {
 
   Future<SharedPreferences> get sharedPreferences async =>
       await SharedPreferences.getInstance();
+
+  @override
+  Future<String> read(String key) async {
+    final prefs = await sharedPreferences;
+    return prefs.getString(key);
+  }
 }
