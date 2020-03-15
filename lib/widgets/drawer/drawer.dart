@@ -3,15 +3,16 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/hex_to_color_class.dart';
-import 'package:flutter_provider_app/widgets/common/go_to_subreddit.dart';
-import 'package:flutter_provider_app/widgets/drawer/list_header.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
+  final Mode mode;
 
-  LeftDrawer({this.firstLaunch = false});
+  LeftDrawer({this.firstLaunch = false, @required this.mode});
 
   @override
   _LeftDrawerState createState() => _LeftDrawerState();
@@ -57,6 +58,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   DrawerSliverAppBar(),
                   GoToSubredditWidget(
                     focusNode: focusNode,
+                    mode: widget.mode,
                   ),
                   SliverListHeader(title: 'Subscribed Subreddits'),
                   SliverList(
@@ -142,6 +144,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   DrawerSliverAppBar(),
                   GoToSubredditWidget(
                     focusNode: focusNode,
+                    mode: widget.mode,
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([

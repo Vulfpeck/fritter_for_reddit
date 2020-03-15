@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/secrets.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/secrets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewSignIn extends StatefulWidget {

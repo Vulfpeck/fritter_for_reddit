@@ -1,14 +1,20 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/helpers/functions/misc_functions.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/models/subreddit_info/subreddit_information_entity.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/misc_functions.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:reddit/reddit.dart';
 
 class FeedProvider with ChangeNotifier {
   final SecureStorageHelper _storageHelper = new SecureStorageHelper();
+  Reddit _reddit = Reddit(Client());
 
   PostsFeedEntity _postFeed;
   SubredditInformationEntity _subredditInformationEntity;
@@ -27,33 +33,42 @@ class FeedProvider with ChangeNotifier {
   CurrentPage _currentPage;
 
   bool get subredditInformationError => _subInformationLoadingError;
+
   bool get feedInformationError => _feedInformationLoadingError;
 
   ViewState get partialState => _partialState;
+
   ViewState get state => _state;
+
   ViewState get loadMorePostsState => _loadMorePostsState;
 
   PostsFeedEntity get postFeed => _postFeed;
+
   SubredditInformationEntity get subredditInformationEntity =>
       _subredditInformationEntity;
+
   CurrentPage get currentPage => _currentPage;
 
   bool get subLoadingError => _subLoadingError;
 
   FeedProvider() {
     _currentPage = CurrentPage.FrontPage;
+//    _signIn().then((_) {
+//      return fetchPostsListing();
+//    });
+
     fetchPostsListing();
   }
 
   FeedProvider.openFromName(String currentSubreddit) {
     _currentPage = CurrentPage.Other;
     _subLoadingError = false;
-
     fetchPostsListing(currentSubreddit: currentSubreddit);
+//    _signIn();
   }
 
   Future<void> fetchPostsListing({
-    String currentSubreddit = "",
+    String currentSubreddit = '',
     String currentSort = "Hot",
     loadingTop = false,
   }) async {
@@ -372,4 +387,63 @@ class FeedProvider with ChangeNotifier {
   }
 
   void selectProperPreviewImage() {}
+
+  Future<Stream<Map>> accessCodeServer() async {
+    final StreamController<Map> onCode = StreamController();
+    HttpServer server =
+        await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
+    server.listen((HttpRequest request) async {
+//      // print("Server started");
+      final Map<String, String> response = request.uri.queryParameters;
+//      // print(request.uri.pathSegments);
+      request.response
+        ..statusCode = 200
+        ..headers.set("Content-Type", ContentType.html.mimeType)
+        ..write(
+            '<html><meta name="viewport" content="width=device-width, initial-scale=1.0"><body> <h2 style="text-align: center; position: absolute; top: 50%; left: 0: right: 0">Welcome to Fritter</h2><h3>You can close this window<script type="javascript">window.close()</script> </h3></body></html>');
+      await request.response.close();
+      await server.close(force: true);
+      onCode.add(response);
+      await onCode.close();
+    });
+    return onCode.stream;
+  }
+
+  Future _signIn() async {
+    String accessToken = await _storageHelper.authToken;
+    _reddit.authSetup(CLIENT_ID, '');
+    Uri authUri = _reddit.authUrl('http://localhost:8080/',
+        scopes: [
+          'identity',
+          'edit',
+          'flair',
+          'history',
+          'modconfig',
+          'modflair',
+          'modlog',
+          'modposts',
+          'modwiki',
+          'mysubreddits',
+          'privatemessages',
+          'read',
+          'report',
+          'save',
+          'submit',
+          'subscribe',
+          'vote',
+          'wikiedit',
+          'wikiread'
+        ],
+        state: 'samplestate');
+    if (true /*accessToken == null*/) {
+      launchURL(Colors.blue, authUri.toString());
+
+      final server = await accessCodeServer();
+      final Map responseParameters = await server.first;
+      accessToken = responseParameters['code'];
+      _storageHelper.updateAuthToken(accessToken);
+    }
+    _reddit = await _reddit.authFinish(
+        username: CLIENT_ID, password: '', code: accessToken);
+  }
 }

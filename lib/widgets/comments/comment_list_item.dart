@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_provider_app/helpers/comment_color_annotations/colors.dart';
-import 'package:flutter_provider_app/helpers/design_system/color_enums.dart';
-import 'package:flutter_provider_app/helpers/design_system/colors.dart';
-import 'package:flutter_provider_app/helpers/functions/conversion_functions.dart';
-import 'package:flutter_provider_app/models/comment_chain/comment.dart'
+import 'package:fritter_for_reddit/helpers/comment_color_annotations/colors.dart';
+import 'package:fritter_for_reddit/helpers/design_system/color_enums.dart';
+import 'package:fritter_for_reddit/helpers/design_system/colors.dart';
+import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
+import 'package:fritter_for_reddit/models/comment_chain/comment.dart'
     as CommentPojo;
-import 'package:flutter_provider_app/pages/subreddit_feed.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:flutter_provider_app/widgets/common/swiper.dart';
+import 'package:fritter_for_reddit/pages/subreddit_feed_page.dart';
+import 'package:fritter_for_reddit/providers/comments_provider.dart';
+import 'package:fritter_for_reddit/widgets/common/swiper.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
@@ -196,7 +196,7 @@ class CommentBody extends StatelessWidget {
                   );
                 } else if (url.startsWith("/u/") || url.startsWith("u/")) {
                 } else {
-                  launchURL(context, url);
+                  launchURL(Theme.of(context).primaryColor, url);
                 }
               },
             ),

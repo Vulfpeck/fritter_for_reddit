@@ -2,10 +2,10 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/comment_chain/comment.dart'
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/comment_chain/comment.dart'
     as CommentPojo;
-import 'package:flutter_provider_app/models/comment_chain/comment_more_entity.dart';
+import 'package:fritter_for_reddit/models/comment_chain/comment_more_entity.dart';
 import 'package:http/http.dart' as http;
 
 class CommentsProvider with ChangeNotifier {

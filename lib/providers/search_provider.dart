@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/models/search_results/subreddits/search_subreddits_repo_entity.dart';
-import 'package:flutter_provider_app/models/states.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/search_results/subreddits/search_subreddits_repo_entity.dart';
+import 'package:fritter_for_reddit/models/states.dart';
 import 'package:http/http.dart' as http;
 
 class SearchProvider with ChangeNotifier {

@@ -26,8 +26,12 @@ class _RedditVideoPlayerState extends State<RedditVideoPlayer> {
         Uri.parse(widget.uri),
       ).getVideos(),
       builder: (BuildContext context, AsyncSnapshot<Video> snapshot) {
+        if (!snapshot.hasData) {
+          return CircularProgressIndicator();
+        }
         final controller =
             VideoPlayerController.network(snapshot.data.uri.path);
+        Future.delayed(Duration(seconds: 2)).then((value) => controller.play());
         return VideoPlayer(controller);
       },
     );

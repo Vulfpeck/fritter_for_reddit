@@ -1,4 +1,4 @@
-import 'package:flutter_provider_app/models/subreddits/child.dart';
+import 'package:fritter_for_reddit/models/subreddits/child.dart';
 
 class Children {
   final List<Child> children;

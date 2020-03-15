@@ -1,4 +1,4 @@
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 
 import '../media_type_enum.dart';
 

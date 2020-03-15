@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
@@ -32,7 +32,7 @@ class PostUrlPreview extends StatelessWidget {
         child: ListTile(
           dense: true,
           onTap: () {
-            launchURL(context, data.url);
+            launchURL(Theme.of(context).primaryColor, data.url);
           },
           title: Text(
             data.url,

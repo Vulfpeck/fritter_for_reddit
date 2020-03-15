@@ -1,4 +1,4 @@
-import 'package:flutter_provider_app/models/search_results/subreddits/search_subreddits_repo_entity.dart';
+import 'package:fritter_for_reddit/models/search_results/subreddits/search_subreddits_repo_entity.dart';
 
 searchSubredditsRepoEntityFromJson(
     SearchSubredditsRepoEntity data, Map<String, dynamic> json) {

@@ -4,13 +4,14 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/states.dart';
-import 'package:flutter_provider_app/models/subreddits/child.dart';
-import 'package:flutter_provider_app/models/subreddits/subreddits_subscribed.dart';
-import 'package:flutter_provider_app/models/user_profile/user_information_entity.dart';
-import 'package:flutter_provider_app/secrets.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/states.dart';
+import 'package:fritter_for_reddit/models/subreddits/child.dart';
+import 'package:fritter_for_reddit/models/subreddits/subreddits_subscribed.dart';
+import 'package:fritter_for_reddit/models/user_profile/user_information_entity.dart';
+import 'package:fritter_for_reddit/secrets.dart';
 import 'package:http/http.dart' as http;
+import 'package:reddit/reddit.dart';
 
 class UserInformationProvider with ChangeNotifier {
   HttpServer server;
@@ -65,7 +66,7 @@ class UserInformationProvider with ChangeNotifier {
     await _storageHelper.clearStorage();
 //    // print("*** Performing authentication ****");
     // start a new instance of the server that listens to localhost requests
-    Stream<String> onCode = await _server();
+    Stream<String> onCode = await accessCodeServer();
 
     // server returns the first access_code it receives
 
@@ -79,7 +80,7 @@ class UserInformationProvider with ChangeNotifier {
       authResult = false;
     }
 
-    // now we use this code to obtain authentication token and other shit
+    // now we use this code to obtain authentication token and other data
 
     String user = CLIENT_ID;
     String password = ""; // blank for unknown clients like apps
@@ -114,7 +115,7 @@ class UserInformationProvider with ChangeNotifier {
     return authResult;
   }
 
-  Future<Stream<String>> _server() async {
+  Future<Stream<String>> accessCodeServer() async {
     final StreamController<String> onCode = new StreamController();
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
@@ -190,7 +191,7 @@ class UserInformationProvider with ChangeNotifier {
 
   Future<void> authenticateUser(BuildContext context) async {
     launchURL(
-        context,
+        Theme.of(context).primaryColor,
         "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
             CLIENT_ID +
             "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");

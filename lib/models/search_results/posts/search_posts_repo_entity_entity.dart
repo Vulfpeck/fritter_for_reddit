@@ -1,5 +1,5 @@
-import 'package:flutter_provider_app/generated/json/base/json_convert_content.dart';
-import 'package:flutter_provider_app/generated/json/base/json_filed.dart';
+import 'package:fritter_for_reddit/generated/json/base/json_convert_content.dart';
+import 'package:fritter_for_reddit/generated/json/base/json_filed.dart';
 
 class SearchPostsRepoEntity with JsonConvert<SearchPostsRepoEntity> {
   String kind;
