@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
 import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
 
 class LeftDrawer extends StatefulWidget {
@@ -65,56 +66,18 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     delegate: model.state == ViewState.Idle
                         ? SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              return ListTile(
-                                dense: true,
-                                title: Text(
-                                  model.userSubreddits.data.children[index]
-                                      .display_name,
-                                  style: Theme.of(context).textTheme.subhead,
-                                ),
-                                leading: CircleAvatar(
-                                  maxRadius: 16,
-                                  backgroundImage: model.userSubreddits.data
-                                              .children[index].community_icon !=
-                                          ""
-                                      ? CachedNetworkImageProvider(
-                                          model.userSubreddits.data
-                                              .children[index].community_icon,
-                                        )
-                                      : model.userSubreddits.data
-                                                  .children[index].icon_img !=
-                                              ""
-                                          ? CachedNetworkImageProvider(
-                                              model.userSubreddits.data
-                                                  .children[index].icon_img,
-                                            )
-                                          : AssetImage(
-                                              'assets/default_icon.png'),
-                                  backgroundColor: model.userSubreddits.data
-                                              .children[index].primary_color ==
-                                          ""
-                                      ? Theme.of(context).accentColor
-                                      : HexColor(
-                                          model.userSubreddits.data
-                                              .children[index].primary_color,
-                                        ),
-                                ),
-                                onTap: () {
-                                  focusNode.unfocus();
-                                  return Navigator.of(
-                                    context,
-                                    rootNavigator: false,
-                                  ).push(
-                                    CupertinoPageRoute(
-                                      builder: (context) => SubredditFeedPage(
-                                        subreddit: model.userSubreddits.data
-                                            .children[index].display_name,
-                                      ),
-                                      fullscreenDialog: false,
-                                    ),
-                                  );
-                                },
-                              );
+                              if (widget.mode == Mode.mobile) {
+                                return SubredditDrawerTile(
+                                  focusNode: focusNode,
+                                  child:
+                                      model.userSubreddits.data.children[index],
+                                );
+                              } else {
+                                return DesktopSubredditDrawerTile(
+                                  child:
+                                      model.userSubreddits.data.children[index],
+                                );
+                              }
                             },
                             childCount:
                                 model.userSubreddits.data.children.length,
@@ -221,6 +184,60 @@ class _LeftDrawerState extends State<LeftDrawer> {
           }
         }),
       ),
+    );
+  }
+}
+
+class SubredditDrawerTile extends StatelessWidget {
+  final Child child;
+
+  const SubredditDrawerTile({
+    Key key,
+    @required this.focusNode,
+    @required this.child,
+  }) : super(key: key);
+
+  final FocusNode focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      title: Text(
+        child.display_name,
+        style: Theme.of(context).textTheme.subhead,
+      ),
+      leading: CircleAvatar(
+        maxRadius: 16,
+        backgroundImage: child.community_icon != ""
+            ? CachedNetworkImageProvider(
+                child.community_icon,
+              )
+            : child.icon_img != ""
+                ? CachedNetworkImageProvider(
+                    child.icon_img,
+                  )
+                : AssetImage('assets/default_icon.png'),
+        backgroundColor: child.primary_color == ""
+            ? Theme.of(context).accentColor
+            : HexColor(
+                child.primary_color,
+              ),
+      ),
+      onTap: () {
+        focusNode.unfocus();
+        return Navigator.of(
+          context,
+          rootNavigator: false,
+        ).push(
+          CupertinoPageRoute(
+            builder: (context) => SubredditFeedPage(
+              subreddit: child.display_name,
+            ),
+            fullscreenDialog: false,
+          ),
+        );
+      },
     );
   }
 }

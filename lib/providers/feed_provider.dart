@@ -13,6 +13,8 @@ import 'package:http/http.dart';
 import 'package:reddit/reddit.dart';
 
 class FeedProvider with ChangeNotifier {
+  static FeedProvider of(BuildContext context, {bool listen}) =>
+      Provider.of<FeedProvider>(context, listen: listen);
   final SecureStorageHelper _storageHelper = new SecureStorageHelper();
   Reddit _reddit = Reddit(Client());
 

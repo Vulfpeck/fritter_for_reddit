@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/pages/photo_viewer_screen.dart';
@@ -26,7 +27,10 @@ class DesktopFeedCard extends StatelessWidget {
                 imageUrl: data.preview.images.first.source.url,
                 width: 50,
               )
-            : Text(data.subredditNamePrefixed),
+            : Chip(
+                label: Text(data.linkFlairText ?? ''),
+                backgroundColor: HexColor(data.linkFlairBackgroundColor),
+              ),
       ),
       title: FeedCardTitle(
         title: data.title,
