@@ -147,34 +147,15 @@ class _SubredditFeedState extends State<SubredditFeed>
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               textTheme: Theme.of(context).textTheme,
               centerTitle: true,
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: model.currentPage != CurrentPage.FrontPage
-                        ? Text(
-                            '/r/' + model.sub.toString(),
-                            textAlign: TextAlign.center,
-                          )
-                        : Text('Frontpage', textAlign: TextAlign.center),
-                  ),
-                  Flexible(
-                    child: IconButton(
-                      icon: Icon(Icons.expand_more),
-                      onPressed: () =>
-                          Navigator.of(context, rootNavigator: false).push(
-                        CupertinoPageRoute(
-                          maintainState: true,
-                          builder: (context) => LeftDrawer(),
-                          fullscreenDialog: true,
-                        ),
-                      ),
-                      color: Theme.of(context).accentColor,
-                    ),
-                  )
-                ],
-              ),
+              titleSpacing: 0,
+              title: model.currentPage != CurrentPage.FrontPage
+                  ? Text(
+                      '/r/' + model.sub.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.clip,
+                      softWrap: false,
+                    )
+                  : Text('Frontpage', textAlign: TextAlign.center),
             ),
             SliverList(
               delegate: (model.subredditInformationError ||
@@ -232,6 +213,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                 _openComments(item, context, index);
                               },
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   FeedCard(
                                     item,
@@ -255,6 +237,9 @@ class _SubredditFeedState extends State<SubredditFeed>
             )
           ],
         );
+//        if (model.state == ViewState.Busy) {
+//          return Center(child: CircularProgressIndicator());
+//        }
 //        return ListView.builder(
 //          itemBuilder: (BuildContext context, int index) {
 //            var item = model.postFeed.data.children[index].data;

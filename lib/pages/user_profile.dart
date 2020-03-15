@@ -171,7 +171,7 @@ class SignedInProfileContent extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         "Link Karma",
-                        style: Theme.of(context).textTheme.subtitle,
+                        style: Theme.of(context).textTheme.subtitle2,
                       ),
                       SizedBox(
                         height: 4.0,
@@ -180,7 +180,7 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.link,
-                            color: Theme.of(context).textTheme.subtitle.color,
+                            color: Theme.of(context).textTheme.subtitle2.color,
                           ),
                           SizedBox(
                             width: 8.0,
@@ -197,7 +197,7 @@ class SignedInProfileContent extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         "Comment Karma",
-                        style: Theme.of(context).textTheme.subtitle,
+                        style: Theme.of(context).textTheme.subtitle2,
                       ),
                       SizedBox(
                         height: 4.0,
@@ -206,7 +206,7 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.chat_bubble_outline,
-                            color: Theme.of(context).textTheme.subtitle.color,
+                            color: Theme.of(context).textTheme.subtitle2.color,
                           ),
                           SizedBox(
                             width: 8.0,

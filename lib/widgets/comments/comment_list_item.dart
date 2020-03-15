@@ -26,55 +26,58 @@ class CommentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
-      SizedBox(
-        width: 16.0 * _comment.data.depth,
-      ),
-      Expanded(
-        child: _comment.data.collapseParent == true
-            ? Column(
-                children: <Widget>[
-                  CollapsedCommentParent(
+    return Column(
+      children: <Widget>[
+        if (!_comment.data.collapse || _comment.data.collapseParent)
+          Row(
+            children: [
+              SizedBox(width: 16.0 * _comment.data.depth),
+              if (_comment.data.collapseParent)
+                Expanded(
+                  child: CollapsedCommentParent(
                     comment: _comment,
                     postId: postId,
                     commentIndex: commentIndex,
                   ),
-                  Divider(),
-                ],
-              )
-            : _comment.data.collapse == true
-                ? Container()
-                : _comment.kind == CommentPojo.Kind.MORE
-                    ? Column(
-                        children: <Widget>[
-                          MoreCommentKind(
-                            comment: _comment,
-                            postFullName: name,
-                            id: postId,
-                          ),
-                          Divider(),
-                        ],
-                      )
-                    : Column(
-                        children: <Widget>[
-                          Swiper(
-                            comment: _comment,
-                            postId: postId,
-                            child: CommentBody(
-                              context: context,
-                              commentIndex: commentIndex,
-                              comment: _comment,
-                              postId: postId,
-                            ),
-                            commentIndex: commentIndex,
-                          ),
-                          Divider(
-                            indent: 16,
-                          ),
-                        ],
-                      ),
-      ),
-    ]);
+                ),
+              if (!_comment.data.collapse &&
+                  _comment.kind == CommentPojo.Kind.MORE)
+                Expanded(
+                  child: MoreCommentKind(
+                    comment: _comment,
+                    postFullName: name,
+                    id: postId,
+                  ),
+                ),
+              if (!_comment.data.collapseParent &&
+                  _comment.kind == CommentPojo.Kind.T1)
+                Expanded(
+                  child: Swiper(
+                    comment: _comment,
+                    postId: postId,
+                    child: CommentBody(
+                      context: context,
+                      commentIndex: commentIndex,
+                      comment: _comment,
+                      postId: postId,
+                    ),
+                    commentIndex: commentIndex,
+                  ),
+                ),
+            ],
+          ),
+        if (!_comment.data.collapse || _comment.data.collapseParent)
+          SizedBox(height: 4),
+        if (!_comment.data.collapse || _comment.data.collapseParent)
+          Divider(
+            indent: 16.0 * (_comment.data.depth) + 8.0,
+            height: 1,
+            thickness: 1,
+          ),
+        if (!_comment.data.collapse || _comment.data.collapseParent)
+          SizedBox(height: 8),
+      ],
+    );
   }
 }
 
@@ -82,28 +85,37 @@ class CollapsedCommentParent extends StatelessWidget {
   final CommentPojo.Child comment;
   final String postId;
   final int commentIndex;
+
   CollapsedCommentParent({
     @required this.comment,
     @required this.postId,
     @required this.commentIndex,
   });
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (BuildContext context, CommentsProvider model, _) {
-        return ListTile(
-          dense: true,
-          onTap: () {
-            collapse(commentIndex, context);
-          },
-          title: Text(
-            comment.data.author +
-                " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
-            style: Theme.of(context).textTheme.subtitle.copyWith(
-                  fontStyle: FontStyle.italic,
-                ),
-          ),
-          trailing: Icon(Icons.expand_more),
+        return Column(
+          children: <Widget>[
+            ListTile(
+              dense: true,
+              onTap: () {
+                collapse(commentIndex, context);
+              },
+              title: Text(
+                comment.data.author +
+                    " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
+                style: Theme.of(context).textTheme.subtitle2.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+              trailing: Icon(
+                Icons.expand_more,
+                color: Theme.of(context).textTheme.subtitle2.color,
+              ),
+            ),
+          ],
         );
       },
     );
@@ -139,11 +151,16 @@ class CommentBody extends StatelessWidget {
 
   Brightness _platformBrightness;
 
+  final List<Widget> columnWidgets = [];
+
   @override
   Widget build(BuildContext context) {
     _platformBrightness = MediaQuery.of(context).platformBrightness;
+    // pinned comment tag
+
     return Container(
-      padding: const EdgeInsets.only(left: 12, right: 12.0, top: 4.0),
+      padding:
+          const EdgeInsets.only(left: 12, right: 12.0, top: 4.0, bottom: 8.0),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         border: Border(
@@ -164,20 +181,27 @@ class CommentBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            comment.data.stickied
-                ? PinnedCommentTag(platformBrightness: _platformBrightness)
-                : Container(),
+            if (comment.data.stickied)
+              PinnedCommentTag(platformBrightness: _platformBrightness),
+
+            // author tag
             Flexible(
               child: AuthorTag(
                 comment: comment,
                 platformBrightness: _platformBrightness,
               ),
             ),
+
+            //comment body
+
             Html(
+              defaultTextStyle: Theme.of(context).textTheme.bodyText1,
               data: _htmlContent,
               useRichText: true,
               showImages: false,
-              padding: const EdgeInsets.all(0),
+              customEdgeInsets: (_) {
+                return EdgeInsets.zero;
+              },
               onLinkTap: (url) {
                 if (url.startsWith("/r/") || url.startsWith("r/")) {
                   Navigator.push(
@@ -217,7 +241,7 @@ class CommentBody extends StatelessWidget {
 }
 
 class AuthorTag extends StatelessWidget {
-  const AuthorTag({
+  AuthorTag({
     @required this.comment,
     @required Brightness platformBrightness,
   }) : _platformBrightness = platformBrightness;
@@ -226,86 +250,92 @@ class AuthorTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        comment.data.isSubmitter
-            ? Padding(
-                padding: const EdgeInsets.only(right: 4.0),
-                child: comment.data.isSubmitter
-                    ? Icon(
-                        Icons.person,
-                        size: 16,
-                        color: Theme.of(context).accentColor,
-                      )
-                    : Container(),
-              )
-            : Container(),
-        RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: comment.data.author + "  ",
-                style: comment.data.isSubmitter
-                    ? Theme.of(context).textTheme.caption.copyWith(
-                          color: Theme.of(context).accentColor,
-                        )
-                    : Theme.of(context).textTheme.caption,
+    // Add OP Tag
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0, bottom: 4.0, left: 2),
+      child: Wrap(
+        children: <Widget>[
+          if (comment.data.isSubmitter)
+            Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: Icon(
+                Icons.person,
+                size: 16,
+                color: Theme.of(context).accentColor,
               ),
-              comment.data.distinguished.toString().compareTo("moderator") == 0
-                  ? TextSpan(
-                      text: "MOD",
-                      style: Theme.of(context).textTheme.subtitle.copyWith(
+            ),
+
+          // Author and MOD tag
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: comment.data.author + "  ",
+                  style: comment.data.isSubmitter
+                      ? Theme.of(context).textTheme.caption.copyWith(
                             color: Theme.of(context).accentColor,
-                            letterSpacing: 1,
+                            fontWeight: FontWeight.bold,
+                          )
+                      : Theme.of(context).textTheme.caption.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                    )
-                  : TextSpan(),
-            ],
+                ),
+                comment.data.distinguished.toString().compareTo("moderator") ==
+                        0
+                    ? TextSpan(
+                        text: "MOD",
+                        style: Theme.of(context).textTheme.subtitle2.copyWith(
+                              color: Theme.of(context).accentColor,
+                              letterSpacing: 1,
+                            ),
+                      )
+                    : TextSpan(),
+              ],
+            ),
           ),
-        ),
-        Row(
-          children: <Widget>[
-            Icon(
-              Icons.arrow_upward,
-              color: comment.data.likes != null
-                  ? comment.data.likes == true
-                      ? getColor(_platformBrightness, ColorObjects.UpvoteColor)
-                      : getColor(
-                          _platformBrightness, ColorObjects.DownvoteColor)
-                  : Theme.of(context).textTheme.subtitle.color,
-              size: 14,
-            ),
-            Text(
-              (comment.data.scoreHidden
-                  ? " [?]"
-                  : " " + getRoundedToThousand(comment.data.score)),
-              style: comment.data.likes != null
-                  ? comment.data.likes == true
-                      ? Theme.of(context).textTheme.subtitle.copyWith(
-                            color: getColor(
-                                _platformBrightness, ColorObjects.UpvoteColor),
-                          )
-                      : Theme.of(context).textTheme.subtitle.copyWith(
-                            color: getColor(_platformBrightness,
-                                ColorObjects.DownvoteColor),
-                          )
-                  : Theme.of(context).textTheme.subtitle,
-              softWrap: true,
-              overflow: TextOverflow.clip,
-              maxLines: 100,
-            ),
-          ],
-        ),
-        Expanded(
-          child: Text(
+
+          // Upvote Icon
+          Icon(
+            Icons.arrow_upward,
+            color: comment.data.likes != null
+                ? comment.data.likes == true
+                    ? getColor(_platformBrightness, ColorObjects.UpvoteColor)
+                    : getColor(_platformBrightness, ColorObjects.DownvoteColor)
+                : Theme.of(context).textTheme.subtitle2.color,
+            size: 14,
+          ),
+
+          // votes count
+          Text(
+            (comment.data.scoreHidden
+                ? " [?]"
+                : " " + getRoundedToThousand(comment.data.score)),
+            style: comment.data.likes != null
+                ? comment.data.likes == true
+                    ? Theme.of(context).textTheme.subtitle2.copyWith(
+                          color: getColor(
+                              _platformBrightness, ColorObjects.UpvoteColor),
+                        )
+                    : Theme.of(context).textTheme.subtitle2.copyWith(
+                          color: getColor(
+                              _platformBrightness, ColorObjects.DownvoteColor),
+                        )
+                : Theme.of(context).textTheme.subtitle2,
+            softWrap: true,
+            overflow: TextOverflow.clip,
+            maxLines: 100,
+          ),
+
+          // Time posted
+          Text(
             " • " + getTimePosted(comment.data.createdUtc),
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
             overflow: TextOverflow.fade,
             maxLines: 100,
           ),
-        ),
-      ],
+        ],
+        verticalDirection: VerticalDirection.down,
+      ),
     );
   }
 }
@@ -336,15 +366,15 @@ class PinnedCommentTag extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.label_outline,
-            color: Theme.of(context).textTheme.subtitle.color,
-            size: Theme.of(context).textTheme.subtitle.fontSize,
+            color: Theme.of(context).textTheme.subtitle2.color,
+            size: Theme.of(context).textTheme.subtitle2.fontSize,
           ),
           SizedBox(
             width: 4.0,
           ),
           Text(
             "Pinned",
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
       ),
@@ -358,6 +388,7 @@ class MoreCommentKind extends StatelessWidget {
   final String id;
 
   MoreCommentKind({this.comment, this.postFullName, this.id});
+
   @override
   Widget build(BuildContext context) {
     return Consumer(

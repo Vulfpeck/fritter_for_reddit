@@ -66,6 +66,8 @@ class CommentsScreen extends StatelessWidget {
                       CommentsControlBar(postData),
                       Divider(),
                     ],
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                   ),
                 ]),
               ),
@@ -108,69 +110,12 @@ class CommentsScreen extends StatelessWidget {
                                   model.commentsMap[postData.id].elementAt(
                                 (index),
                               );
-//                                String _htmlContent = _unescape
-//                                    .convert(commentItem.data.bodyHtml);
-//                                return ListTile(
-//                                  title: Row(
-//                                    children: <Widget>[
-//                                      SizedBox(
-//                                        width: commentItem.data.depth * 16.0,
-//                                      ),
-//                                      Html(
-//                                        data: commentItem.data.bodyHtml,
-//                                        useRichText: false,
-//                                      ),
-//                                    ],
-//                                  ),
-//                                );
                               return CommentItem(
                                 commentItem,
                                 postData.name,
                                 postData.id,
                                 index,
                               );
-//                                return ListTile(
-//                                  title: Html(
-//                                    padding: EdgeInsets.all(0),
-//                                    defaultTextStyle:
-//                                        Theme.of(context).textTheme.body1,
-//                                    linkStyle: Theme.of(context)
-//                                        .textTheme
-//                                        .body1
-//                                        .copyWith(
-//                                          color: Theme.of(context).accentColor,
-//                                        ),
-//                                    data: _htmlContent,
-//                                    useRichText: true,
-//                                    blockSpacing: 1,
-//                                    showImages: false,
-//                                    renderNewlines: false,
-//                                    onLinkTap: (url) {
-//                                      if (url.startsWith("/r/") ||
-//                                          url.startsWith("r/")) {
-//                                        Navigator.push(
-//                                          context,
-//                                          CupertinoPageRoute(
-//                                            fullscreenDialog: false,
-//                                            builder: (BuildContext context) {
-//                                              return SubredditFeedPage(
-//                                                  subreddit:
-//                                                      url.startsWith("/r/")
-//                                                          ? url.replaceFirst(
-//                                                              "/r/", "")
-//                                                          : url.replaceFirst(
-//                                                              "r/", ""));
-//                                            },
-//                                          ),
-//                                        );
-//                                      } else if (url.startsWith("/u/") ||
-//                                          url.startsWith("u/")) {
-//                                      } else {
-//                                        launchURL(context, url);
-//                                      }
-//                                    },
-//                                  ),
-//                                );
                             },
                             childCount: model.commentsMap[postData.id].length,
                           ),

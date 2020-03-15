@@ -27,35 +27,40 @@ class UserInformationProvider with ChangeNotifier {
   ViewState get authenticationStatus => _authenticationStatus;
 
   UserInformationProvider() {
-//    // print("*** Initializeding user information provider ****");
+    print("UserInformationProvider-> Constructor()");
     validateAuthentication();
   }
 
   ViewState get state => _state;
 
   Future<void> performTokenRefresh() async {
+    print("UserInformationProvider-> PerformTokenRefresh()");
     await _storageHelper.performTokenRefresh();
   }
 
   Future<void> validateAuthentication() async {
-//    // print("*** Validating authentication ****");
+    print("UserInformationProvider-> ValidateAuthentication()");
     await _storageHelper.init();
     _state = ViewState.Busy;
     notifyListeners();
+    print("UserInformationProvider-> ValidateAuth() -> Update state -> busy");
 
     if (_storageHelper.signInStatus) {
+      print("UserInformationProvider-> ValidateAuth() <- User is Signed in");
       await _storageHelper.performTokenRefresh();
       await loadUserInformation();
     } else {
-//      // print("** user is not authenticated");
+      print(
+          "UserInformationProvider-> ValidateAuth() <- user is not signed in");
     }
 
     _state = ViewState.Idle;
-    // // print("validate authentication debug // // print" + _storageHelper.debug// // print);
+    print("UserInformationProvider-> ValidateAuth() -> Update State -> idle");
     notifyListeners();
   }
 
   Future<bool> performAuthentication() async {
+    print("UserInformationProvider-> performAuth()");
     _authenticationStatus = ViewState.Busy;
     notifyListeners();
     bool authResult = true;
@@ -63,48 +68,44 @@ class UserInformationProvider with ChangeNotifier {
       await server.close(force: true);
     }
     await _storageHelper.clearStorage();
-//    // print("*** Performing authentication ****");
-    // start a new instance of the server that listens to localhost requests
     Stream<String> onCode = await _server();
 
-    // server returns the first access_code it receives
-
     final String accessCode = await onCode.first;
-//    // print("local host response");
 
-    notifyListeners();
     _authenticationStatus = ViewState.Busy;
+    notifyListeners();
     if (accessCode == null) {
-//      // print("isNull");
+      print("UserInformationProvider-> performAuth() ->auth failed");
       authResult = false;
     }
 
-    // now we use this code to obtain authentication token and other shit
+    http.Response authenticationResponse;
+    if (authResult) {
+      String user = CLIENT_ID;
+      String password = ""; // blank for unknown clients like apps
 
-    String user = CLIENT_ID;
-    String password = ""; // blank for unknown clients like apps
-
-    String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
-    final response = await http.post(
-      "https://www.reddit.com/api/v1/access_token",
-      headers: {
-        "Authorization": basicAuth,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body:
-          "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
-    );
-
-//    // print(
-//        "New authentication response code: " + response.statusCode.toString());
-    if (response.statusCode == 200) {
-      Map<String, dynamic> map = json.decode(response.body);
+      String basicAuth =
+          "Basic " + base64Encode(utf8.encode('$user:$password'));
+      authenticationResponse = await http.post(
+        "https://www.reddit.com/api/v1/access_token",
+        headers: {
+          "Authorization": basicAuth,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body:
+            "grant_type=authorization_code&code=$accessCode&redirect_uri=http://localhost:8080/",
+      );
+    }
+    if (authenticationResponse != null &&
+        authenticationResponse.statusCode == 200) {
+      print("UserInformationProvider-> performAuth() -> auth success");
+      Map<String, dynamic> map = json.decode(authenticationResponse.body);
       await _storageHelper.updateCredentials(map['access_token'],
           map['refresh_token'], DateTime.now().toIso8601String(), true);
-//      // print('authentication: token stored to secure storage');
       await loadUserInformation();
     } else {
-//      // print("Authentication failed");
+      print("UserInformationProvider-> performAuth() ->auth failed");
+      print(authenticationResponse);
       authResult = false;
     }
 
@@ -118,9 +119,7 @@ class UserInformationProvider with ChangeNotifier {
     final StreamController<String> onCode = new StreamController();
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
-//      // print("Server started");
       final String code = request.uri.queryParameters["code"];
-//      // print(request.uri.pathSegments);
       request.response
         ..statusCode = 200
         ..headers.set("Content-Type", ContentType.html.mimeType)
@@ -135,6 +134,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> signOutUser() async {
+    print("UserInformationProvider-> signoutUser()");
     _state = ViewState.Busy;
     notifyListeners();
     await _storageHelper.clearStorage();
@@ -143,8 +143,6 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> loadUserInformation() async {
-//    // print("*** Loading user information ****");
-
     String token = await _storageHelper.authToken;
 
     if (token == null) {
@@ -157,9 +155,6 @@ class UserInformationProvider with ChangeNotifier {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
       },
     );
-//    // print("Loading user information response code: " +
-//        response.statusCode.toString());
-//    // print(json.decode(response.body));
 
     if (response.statusCode == 200)
       userInformation =

@@ -159,31 +159,30 @@ class _SearchPageState extends State<SearchPage> {
                         ? SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               if (index.isOdd) {
-                                return Divider();
+                                return Divider(
+                                  thickness: 1,
+                                );
                               } else {
                                 final item = model
                                     .postsQueryResult.data.children
                                     .elementAt(index ~/ 2)
                                     .data;
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 4.0, top: 4.0),
-                                  child: Material(
-                                    color: Theme.of(context).cardColor,
-                                    child: InkWell(
-                                      onTap: () {
-                                        focusNode.unfocus();
-                                        Provider.of<CommentsProvider>(context)
-                                            .fetchComments(
-                                          requestingRefresh: false,
-                                          subredditName: item.subreddit,
-                                          postId: item.id,
-                                          sort: item.suggestedSort != null
-                                              ? changeCommentSortConvertToEnum[
-                                                  item.suggestedSort]
-                                              : CommentSortTypes.Best,
-                                        );
-                                        Navigator.of(context).push(
+                                return Material(
+                                  color: Theme.of(context).cardColor,
+                                  child: InkWell(
+                                    onTap: () {
+                                      focusNode.unfocus();
+                                      Provider.of<CommentsProvider>(context)
+                                          .fetchComments(
+                                        requestingRefresh: false,
+                                        subredditName: item.subreddit,
+                                        postId: item.id,
+                                        sort: item.suggestedSort != null
+                                            ? changeCommentSortConvertToEnum[
+                                                item.suggestedSort]
+                                            : CommentSortTypes.Best,
+                                      );
+                                      Navigator.of(context).push(
 //                                          PageRouteBuilder(
 //                                            pageBuilder:
 //                                                (BuildContext context, _, __) {
@@ -209,23 +208,18 @@ class _SearchPageState extends State<SearchPage> {
 //                                              milliseconds: 250,
 //                                            ),
 //                                          ),
-                                          CupertinoPageRoute(
-                                            maintainState: true,
-                                            builder: (BuildContext context) {
-                                              return CommentsScreen(
-                                                postData: item,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: Column(
-                                        children: <Widget>[
-                                          FeedCard(
-                                            item,
-                                          ),
-                                        ],
-                                      ),
+                                        CupertinoPageRoute(
+                                          maintainState: true,
+                                          builder: (BuildContext context) {
+                                            return CommentsScreen(
+                                              postData: item,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: FeedCard(
+                                      item,
                                     ),
                                   ),
                                 );

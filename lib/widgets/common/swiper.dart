@@ -3,7 +3,7 @@ import 'package:flutter/physics.dart';
 import 'package:flutter_provider_app/helpers/design_system/color_enums.dart';
 import 'package:flutter_provider_app/helpers/design_system/colors.dart';
 import 'package:flutter_provider_app/models/comment_chain/comment.dart'
-as CommentPojo;
+    as CommentPojo;
 
 import '../../exports.dart';
 
@@ -13,10 +13,11 @@ class Swiper extends StatefulWidget {
   final CommentPojo.Child comment;
   final int commentIndex;
 
-  Swiper({@required this.child,
-    @required this.comment,
-    @required this.postId,
-    @required this.commentIndex});
+  Swiper(
+      {@required this.child,
+      @required this.comment,
+      @required this.postId,
+      @required this.commentIndex});
 
   @override
   _SwiperState createState() => _SwiperState();
@@ -67,10 +68,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
     _controller.addListener(() {
       setState(() {
         commentOffset =
-            Offset(_animation.value.x * MediaQuery
-                .of(context)
-                .size
-                .width, 0);
+            Offset(_animation.value.x * MediaQuery.of(context).size.width, 0);
       });
     });
   }
@@ -84,9 +82,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _mediaQuery = MediaQuery.of(context);
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onHorizontalDragDown: (details) {
@@ -100,11 +96,11 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
       onHorizontalDragUpdate: (details) {
         finalPosition = details.localPosition.dx;
         setState(
-              () {
+          () {
             commentOffset += Offset(details.delta.dx, 0);
             final double change = (finalPosition - initialPosition);
             final double ratio =
-            change < 0 ? change * -1 / size.width : change / size.width;
+                change < 0 ? change * -1 / size.width : change / size.width;
             // print("Drag ratio : " + ratio.toString());
             if (change < 0) {
               if (ratio >= 0 && ratio < 0.15) {
@@ -132,9 +128,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
         // print(change);
         _runAnimation(details.velocity.pixelsPerSecond, size);
         if (isUpvoting && thresholdCrossed) {
-          if (Provider
-              .of<UserInformationProvider>(context)
-              .signedIn) {
+          if (Provider.of<UserInformationProvider>(context).signedIn) {
             if (widget.comment.data.likes == true) {
               Provider.of<CommentsProvider>(context).voteComment(
                 index: widget.commentIndex,
@@ -153,12 +147,10 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
           }
         } else if (!isUpvoting && thresholdCrossed) {
           // print("Downvote");
-          if (Provider
-              .of<UserInformationProvider>(context)
-              .signedIn) {
+          if (Provider.of<UserInformationProvider>(context).signedIn) {
             if (widget.comment.data.likes == false) {
               Provider.of<CommentsProvider>(context).voteComment(
-                  index: widget.commentIndex,  dir: 0, postId: widget.postId);
+                  index: widget.commentIndex, dir: 0, postId: widget.postId);
             } else {
               Provider.of<CommentsProvider>(context).voteComment(
                   index: widget.commentIndex, dir: -1, postId: widget.postId);
@@ -180,31 +172,29 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
               alignment: Alignment.centerRight,
               color: thresholdCrossed
                   ? isUpvoting
-                  ? getColor(_mediaQuery.platformBrightness,
-                  ColorObjects.UpvoteColor)
-                  : getColor(
-                _mediaQuery.platformBrightness,
-                ColorObjects.DownvoteColor,
-              )
-                  : Theme
-                  .of(context)
-                  .dividerColor,
+                      ? getColor(_mediaQuery.platformBrightness,
+                          ColorObjects.UpvoteColor)
+                      : getColor(
+                          _mediaQuery.platformBrightness,
+                          ColorObjects.DownvoteColor,
+                        )
+                  : Theme.of(context).dividerColor,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: thresholdCrossed
                     ? isUpvoting
-                    ? Icon(
-                  Icons.arrow_upward,
-                  color: Colors.white,
-                )
+                        ? Icon(
+                            Icons.arrow_upward,
+                            color: Colors.white,
+                          )
+                        : Icon(
+                            Icons.arrow_downward,
+                            color: Colors.white,
+                          )
                     : Icon(
-                  Icons.arrow_downward,
-                  color: Colors.white,
-                )
-                    : Icon(
-                  Icons.arrow_upward,
-                  color: Colors.white,
-                ),
+                        Icons.arrow_upward,
+                        color: Colors.white,
+                      ),
               ),
             ),
           ),
@@ -217,10 +207,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
               child: Text(
                 "🐶boop",
                 textAlign: TextAlign.center,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .title,
+                style: Theme.of(context).textTheme.title,
               ),
             ),
           ),

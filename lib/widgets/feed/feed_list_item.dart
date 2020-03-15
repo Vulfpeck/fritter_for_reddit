@@ -36,28 +36,26 @@ class FeedCard extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Text(
             'in r/' + data.subreddit + ' by ' + data.author,
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
         ),
-        data.isSelf == false && data.postType == MediaType.Url
-            ? PostUrlPreview(
-                data: data,
-                htmlUnescape: _htmlUnescape,
-              )
-            : Container(),
-        data.preview != null &&
-                data.isSelf == false &&
-                data.postType != MediaType.Url
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                child: FeedCardBodyImage(
-                  images: data.preview.images,
-                  data: data,
-                  postMetaData: {'media_type': data.postType, 'url': data.url},
-                  deviceWidth: MediaQuery.of(context).size.width,
-                ),
-              )
-            : Container(),
+        if (data.isSelf == false && data.postType == MediaType.Url)
+          PostUrlPreview(
+            data: data,
+            htmlUnescape: _htmlUnescape,
+          ),
+        if (data.preview != null &&
+            data.isSelf == false &&
+            data.postType != MediaType.Url)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+            child: FeedCardBodyImage(
+              images: data.preview.images,
+              data: data,
+              postMetaData: {'media_type': data.postType, 'url': data.url},
+              deviceWidth: MediaQuery.of(context).size.width,
+            ),
+          ),
       ],
     );
   }
@@ -99,50 +97,45 @@ class FeedCardTitle extends StatelessWidget {
           StickyTag(stickied),
           Text(
             title,
+            style: Theme.of(context).textTheme.subtitle1,
           ),
           SizedBox(
             height: 4.0,
           ),
-//          nsfw == true || linkFlairText != null
-//              ? RichText(
-//                  textScaleFactor: 0.9,
-//                  text: TextSpan(
-//                    children: <TextSpan>[
-//                      nsfw != null && nsfw
-//                          ? TextSpan(
-//                              text: "NSFW ",
-//                              style: TextStyle(
-//                                color: Colors.red.withOpacity(
-//                                  0.9,
-//                                ),
-//                              ),
-//                            )
-//                          : TextSpan(),
-//                      linkFlairText != null
-//                          ? TextSpan(
-//                              text: linkFlairText,
-//                              style: Theme.of(context)
-//                                  .textTheme
-//                                  .subtitle
-//                                  .copyWith(
-//                                      color: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.8),
-//                                      backgroundColor: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.15),
-//                                      decorationThickness: 2),
-//                            )
-//                          : TextSpan(),
-//                    ],
-//                    style: Theme.of(context).textTheme.subtitle,
-//                  ),
-//                )
-//              : Container(),
+          if (nsfw == true || linkFlairText != null)
+            RichText(
+              textScaleFactor: 0.9,
+              text: TextSpan(
+                children: <TextSpan>[
+                  if (nsfw)
+                    TextSpan(
+                      text: "NSFW ",
+                      style: TextStyle(
+                        color: Colors.red.withOpacity(
+                          0.9,
+                        ),
+                      ),
+                    ),
+                  if (linkFlairText != null)
+                    TextSpan(
+                      text: linkFlairText,
+                      style: Theme.of(context).textTheme.subtitle2.copyWith(
+                          color: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .color
+                              .withOpacity(0.8),
+                          backgroundColor: Theme.of(context)
+                              .textTheme
+                              .subtitle2
+                              .color
+                              .withOpacity(0.15),
+                          decorationThickness: 2),
+                    )
+                ],
+                style: Theme.of(context).textTheme.subtitle2,
+              ),
+            ),
         ],
       ),
     );
@@ -197,7 +190,7 @@ class FeedCardBodyImage extends StatelessWidget {
                               postMetaData['media_type'] == MediaType.Video,
                         );
                       },
-                      fullscreenDialog: true,
+                      fullscreenDialog: false,
                     ),
                   );
                 } else {}
@@ -248,8 +241,8 @@ class FeedCardBodySelfText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.body1,
-      linkStyle: Theme.of(context).textTheme.body1.copyWith(
+      defaultTextStyle: Theme.of(context).textTheme.bodyText1,
+      linkStyle: Theme.of(context).textTheme.bodyText1.copyWith(
             color: Theme.of(context).accentColor,
           ),
       padding: EdgeInsets.all(16),

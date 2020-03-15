@@ -67,7 +67,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 children: <Widget>[
                   Text(
                     'Sort By',
-                    style: Theme.of(context).textTheme.subtitle,
+                    style: Theme.of(context).textTheme.subtitle2,
                   ),
                   Text(
                     capitalizeString(
