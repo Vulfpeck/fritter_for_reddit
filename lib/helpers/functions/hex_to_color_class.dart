@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
+    if (hexColor.isEmpty) {
+      return Colors.transparent.value;
+    }
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {
       hexColor = "FF" + hexColor;

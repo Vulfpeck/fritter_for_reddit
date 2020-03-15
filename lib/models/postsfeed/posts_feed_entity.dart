@@ -170,7 +170,7 @@ class PostsFeedDataChildrenData {
   int numCrossposts;
   int thumbnailWidth;
   PostsFeedDataChildrenDataSecureMediaEmbed secureMediaEmbed;
-  dynamic linkFlairText;
+  String linkFlairText;
   String subredditType;
   bool isMeta;
   int subredditSubscribers;
@@ -185,6 +185,8 @@ class PostsFeedDataChildrenData {
   bool contestMode;
   bool isRedditMediaDomain;
   MediaType postType;
+
+  bool get hasLinkFlairText => linkFlairText != null;
 
   PostsFeedDataChildrenData({
     this.secureMedia,
