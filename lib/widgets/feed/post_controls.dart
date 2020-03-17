@@ -1,9 +1,11 @@
+import 'package:conditional_wrapper/conditional_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/pages/subreddit_feed_page.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class PostControls extends StatelessWidget {
@@ -23,23 +25,23 @@ class PostControls extends StatelessWidget {
           Icon(
             Icons.chat_bubble_outline,
             size: 16,
-            color: Theme.of(context).textTheme.subtitle.color,
+            color: Theme.of(context).textTheme.subtitle2.color,
           ),
           SizedBox(width: 4.0),
           Text(
             getRoundedToThousand(postData.numComments),
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
           SizedBox(width: 8.0),
           Icon(
             Icons.access_time,
             size: 16,
-            color: Theme.of(context).textTheme.subtitle.color,
+            color: Theme.of(context).textTheme.subtitle2.color,
           ),
           SizedBox(width: 4.0),
           Text(
             getTimePosted(postData.createdUtc),
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
           Expanded(
             child: Container(),
@@ -167,29 +169,38 @@ class PostVoteControls extends StatelessWidget {
                           );
                         },
                       ),
-                      ListTile(
-                        title: Text('Download'),
-                        leading: CircleAvatar(
-                          child: Icon(Icons.file_download),
-                        ),
-                        onTap: () async {
-                          if (postData.hasImage) {
-                            await Future.forEach(
-                              postData.images,
-                              (image) async {
-                                String downloadPath =
-                                    await ImageDownloader.downloadImage(
-                                  image.source.url,
-                                  destination:
-                                      AndroidDestinationType.directoryPictures,
-                                );
-
-                                debugPrint('Downloading ${image.source.url}');
-                              },
-                            );
-                            Navigator.pop(context);
-                          }
+                      ConditionalWrapper(
+                        builder: (BuildContext context, Widget child) {
+                          return AbsorbPointer(
+                            absorbing: true,
+                            child: child,
+                          );
                         },
+                        condition: PlatformX.isDesktop,
+                        child: ListTile(
+                          title: Text('Download'),
+                          leading: CircleAvatar(
+                            child: Icon(Icons.file_download),
+                          ),
+                          onTap: () async {
+                            if (postData.hasImage) {
+                              await Future.forEach(
+                                postData.images,
+                                (image) async {
+                                  String downloadPath =
+                                      await ImageDownloader.downloadImage(
+                                    image.source.url,
+                                    destination: AndroidDestinationType
+                                        .directoryPictures,
+                                  );
+
+                                  debugPrint('Downloading ${image.source.url}');
+                                },
+                              );
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
                       )
                     ]),
                   ),
@@ -216,7 +227,7 @@ class VotesCountWidget extends StatelessWidget {
           Icons.arrow_upward,
           size: 16,
           color: postData.likes == null
-              ? Theme.of(context).textTheme.subtitle.color
+              ? Theme.of(context).textTheme.subtitle2.color
               : postData.likes == true ? Colors.orange : Colors.purple,
         ),
         SizedBox(
@@ -226,8 +237,8 @@ class VotesCountWidget extends StatelessWidget {
           getRoundedToThousand(postData.score),
           textAlign: TextAlign.center,
           style: postData.likes == null
-              ? Theme.of(context).textTheme.subtitle
-              : Theme.of(context).textTheme.subtitle.copyWith(
+              ? Theme.of(context).textTheme.subtitle2
+              : Theme.of(context).textTheme.subtitle2.copyWith(
                     color: postData.likes == null
                         ? Colors.grey
                         : postData.likes == true

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
-import 'package:fritter_for_reddit/pages/subreddit_feed_page.dart';
 
 class DesktopMainSubredditTile extends StatelessWidget {
   final String subreddit;
@@ -20,7 +19,7 @@ class DesktopMainSubredditTile extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
-        style: Theme.of(context).textTheme.subhead,
+        style: Theme.of(context).textTheme.subtitle1,
       ),
       leading: CircleAvatar(
         backgroundImage: AssetImage('assets/default_icon.png'),

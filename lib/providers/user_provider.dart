@@ -11,7 +11,6 @@ import 'package:fritter_for_reddit/models/subreddits/subreddits_subscribed.dart'
 import 'package:fritter_for_reddit/models/user_profile/user_information_entity.dart';
 import 'package:fritter_for_reddit/secrets.dart';
 import 'package:http/http.dart' as http;
-import 'package:reddit/reddit.dart';
 
 class UserInformationProvider with ChangeNotifier {
   HttpServer server;

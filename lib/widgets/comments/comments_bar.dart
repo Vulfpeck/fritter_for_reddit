@@ -36,7 +36,11 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
             FlatButton.icon(
               icon: Icon(
                 Icons.refresh,
-                color: Theme.of(context).textTheme.body1.color.withOpacity(0.6),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyText2
+                    .color
+                    .withOpacity(0.6),
               ),
               colorBrightness: MediaQuery.of(context).platformBrightness,
               label: Text(
@@ -44,7 +48,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 style: TextStyle(
                     color: Theme.of(context)
                         .textTheme
-                        .body1
+                        .bodyText2
                         .color
                         .withOpacity(0.8)),
               ),
@@ -67,7 +71,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 children: <Widget>[
                   Text(
                     'Sort By',
-                    style: Theme.of(context).textTheme.subtitle,
+                    style: Theme.of(context).textTheme.subtitle2,
                   ),
                   Text(
                     capitalizeString(

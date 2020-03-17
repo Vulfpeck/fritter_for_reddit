@@ -338,7 +338,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       stretch: false,
       title: Text(
         "Search",
-        style: Theme.of(context).textTheme.title,
+        style: Theme.of(context).textTheme.headline6,
       ),
       textTheme: Theme.of(context).textTheme,
       brightness: MediaQuery.of(context).platformBrightness,

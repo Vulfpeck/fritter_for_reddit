@@ -1,2 +1,2 @@
 enum ViewState { Idle, Busy }
-enum CurrentPage { FrontPage, Other }
+enum CurrentPage { frontPage, other }

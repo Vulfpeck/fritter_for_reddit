@@ -74,7 +74,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                 );
                               } else {
                                 return DesktopSubredditDrawerTile(
-                                  child:
+                                  subreddit:
                                       model.userSubreddits.data.children[index],
                                 );
                               }
@@ -128,10 +128,12 @@ class _LeftDrawerState extends State<LeftDrawer> {
                               "Hello 🥳",
                               style: Theme.of(context)
                                   .textTheme
-                                  .display1
+                                  .headline4
                                   .copyWith(
-                                    color:
-                                        Theme.of(context).textTheme.title.color,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .headline6
+                                        .color,
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -140,7 +142,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                             ),
                             Text(
                               "You're not signed in",
-                              style: Theme.of(context).textTheme.headline,
+                              style: Theme.of(context).textTheme.headline5,
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(
@@ -148,7 +150,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                             ),
                             Text(
                               "Sign in to Fritter to see your subscriptions",
-                              style: Theme.of(context).textTheme.body2,
+                              style: Theme.of(context).textTheme.bodyText2,
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(
@@ -205,7 +207,7 @@ class SubredditDrawerTile extends StatelessWidget {
       dense: true,
       title: Text(
         child.display_name,
-        style: Theme.of(context).textTheme.subhead,
+        style: Theme.of(context).textTheme.subtitle1,
       ),
       leading: CircleAvatar(
         maxRadius: 16,
@@ -256,7 +258,7 @@ class DrawerSliverAppBar extends StatelessWidget {
       expandedHeight: 56,
       title: Text(
         "Subreddits",
-        style: Theme.of(context).textTheme.title,
+        style: Theme.of(context).textTheme.headline6,
       ),
       brightness: MediaQuery.of(context).platformBrightness,
       iconTheme: Theme.of(context).iconTheme,

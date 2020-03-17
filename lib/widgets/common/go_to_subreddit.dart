@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
-import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
-import 'package:fritter_for_reddit/widgets/desktop/desktop_main_subreddit_tile.dart';
 import 'package:fritter_for_reddit/widgets/feed/main_subreddit_tile.dart';
 
 import '../../exports.dart';

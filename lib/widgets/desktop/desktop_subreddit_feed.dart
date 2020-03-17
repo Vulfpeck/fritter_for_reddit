@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
 import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
@@ -10,8 +9,6 @@ import 'package:fritter_for_reddit/widgets/comments/comments_page.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_feed_list_item.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
-import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
-
 import 'package:fritter_for_reddit/widgets/feed/post_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -102,7 +99,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
 
                                 model.fetchPostsListing(
                                   currentSort: "/top/.json?sort=top&t=$value",
-                                  currentSubreddit: model.sub,
+                                  currentSubreddit: model.currentSubreddit,
                                   loadingTop: true,
                                 );
                               },
@@ -115,7 +112,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                       sortSelectorValue = value;
                       feedProvider.fetchPostsListing(
                         currentSort: value,
-                        currentSubreddit: model.sub,
+                        currentSubreddit: model.currentSubreddit,
                         loadingTop: false,
                       );
                     }
@@ -155,12 +152,23 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               textTheme: Theme.of(context).textTheme,
               centerTitle: true,
-              title: model.currentPage != CurrentPage.FrontPage
-                  ? Text(
-                      '/r/' + model.sub.toString(),
-                      textAlign: TextAlign.center,
-                    )
-                  : Text('Frontpage', textAlign: TextAlign.center),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    model.currentSubreddit,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    '/r/${model.currentSubreddit}',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle2
+                        .copyWith(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
             FeedList(feedProvider: model)
           ],
@@ -242,7 +250,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                     // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
                     child: feedProvider != null
                         ? feedProvider.state == ViewState.Idle
-                            ? feedProvider.currentPage == CurrentPage.FrontPage
+                            ? feedProvider.currentPage == CurrentPage.frontPage
                                 ? Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
@@ -261,7 +269,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                             'Front Page',
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .headline
+                                                .headline5
                                                 .copyWith(
                                                     fontWeight:
                                                         FontWeight.bold),
@@ -357,7 +365,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                         widget.pageTitle,
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .headline
+                                                            .headline5
                                                             .copyWith(
                                                                 fontWeight:
                                                                     FontWeight
@@ -385,7 +393,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                         .displayNamePrefixed,
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .headline
+                                                        .headline5
                                                         .copyWith(
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -403,7 +411,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                         " Subscribers",
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .subhead,
+                                                        .headline1,
                                                   ),
                                                   SizedBox(
                                                     height: 8,
@@ -417,7 +425,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                           textColor:
                                                               Theme.of(context)
                                                                   .textTheme
-                                                                  .body1
+                                                                  .bodyText2
                                                                   .color,
                                                           child: feedProvider
                                                                       .partialState ==
@@ -479,7 +487,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                   'Front Page',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .headline
+                                      .headline5
                                       .copyWith(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -497,24 +505,33 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
 }
 
 class DesktopPostCard extends StatelessWidget {
+  final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
+
   const DesktopPostCard({
     Key key,
     @required this.item,
+    @required this.onTap,
+    @required this.onDoubleTap,
   }) : super(key: key);
 
   final PostsFeedDataChildrenData item;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        DesktopFeedCard(
-          item,
-        ),
-        PostControls(
-          postData: item,
-        ),
-      ],
+    return InkWell(
+      child: Column(
+        children: <Widget>[
+          DesktopFeedCard(
+            post: item,
+          ),
+          PostControls(
+            postData: item,
+          ),
+        ],
+      ),
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
     );
   }
 }
@@ -527,13 +544,6 @@ class FeedList extends StatelessWidget {
       feedProvider.feedInformationError;
 
   const FeedList({Key key, @required this.feedProvider}) : super(key: key);
-
-  @override
-  Widget build2(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -549,9 +559,10 @@ class FeedList extends StatelessWidget {
         )
       ]);
     } else {
-      if (feedProvider.state == ViewState.Idle &&
+      bool idle = feedProvider.state == ViewState.Idle &&
           Provider.of<UserInformationProvider>(context, listen: false).state ==
-              ViewState.Idle) {
+              ViewState.Idle;
+      if (idle) {
         sliverChildDelegate = SliverChildBuilderDelegate(
           (BuildContext context, int index) {
             if (index == feedProvider.postFeed.data.children.length * 2) {
@@ -576,23 +587,26 @@ class FeedList extends StatelessWidget {
               }
             }
 
-            if (index % 2 == 1) {
-              return Divider();
-            }
-            var item = feedProvider.postFeed.data.children[(index ~/ 2)].data;
-            return InkWell(
-              onDoubleTap: () {
-                if (item.isSelf == false) {
-                  launchURL(Theme.of(context).primaryColor, item.url);
-                }
-              },
-              onTap: () {
-                _openComments(item, context, index);
-              },
-              child: DesktopPostCard(item: item),
+            final item = feedProvider.postFeed.data.children[index].data;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Divider(),
+                DesktopPostCard(
+                  item: item,
+                  onTap: () {
+                    _openComments(item, context, index);
+                  },
+                  onDoubleTap: () {
+                    if (item.isSelf == false) {
+                      launchURL(Theme.of(context).primaryColor, item.url);
+                    }
+                  },
+                ),
+              ],
             );
           },
-          childCount: feedProvider.postFeed.data.children.length * 2 + 1,
+          childCount: feedProvider.postFeed.data.children.length,
         );
       } else {
         sliverChildDelegate = SliverChildListDelegate([
