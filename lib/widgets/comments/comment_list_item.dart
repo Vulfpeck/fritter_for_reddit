@@ -99,7 +99,7 @@ class CollapsedCommentParent extends StatelessWidget {
           title: Text(
             comment.data.author +
                 " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
-            style: Theme.of(context).textTheme.subtitle.copyWith(
+            style: Theme.of(context).textTheme.subtitle2.copyWith(
                   fontStyle: FontStyle.italic,
                 ),
           ),
@@ -255,7 +255,7 @@ class AuthorTag extends StatelessWidget {
               comment.data.distinguished.toString().compareTo("moderator") == 0
                   ? TextSpan(
                       text: "MOD",
-                      style: Theme.of(context).textTheme.subtitle.copyWith(
+                      style: Theme.of(context).textTheme.subtitle2.copyWith(
                             color: Theme.of(context).accentColor,
                             letterSpacing: 1,
                           ),
@@ -273,7 +273,7 @@ class AuthorTag extends StatelessWidget {
                       ? getColor(_platformBrightness, ColorObjects.UpvoteColor)
                       : getColor(
                           _platformBrightness, ColorObjects.DownvoteColor)
-                  : Theme.of(context).textTheme.subtitle.color,
+                  : Theme.of(context).textTheme.subtitle2.color,
               size: 14,
             ),
             Text(
@@ -282,15 +282,15 @@ class AuthorTag extends StatelessWidget {
                   : " " + getRoundedToThousand(comment.data.score)),
               style: comment.data.likes != null
                   ? comment.data.likes == true
-                      ? Theme.of(context).textTheme.subtitle.copyWith(
+                      ? Theme.of(context).textTheme.subtitle2.copyWith(
                             color: getColor(
                                 _platformBrightness, ColorObjects.UpvoteColor),
                           )
-                      : Theme.of(context).textTheme.subtitle.copyWith(
+                      : Theme.of(context).textTheme.subtitle2.copyWith(
                             color: getColor(_platformBrightness,
                                 ColorObjects.DownvoteColor),
                           )
-                  : Theme.of(context).textTheme.subtitle,
+                  : Theme.of(context).textTheme.subtitle2,
               softWrap: true,
               overflow: TextOverflow.clip,
               maxLines: 100,
@@ -300,7 +300,7 @@ class AuthorTag extends StatelessWidget {
         Expanded(
           child: Text(
             " • " + getTimePosted(comment.data.createdUtc),
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
             overflow: TextOverflow.fade,
             maxLines: 100,
           ),
@@ -336,15 +336,15 @@ class PinnedCommentTag extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.label_outline,
-            color: Theme.of(context).textTheme.subtitle.color,
-            size: Theme.of(context).textTheme.subtitle.fontSize,
+            color: Theme.of(context).textTheme.subtitle2.color,
+            size: Theme.of(context).textTheme.subtitle2.fontSize,
           ),
           SizedBox(
             width: 4.0,
           ),
           Text(
             "Pinned",
-            style: Theme.of(context).textTheme.subtitle,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
       ),

@@ -1,6 +1,6 @@
+import 'package:fritter_for_reddit/models/comment_chain/comment_more_entity.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
-import 'package:fritter_for_reddit/models/comment_chain/comment_more_entity.dart';
 import 'package:fritter_for_reddit/models/user_profile/user_information_entity.dart';
 
 class EntityFactory {

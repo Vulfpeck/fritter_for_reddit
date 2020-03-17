@@ -207,7 +207,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
               child: Text(
                 "🐶boop",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ),
           ),

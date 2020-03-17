@@ -75,7 +75,7 @@ class UserProfileScreen extends StatelessWidget {
                                             "You're not signed in",
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .headline,
+                                                .headline5,
                                             textAlign: TextAlign.center,
                                           ),
                                           SizedBox(
@@ -158,7 +158,7 @@ class SignedInProfileContent extends StatelessWidget {
                 model.userInformation.name,
                 style: Theme.of(context)
                     .textTheme
-                    .headline
+                    .headline5
                     .copyWith(fontWeight: FontWeight.w500),
               ),
               SizedBox(
@@ -171,7 +171,7 @@ class SignedInProfileContent extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         "Link Karma",
-                        style: Theme.of(context).textTheme.subtitle,
+                        style: Theme.of(context).textTheme.subtitle2,
                       ),
                       SizedBox(
                         height: 4.0,
@@ -180,14 +180,14 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.link,
-                            color: Theme.of(context).textTheme.subtitle.color,
+                            color: Theme.of(context).textTheme.subtitle2.color,
                           ),
                           SizedBox(
                             width: 8.0,
                           ),
                           Text(
                             model.userInformation.linkKarma.toString(),
-                            style: Theme.of(context).textTheme.title,
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ],
                       ),
@@ -197,7 +197,7 @@ class SignedInProfileContent extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         "Comment Karma",
-                        style: Theme.of(context).textTheme.subtitle,
+                        style: Theme.of(context).textTheme.subtitle2,
                       ),
                       SizedBox(
                         height: 4.0,
@@ -206,14 +206,14 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.chat_bubble_outline,
-                            color: Theme.of(context).textTheme.subtitle.color,
+                            color: Theme.of(context).textTheme.subtitle2.color,
                           ),
                           SizedBox(
                             width: 8.0,
                           ),
                           Text(
                             model.userInformation.commentKarma.toString(),
-                            style: Theme.of(context).textTheme.title,
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ],
                       ),

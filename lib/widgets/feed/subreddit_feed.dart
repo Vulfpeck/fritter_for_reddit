@@ -101,7 +101,7 @@ class _SubredditFeedState extends State<SubredditFeed>
 
                                 model.fetchPostsListing(
                                   currentSort: "/top/.json?sort=top&t=$value",
-                                  currentSubreddit: model.sub,
+                                  currentSubreddit: model.currentSubreddit,
                                   loadingTop: true,
                                 );
                               },
@@ -114,7 +114,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                       sortSelectorValue = value;
                       feedProvider.fetchPostsListing(
                         currentSort: value,
-                        currentSubreddit: model.sub,
+                        currentSubreddit: model.currentSubreddit,
                         loadingTop: false,
                       );
                     }
@@ -159,9 +159,9 @@ class _SubredditFeedState extends State<SubredditFeed>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Expanded(
-                    child: model.currentPage != CurrentPage.FrontPage
+                    child: model.currentPage != CurrentPage.frontPage
                         ? Text(
-                            '/r/' + model.sub.toString(),
+                            '/r/' + model.currentSubreddit.toString(),
                             textAlign: TextAlign.center,
                           )
                         : Text('Frontpage', textAlign: TextAlign.center),
@@ -333,7 +333,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
                   child: feedProvider != null
                       ? feedProvider.state == ViewState.Idle
-                          ? feedProvider.currentPage == CurrentPage.FrontPage
+                          ? feedProvider.currentPage == CurrentPage.frontPage
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +344,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                           'Front Page',
                                           style: Theme.of(context)
                                               .textTheme
-                                              .headline
+                                              .headline5
                                               .copyWith(
                                                   fontWeight: FontWeight.bold),
                                         ),
@@ -437,7 +437,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                       widget.pageTitle,
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .headline
+                                                          .headline5
                                                           .copyWith(
                                                               fontWeight:
                                                                   FontWeight
@@ -465,7 +465,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                       .displayNamePrefixed,
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .headline
+                                                      .headline5
                                                       .copyWith(
                                                         fontWeight:
                                                             FontWeight.w600,
@@ -482,7 +482,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                       " Subscribers",
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .subhead,
+                                                      .subtitle1,
                                                 ),
                                                 SizedBox(
                                                   height: 8,
@@ -496,7 +496,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                                         textColor:
                                                             Theme.of(context)
                                                                 .textTheme
-                                                                .body1
+                                                                .bodyText2
                                                                 .color,
                                                         child: feedProvider
                                                                     .partialState ==
@@ -558,7 +558,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                 'Front Page',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline
+                                    .headline5
                                     .copyWith(fontWeight: FontWeight.bold),
                               ),
                             ],

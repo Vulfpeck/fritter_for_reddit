@@ -5,11 +5,11 @@ import 'package:fritter_for_reddit/models/subreddits/child.dart';
 import 'package:fritter_for_reddit/providers/feed_provider.dart';
 
 class DesktopSubredditDrawerTile extends StatelessWidget {
-  final Child child;
+  final Child subreddit;
 
   const DesktopSubredditDrawerTile({
     Key key,
-    @required this.child,
+    @required this.subreddit,
   }) : super(key: key);
 
   @override
@@ -17,29 +17,28 @@ class DesktopSubredditDrawerTile extends StatelessWidget {
     return ListTile(
       dense: true,
       title: Text(
-        child.display_name,
-        style: Theme.of(context).textTheme.subhead,
+        subreddit.display_name,
+        style: Theme.of(context).textTheme.subtitle1,
       ),
       leading: CircleAvatar(
         maxRadius: 16,
-        backgroundImage: child.community_icon != ""
+        backgroundImage: subreddit.community_icon != ""
             ? CachedNetworkImageProvider(
-                child.community_icon,
+                subreddit.community_icon,
               )
-            : child.icon_img != ""
+            : subreddit.icon_img != ""
                 ? CachedNetworkImageProvider(
-                    child.icon_img,
+                    subreddit.icon_img,
                   )
                 : AssetImage('assets/default_icon.png'),
-        backgroundColor: child.primary_color == ""
+        backgroundColor: subreddit.primary_color == ""
             ? Theme.of(context).accentColor
             : HexColor(
-                child.primary_color,
+                subreddit.primary_color,
               ),
       ),
       onTap: () {
-        FeedProvider.of(context, listen: false)
-            .fetchPostsListing(currentSubreddit: child.display_name);
+        FeedProvider.of(context).navigateToSubreddit(subreddit.display_name);
       },
     );
   }

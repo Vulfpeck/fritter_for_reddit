@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 
 import 'search_screen.dart';
 import 'user_profile.dart';
@@ -50,8 +51,9 @@ class HomePage extends StatelessWidget {
           switch (index) {
             case 0:
               return CupertinoTabView(
-                navigatorKey: firstTabNavKey,
+//                navigatorKey: firstTabNavKey,
                 builder: (BuildContext context) => LeftDrawer(
+                  mode: Mode.mobile,
                   firstLaunch: true,
                 ),
                 defaultTitle: 'Feed',
@@ -59,14 +61,14 @@ class HomePage extends StatelessWidget {
               break;
             case 1:
               return CupertinoTabView(
-                navigatorKey: secondTabNavKey,
+//                navigatorKey: secondTabNavKey,
                 builder: (BuildContext context) => SearchPage(),
                 defaultTitle: 'Search',
               );
               break;
             case 2:
               return CupertinoTabView(
-                navigatorKey: thirdTabNavKey,
+//                navigatorKey: thirdTabNavKey,
                 builder: (BuildContext context) => UserProfileScreen(),
                 defaultTitle: 'Profile',
               );

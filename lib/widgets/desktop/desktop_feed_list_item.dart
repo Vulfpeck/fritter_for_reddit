@@ -12,88 +12,158 @@ import 'package:fritter_for_reddit/widgets/feed/reddit_video_player.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class DesktopFeedCard extends StatelessWidget {
-  final PostsFeedDataChildrenData data;
+  final PostsFeedDataChildrenData post;
 
-  DesktopFeedCard(this.data);
+  DesktopFeedCard({@required this.post});
 
   final _htmlUnescape = new HtmlUnescape();
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      leading: Card(
-        child: data.hasImage
-            ? CachedNetworkImage(
-                imageUrl: data.preview.images.first.source.url,
-                width: 50,
-              )
-            : Chip(
-                label: Text(data.linkFlairText ?? ''),
-                backgroundColor: HexColor(data.linkFlairBackgroundColor),
-              ),
-      ),
-      title: FeedCardTitle(
-        title: data.title,
-        stickied: data.stickied,
-        linkFlairText: data.linkFlairText,
-        nsfw: data.over18,
-        locked: data.locked,
-      ),
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'in r/' + data.subreddit + ' by ' + data.author,
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-              if (data.over18)
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.warning,
-                        color: Colors.red,
-                        size: 15,
-                      ),
-                      SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        'NSFW',
-                        style: TextStyle(color: Colors.red),
-                      )
-                    ],
-                  ),
-                ),
-            ],
+    if (post.hasImage) {
+      return ExpansionTile(
+        leading: Card(
+          child: CachedNetworkImage(
+            imageUrl: post.preview.images.first.source.url,
+            width: 50,
           ),
         ),
-        data.isSelf == false && data.postType == MediaType.Url
-            ? PostUrlPreview(
-                data: data,
-                htmlUnescape: _htmlUnescape,
-              )
-            : Container(),
-        data.preview != null &&
-                data.isSelf == false &&
-                data.postType != MediaType.Url
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                child: FeedCardBodyImage(
-                  images: data.preview.images,
-                  data: data,
-                  postMetaData: {'media_type': data.postType, 'url': data.url},
-                  deviceWidth: MediaQuery.of(context).size.width,
-                ),
-              )
-            : Container(),
-      ],
-    );
+        title: FeedCardTitle(
+          title: post.title,
+          stickied: post.stickied,
+          linkFlairText: post.linkFlairText,
+          nsfw: post.over18,
+          locked: post.locked,
+          author: post.author,
+        ),
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                if (post.over18)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.warning,
+                          color: Colors.red,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          'NSFW',
+                          style: TextStyle(color: Colors.red),
+                        )
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          post.isSelf == false && post.postType == MediaType.Url
+              ? PostUrlPreview(
+                  data: post,
+                  htmlUnescape: _htmlUnescape,
+                )
+              : Container(),
+          post.preview != null &&
+                  post.isSelf == false &&
+                  post.postType != MediaType.Url
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+                  child: FeedCardBodyImage(
+                    images: post.preview.images,
+                    data: post,
+                    postMetaData: {
+                      'media_type': post.postType,
+                      'url': post.url
+                    },
+                    deviceWidth: MediaQuery.of(context).size.width,
+                  ),
+                )
+              : Container(),
+        ],
+      );
+    } else {
+      return ListTile(
+        leading: Card(
+          child: Chip(
+            label: Text(post.linkFlairText ?? ''),
+            backgroundColor: HexColor(post.linkFlairBackgroundColor),
+          ),
+        ),
+        title: FeedCardTitle(
+          title: post.title,
+          stickied: post.stickied,
+          linkFlairText: post.linkFlairText,
+          nsfw: post.over18,
+          locked: post.locked,
+          author: post.author,
+        ),
+        subtitle: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  if (post.over18)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.warning,
+                            color: Colors.red,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 3,
+                          ),
+                          Text(
+                            'NSFW',
+                            style: TextStyle(color: Colors.red),
+                          )
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            post.isSelf == false && post.postType == MediaType.Url
+                ? PostUrlPreview(
+                    data: post,
+                    htmlUnescape: _htmlUnescape,
+                  )
+                : Container(),
+            post.preview != null &&
+                    post.isSelf == false &&
+                    post.postType != MediaType.Url
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+                    child: FeedCardBodyImage(
+                      images: post.preview.images,
+                      data: post,
+                      postMetaData: {
+                        'media_type': post.postType,
+                        'url': post.url
+                      },
+                      deviceWidth: MediaQuery.of(context).size.width,
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
+      );
+    }
   }
 }
 
@@ -103,6 +173,7 @@ class FeedCardTitle extends StatelessWidget {
   final String linkFlairText;
   final bool nsfw;
   final bool locked;
+  final String author;
 
   final String escapedTitle;
 
@@ -112,6 +183,7 @@ class FeedCardTitle extends StatelessWidget {
     @required this.linkFlairText,
     @required this.nsfw,
     @required this.locked,
+    @required this.author,
   }) : escapedTitle = HtmlUnescape().convert(title);
 
   @override
@@ -127,6 +199,11 @@ class FeedCardTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Text(
+            'Posted by u/$author',
+            style: TextStyle(
+                fontWeight: FontWeight.w300, fontSize: 12, color: Colors.grey),
+          ),
           StickyTag(stickied),
           Text(
             title,
@@ -170,7 +247,7 @@ class FeedCardTitle extends StatelessWidget {
 //                            )
 //                          : TextSpan(),
 //                    ],
-//                    style: Theme.of(context).textTheme.subtitle,
+//                    style: Theme.of(context).textTheme.subtitle2,
 //                  ),
 //                )
 //              : Container(),
@@ -274,8 +351,8 @@ class FeedCardBodySelfText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.body1,
-      linkStyle: Theme.of(context).textTheme.body1.copyWith(
+      defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+      linkStyle: Theme.of(context).textTheme.bodyText2.copyWith(
             color: Theme.of(context).accentColor,
           ),
       padding: EdgeInsets.all(16),

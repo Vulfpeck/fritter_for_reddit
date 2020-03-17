@@ -57,7 +57,7 @@ class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               backgroundColor: Colors.transparent,
               title: Text(
                 title,
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ),
           ),

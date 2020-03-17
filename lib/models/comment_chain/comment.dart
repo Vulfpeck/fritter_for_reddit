@@ -19,7 +19,7 @@ class Comment {
     this.data,
   });
 
-  factory Comment.fromMap(Map<String, dynamic> json) => Comment(
+  factory Comment.fromMap(Map json) => Comment(
         kind: json["kind"],
         data: CommentData.fromMap(json["data"]),
       );
@@ -45,7 +45,7 @@ class CommentData {
     this.before,
   });
 
-  factory CommentData.fromMap(Map<String, dynamic> json) => CommentData(
+  factory CommentData.fromMap(Map json) => CommentData(
         modhash: json["modhash"],
         dist: json["dist"] == null ? null : json["dist"],
         children:
@@ -72,7 +72,7 @@ class Child {
     this.data,
   });
 
-  factory Child.fromMap(Map<String, dynamic> json) => Child(
+  factory Child.fromMap(Map json) => Child(
         kind: kindValues.map[json["kind"]],
         data: ChildData.fromMap(json["data"]),
       );
@@ -322,7 +322,7 @@ class ChildData {
     this.children,
   });
 
-  factory ChildData.fromMap(Map<String, dynamic> json) => ChildData(
+  factory ChildData.fromMap(Map json) => ChildData(
         approvedAtUtc: json["approved_at_utc"],
         subreddit: json["subreddit"] == null ? null : json["subreddit"],
         selftext: json["selftext"] == null ? null : json["selftext"],
@@ -665,7 +665,7 @@ class ChildData {
 class Gildings {
   Gildings();
 
-  factory Gildings.fromMap(Map<String, dynamic> json) => Gildings();
+  factory Gildings.fromMap(Map json) => Gildings();
 
   Map<String, dynamic> toMap() => {};
 }
@@ -679,7 +679,7 @@ class Preview {
     this.enabled,
   });
 
-  factory Preview.fromMap(Map<String, dynamic> json) => Preview(
+  factory Preview.fromMap(Map json) => Preview(
         images: List<Image>.from(json["images"].map((x) => Image.fromMap(x))),
         enabled: json["enabled"],
       );
@@ -703,7 +703,7 @@ class Image {
     this.id,
   });
 
-  factory Image.fromMap(Map<String, dynamic> json) => Image(
+  factory Image.fromMap(Map json) => Image(
         source: Source.fromMap(json["source"]),
         resolutions: List<Source>.from(
             json["resolutions"].map((x) => Source.fromMap(x))),
@@ -730,7 +730,7 @@ class Source {
     this.height,
   });
 
-  factory Source.fromMap(Map<String, dynamic> json) => Source(
+  factory Source.fromMap(Map json) => Source(
         url: json["url"],
         width: json["width"],
         height: json["height"],

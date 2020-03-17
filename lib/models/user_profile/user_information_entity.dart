@@ -112,7 +112,7 @@ class UserInformationEntity {
       this.goldExpiration,
       this.seenSubredditChatFtux});
 
-  UserInformationEntity.fromJson(Map<String, dynamic> json) {
+  UserInformationEntity.fromJson(Map json) {
     hasStripeSubscription = json['has_stripe_subscription'];
     canCreateSubreddit = json['can_create_subreddit'];
     over18 = json['over_18'];
@@ -319,7 +319,7 @@ class UserInformationSubreddit {
       this.bannerImg,
       this.name});
 
-  UserInformationSubreddit.fromJson(Map<String, dynamic> json) {
+  UserInformationSubreddit.fromJson(Map json) {
     publicDescription = json['public_description'];
     keyColor = json['key_color'];
     over18 = json['over_18'];
@@ -464,7 +464,7 @@ class UserInformationFeatures {
       this.readFromPrefService,
       this.chatReddarReports});
 
-  UserInformationFeatures.fromJson(Map<String, dynamic> json) {
+  UserInformationFeatures.fromJson(Map json) {
     chatUserSettings = json['chat_user_settings'];
     modAwards = json['mod_awards'];
     stewardUi = json['steward_ui'];
@@ -560,8 +560,7 @@ class UserInformationFeaturesMwebXpromoRevampV3 {
   UserInformationFeaturesMwebXpromoRevampV3(
       {this.owner, this.experimentId, this.variant});
 
-  UserInformationFeaturesMwebXpromoRevampV3.fromJson(
-      Map<String, dynamic> json) {
+  UserInformationFeaturesMwebXpromoRevampV3.fromJson(Map json) {
     owner = json['owner'];
     experimentId = json['experiment_id'];
     variant = json['variant'];
@@ -584,7 +583,7 @@ class UserInformationFeaturesMwebNsfwXpromo {
   UserInformationFeaturesMwebNsfwXpromo(
       {this.owner, this.experimentId, this.variant});
 
-  UserInformationFeaturesMwebNsfwXpromo.fromJson(Map<String, dynamic> json) {
+  UserInformationFeaturesMwebNsfwXpromo.fromJson(Map json) {
     owner = json['owner'];
     experimentId = json['experiment_id'];
     variant = json['variant'];
@@ -607,7 +606,7 @@ class UserInformationFeaturesDefaultSrsHoldout {
   UserInformationFeaturesDefaultSrsHoldout(
       {this.owner, this.experimentId, this.variant});
 
-  UserInformationFeaturesDefaultSrsHoldout.fromJson(Map<String, dynamic> json) {
+  UserInformationFeaturesDefaultSrsHoldout.fromJson(Map json) {
     owner = json['owner'];
     experimentId = json['experiment_id'];
     variant = json['variant'];

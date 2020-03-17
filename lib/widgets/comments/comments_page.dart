@@ -134,10 +134,10 @@ class CommentsScreen extends StatelessWidget {
 //                                  title: Html(
 //                                    padding: EdgeInsets.all(0),
 //                                    defaultTextStyle:
-//                                        Theme.of(context).textTheme.body1,
+//                                        Theme.of(context).textTheme.bodyText2,
 //                                    linkStyle: Theme.of(context)
 //                                        .textTheme
-//                                        .body1
+//                                        .bodyText2
 //                                        .copyWith(
 //                                          color: Theme.of(context).accentColor,
 //                                        ),

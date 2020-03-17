@@ -36,10 +36,11 @@ class PostUrlPreview extends StatelessWidget {
           },
           title: Text(
             data.url,
-            style: Theme.of(context).textTheme.subtitle.copyWith(
-                  color: Theme.of(context).textTheme.subtitle.color.withOpacity(
-                        0.8,
-                      ),
+            style: Theme.of(context).textTheme.subtitle2.copyWith(
+                  color:
+                      Theme.of(context).textTheme.subtitle2.color.withOpacity(
+                            0.8,
+                          ),
                 ),
             maxLines: 1,
             softWrap: false,

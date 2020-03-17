@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class DesktopLayout extends StatefulWidget {
   final Widget leftPanel;
   final Widget content;
+  final Widget rightPanel;
 
   DesktopLayout({
     Key key,
     this.leftPanel,
     this.content,
+    this.rightPanel,
   }) : super(key: key);
 
   @override
@@ -24,7 +26,10 @@ class _DesktopLayoutState extends State<DesktopLayout> {
         Expanded(
           flex: 3,
           child: widget.content ?? Container(),
-        )
+        ),
+        if (widget.rightPanel != null) Divider(),
+        if (widget.rightPanel != null)
+          Expanded(flex: 1, child: widget.rightPanel)
       ],
     );
   }

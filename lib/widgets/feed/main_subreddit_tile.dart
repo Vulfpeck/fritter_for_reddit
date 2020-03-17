@@ -19,7 +19,7 @@ class MainSubredditTile extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
-        style: Theme.of(context).textTheme.subhead,
+        style: Theme.of(context).textTheme.subtitle1,
       ),
       leading: CircleAvatar(
         backgroundImage: AssetImage('assets/default_icon.png'),

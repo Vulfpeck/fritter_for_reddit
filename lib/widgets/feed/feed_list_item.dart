@@ -43,7 +43,7 @@ class FeedCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'in r/' + data.subreddit + ' by ' + data.author,
-                  style: Theme.of(context).textTheme.subtitle,
+                  style: Theme.of(context).textTheme.subtitle2,
                 ),
                 if (data.over18)
                   Padding(
@@ -169,7 +169,7 @@ class FeedCardTitle extends StatelessWidget {
 //                            )
 //                          : TextSpan(),
 //                    ],
-//                    style: Theme.of(context).textTheme.subtitle,
+//                    style: Theme.of(context).textTheme.subtitle2,
 //                  ),
 //                )
 //              : Container(),
@@ -295,8 +295,8 @@ class FeedCardBodySelfText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.body1,
-      linkStyle: Theme.of(context).textTheme.body1.copyWith(
+      defaultTextStyle: Theme.of(context).textTheme.bodyText2,
+      linkStyle: Theme.of(context).textTheme.bodyText2.copyWith(
             color: Theme.of(context).accentColor,
           ),
       padding: EdgeInsets.all(16),

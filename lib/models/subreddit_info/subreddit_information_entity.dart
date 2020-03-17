@@ -4,7 +4,7 @@ class SubredditInformationEntity {
 
   SubredditInformationEntity({this.data, this.kind});
 
-  SubredditInformationEntity.fromJson(Map<String, dynamic> json) {
+  SubredditInformationEntity.fromJson(Map json) {
     data = json['data'] != null
         ? new SubredditInformationData.fromJson(json['data'])
         : null;
@@ -201,7 +201,7 @@ class SubredditInformationData {
       this.emojisCustomSize,
       this.canAssignLinkFlair});
 
-  SubredditInformationData.fromJson(Map<String, dynamic> json) {
+  SubredditInformationData.fromJson(Map json) {
     userFlairPosition = json['user_flair_position'];
     publicDescription = json['public_description'];
     keyColor = json['key_color'];
@@ -401,8 +401,7 @@ class SubredditInformationDataUserFlairRichtext {
 
   SubredditInformationDataUserFlairRichtext({this.t, this.e});
 
-  SubredditInformationDataUserFlairRichtext.fromJson(
-      Map<String, dynamic> json) {
+  SubredditInformationDataUserFlairRichtext.fromJson(Map json) {
     t = json['t'];
     e = json['e'];
   }
