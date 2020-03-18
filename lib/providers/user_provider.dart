@@ -13,6 +13,10 @@ import 'package:fritter_for_reddit/secrets.dart';
 import 'package:http/http.dart' as http;
 
 class UserInformationProvider with ChangeNotifier {
+  static UserInformationProvider of(BuildContext context,
+          {bool listen = false}) =>
+      Provider.of<UserInformationProvider>(context, listen: listen);
+
   HttpServer server;
   final _storageHelper = new SecureStorageHelper();
 
@@ -198,7 +202,7 @@ class UserInformationProvider with ChangeNotifier {
     // print("final res: " + res.toString());
     if (res) {
       await Provider.of<FeedProvider>(context, listen: false)
-          .fetchPostsListing();
+          .navigateToSubreddit('');
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }

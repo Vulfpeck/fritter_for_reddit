@@ -32,6 +32,6 @@ class SubredditInfoAdapter extends TypeAdapter<SubredditInfo> {
       ..writeByte(1)
       ..write(obj.postsFeed)
       ..writeByte(2)
-      ..write(obj.subredditInformation.toJson());
+      ..write(obj.subredditInformation?.toJson());
   }
 }

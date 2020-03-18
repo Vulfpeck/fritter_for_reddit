@@ -13,9 +13,7 @@ import 'package:fritter_for_reddit/widgets/feed/post_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DesktopSubredditFeed extends StatefulWidget {
-  final String pageTitle;
-
-  DesktopSubredditFeed({this.pageTitle = ""});
+  DesktopSubredditFeed();
 
   @override
   _DesktopSubredditFeedState createState() => _DesktopSubredditFeedState();
@@ -54,124 +52,134 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FeedProvider>(
-      builder: (BuildContext context, FeedProvider model, _) {
-        return CustomScrollView(
-          controller: _controller,
-          physics: AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverAppBar(
-              iconTheme: Theme.of(context).iconTheme,
-              actions: <Widget>[
-                PopupMenuButton<String>(
-                  key: key,
-                  icon: Icon(
-                    Icons.sort,
-                  ),
-                  onSelected: (value) {
-                    final RenderBox box = key.currentContext.findRenderObject();
-                    final positionDropDown = box.localToGlobal(Offset.zero);
-                    // print(
-                    if (value == "Top") {
-                      sortSelectorValue = "Top";
-                      showMenu(
-                        position: RelativeRect.fromLTRB(
-                          positionDropDown.dx,
-                          positionDropDown.dy,
-                          0,
-                          0,
-                        ),
-                        context: context,
-                        items: <String>[
-                          'Day',
-                          'Week',
-                          'Month',
-                          'Year',
-                          'All',
-                        ].map((value) {
-                          return PopupMenuItem<String>(
-                            value: value,
-                            child: ListTile(
-                              title: Text(value),
-                              onTap: () {
-                                Navigator.of(context, rootNavigator: false)
-                                    .pop();
-
-                                model.fetchPostsListing(
-                                  currentSort: "/top/.json?sort=top&t=$value",
-                                  currentSubreddit: model.currentSubreddit,
-                                  loadingTop: true,
-                                );
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    } else if (value == 'Close' || value == sortSelectorValue) {
-                    } else {
-                      sortSelectorValue = value;
-                      feedProvider.fetchPostsListing(
-                        currentSort: value,
-                        currentSubreddit: model.currentSubreddit,
-                        loadingTop: false,
-                      );
-                    }
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return <String>[
-                      'Best',
-                      'Hot',
-                      'Top',
-                      'New',
-                      'Controversial',
-                      'Rising'
-                    ].map((String value) {
-                      return new PopupMenuItem<String>(
-                        value: value,
-                        child: new Text(value),
-                      );
-                    }).toList();
-                  },
-                  onCanceled: () {},
-                  initialValue: sortSelectorValue,
+    return StreamBuilder<SubredditInfo>(
+      stream: feedProvider.subStream,
+      builder: (BuildContext context, snapshot) {
+        if (!snapshot.hasData) {
+          return LinearProgressIndicator();
+        }
+        final SubredditInfo subredditInfo = snapshot.data;
+        return RefreshIndicator(
+          onRefresh: () => FeedProvider.of(context).refresh(),
+          child: CustomScrollView(
+            controller: _controller,
+            physics: AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverAppBar(
+                iconTheme: Theme.of(context).iconTheme,
+                centerTitle: true,
+                title: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      subredditInfo.name.isNotEmpty
+                          ? subredditInfo.name
+                          : 'FrontPage',
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      '/r/${subredditInfo.name.isNotEmpty ? subredditInfo.name : 'FrontPage'}',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle2
+                          .copyWith(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.info_outline),
-                  color: Theme.of(context).iconTheme.color,
-                  onPressed: () {
-                    showSubInformationSheet(context);
-                  },
-                )
-              ],
-              pinned: true,
-              snap: true,
-              floating: true,
-              primary: true,
-              elevation: 0,
-              brightness: MediaQuery.of(context).platformBrightness,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              textTheme: Theme.of(context).textTheme,
-              centerTitle: true,
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    model.currentSubreddit,
-                    textAlign: TextAlign.center,
+                actions: <Widget>[
+                  PopupMenuButton<String>(
+                    key: key,
+                    icon: Icon(
+                      Icons.sort,
+                    ),
+                    onSelected: (value) {
+                      final RenderBox box =
+                          key.currentContext.findRenderObject();
+                      final positionDropDown = box.localToGlobal(Offset.zero);
+                      // print(
+                      if (value == "Top") {
+                        sortSelectorValue = "Top";
+                        showMenu(
+                          position: RelativeRect.fromLTRB(
+                            positionDropDown.dx,
+                            positionDropDown.dy,
+                            0,
+                            0,
+                          ),
+                          context: context,
+                          items: <String>[
+                            'Day',
+                            'Week',
+                            'Month',
+                            'Year',
+                            'All',
+                          ].map((value) {
+                            return PopupMenuItem<String>(
+                              value: value,
+                              child: ListTile(
+                                title: Text(value),
+                                onTap: () {
+                                  Navigator.of(context, rootNavigator: false)
+                                      .pop();
+
+                                  feedProvider.updateSorting(
+                                    sortBy: "/top/.json?sort=top&t=$value",
+                                    loadingTop: true,
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      } else if (value == 'Close' ||
+                          value == sortSelectorValue) {
+                      } else {
+                        sortSelectorValue = value;
+                        feedProvider.updateSorting(
+                          sortBy: value,
+                          loadingTop: false,
+                        );
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return <String>[
+                        'Best',
+                        'Hot',
+                        'Top',
+                        'New',
+                        'Controversial',
+                        'Rising'
+                      ].map((String value) {
+                        return new PopupMenuItem<String>(
+                          value: value,
+                          child: new Text(value),
+                        );
+                      }).toList();
+                    },
+                    onCanceled: () {},
+                    initialValue: sortSelectorValue,
                   ),
-                  Text(
-                    '/r/${model.currentSubreddit}',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(fontSize: 12, color: Colors.grey),
-                  ),
+                  IconButton(
+                    icon: Icon(Icons.info_outline),
+                    color: Theme.of(context).iconTheme.color,
+                    onPressed: () {
+                      showSubInformationSheet(context);
+                    },
+                  )
                 ],
+                pinned: true,
+                snap: true,
+                floating: true,
+                primary: true,
+                elevation: 0,
+                brightness: MediaQuery.of(context).platformBrightness,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                textTheme: Theme.of(context).textTheme,
               ),
-            ),
-            FeedList(feedProvider: model)
-          ],
+              FeedList(feedProvider: feedProvider)
+            ],
+          ),
         );
 //        return ListView.builder(
 //          itemBuilder: (BuildContext context, int index) {
@@ -362,7 +370,8 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                   Row(
                                                     children: <Widget>[
                                                       Text(
-                                                        widget.pageTitle,
+                                                        feedProvider.subStream
+                                                            .value.name,
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .headline5
@@ -540,8 +549,7 @@ class FeedList extends StatelessWidget {
   final FeedProvider feedProvider;
 
   bool get hasError =>
-      feedProvider.subredditInformationError ||
-      feedProvider.feedInformationError;
+      feedProvider.subLoadingError || feedProvider.feedInformationLoadingError;
 
   const FeedList({Key key, @required this.feedProvider}) : super(key: key);
 
@@ -559,13 +567,13 @@ class FeedList extends StatelessWidget {
         )
       ]);
     } else {
-      bool idle = feedProvider.state == ViewState.Idle &&
-          Provider.of<UserInformationProvider>(context, listen: false).state ==
-              ViewState.Idle;
-      if (idle) {
+//      bool idle = feedProvider.state == ViewState.Idle &&
+//          Provider.of<UserInformationProvider>(context, listen: false).state ==
+//              ViewState.Idle;
+      if (true) {
         sliverChildDelegate = SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            if (index == feedProvider.postFeed.data.children.length * 2) {
+            if (index == feedProvider.postFeed.data.children.length) {
               bool isLoading =
                   feedProvider.loadMorePostsState == ViewState.Busy;
               if (isLoading) {
@@ -658,7 +666,7 @@ class FeedList extends StatelessWidget {
       CupertinoPageRoute(
         maintainState: true,
         builder: (BuildContext context) {
-          return CommentsScreen(
+          return DesktopCommentsScreen(
             postData: item,
           );
         },

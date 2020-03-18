@@ -8,6 +8,7 @@ import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
 import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
@@ -45,147 +46,73 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CupertinoPageScaffold(
-        child: Consumer<UserInformationProvider>(
-            builder: (BuildContext context, UserInformationProvider model, _) {
-          if (model.signedIn) {
-            return CupertinoScrollbar(
-              controller: _controller,
-              child: CustomScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                slivers: <Widget>[
-                  DrawerSliverAppBar(),
-                  GoToSubredditWidget(
-                    focusNode: focusNode,
-                    mode: widget.mode,
-                  ),
-                  SliverListHeader(title: 'Subscribed Subreddits'),
-                  SliverList(
-                    delegate: model.state == ViewState.Idle
-                        ? SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              if (widget.mode == Mode.mobile) {
-                                return SubredditDrawerTile(
-                                  focusNode: focusNode,
-                                  child:
-                                      model.userSubreddits.data.children[index],
-                                );
-                              } else {
-                                return DesktopSubredditDrawerTile(
-                                  subreddit:
-                                      model.userSubreddits.data.children[index],
-                                );
-                              }
-                            },
-                            childCount:
-                                model.userSubreddits.data.children.length,
-                          )
-                        : SliverChildListDelegate([
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: LinearProgressIndicator(),
-                            ),
-                          ]),
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [SizedBox(height: MediaQuery.of(context).padding.bottom)],
+    return CupertinoPageScaffold(
+      child: Consumer<UserInformationProvider>(
+          builder: (BuildContext context, UserInformationProvider model, _) {
+        return CupertinoScrollbar(
+          controller: _controller,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                child: CustomScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  controller: _controller,
+                  slivers: <Widget>[
+                    DrawerSliverAppBar(),
+                    GoToSubredditWidget(
+                      focusNode: focusNode,
+                      mode: widget.mode,
                     ),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return CupertinoScrollbar(
-              controller: _controller,
-              child: CustomScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                controller: _controller,
-                slivers: <Widget>[
-                  DrawerSliverAppBar(),
-                  GoToSubredditWidget(
-                    focusNode: focusNode,
-                    mode: widget.mode,
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          right: 16,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 48,
-                            ),
-                            Text(
-                              "Hello 🥳",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4
-                                  .copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .headline6
-                                        .color,
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              "You're not signed in",
-                              style: Theme.of(context).textTheme.headline5,
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            Text(
-                              "Sign in to Fritter to see your subscriptions",
-                              style: Theme.of(context).textTheme.bodyText2,
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: 32,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              height: 56.0,
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    14,
-                                  ),
-                                ),
-                                child: Text("Sign In"),
-                                onPressed: () {
-                                  model.authenticateUser(context);
+                    if (!model.signedIn)
+                      Login()
+                    else ...[
+                      SliverListHeader(title: 'Subscribed Subreddits'),
+                      SliverList(
+                        delegate: model.state == ViewState.Idle
+                            ? SliverChildBuilderDelegate(
+                                (BuildContext context, int index) {
+                                  if (widget.mode == Mode.mobile) {
+                                    return SubredditDrawerTile(
+                                      focusNode: focusNode,
+                                      child: model
+                                          .userSubreddits.data.children[index],
+                                    );
+                                  } else {
+                                    return DesktopSubredditDrawerTile(
+                                      subreddit: model
+                                          .userSubreddits.data.children[index],
+                                    );
+                                  }
                                 },
-                              ),
-                            ),
-                            SizedBox(
-                              height:
-                                  MediaQuery.of(context).padding.bottom + 24,
-                            ),
-                          ],
+                                childCount:
+                                    model.userSubreddits.data.children.length,
+                              )
+                            : SliverChildListDelegate([
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: LinearProgressIndicator(),
+                                ),
+                              ]),
+                      ),
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom,
                         ),
                       ),
-                    ]),
-                  ),
-                ],
+                    ],
+                  ],
+                ),
               ),
-            );
-          }
-        }),
-      ),
+              if (model.userInformation != null)
+                ProfileListTile(
+                  name: model.userInformation.name,
+                  imageUrl: model.userInformation.iconImg,
+                ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
@@ -217,7 +144,7 @@ class SubredditDrawerTile extends StatelessWidget {
               )
             : child.icon_img != ""
                 ? CachedNetworkImageProvider(
-                    child.icon_img,
+                    child.icon_img.asSanitizedImageUrl,
                   )
                 : AssetImage('assets/default_icon.png'),
         backgroundColor: child.primary_color == ""
@@ -266,5 +193,105 @@ class DrawerSliverAppBar extends StatelessWidget {
 //    return BlurredSliverAppBar(
 //      title: "Subreddits",
 //    );
+  }
+}
+
+class Login extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 16,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              SizedBox(
+                height: 48,
+              ),
+              Text(
+                "Hello 🥳",
+                style: Theme.of(context).textTheme.headline4.copyWith(
+                      color: Theme.of(context).textTheme.headline6.color,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              Text(
+                "You're not signed in",
+                style: Theme.of(context).textTheme.headline5,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Text(
+                "Sign in to Fritter to see your subscriptions",
+                style: Theme.of(context).textTheme.bodyText2,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 32,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: 56.0,
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      14,
+                    ),
+                  ),
+                  child: Text("Sign In"),
+                  onPressed: () {
+                    Provider.of<UserInformationProvider>(context, listen: false)
+                        .authenticateUser(context);
+                  },
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).padding.bottom + 24,
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class ProfileListTile extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+
+  const ProfileListTile({
+    Key key,
+    @required this.imageUrl,
+    @required this.name,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      leading: CircleAvatar(
+        backgroundImage: CachedNetworkImageProvider(
+          imageUrl.asSanitizedImageUrl,
+        ),
+      ),
+      title: Text(name),
+      children: <Widget>[
+        ListTile(
+          title: Text('Logout'),
+          onTap: () => UserInformationProvider.of(context).signOutUser(),
+        )
+      ],
+    );
   }
 }

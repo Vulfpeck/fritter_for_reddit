@@ -10,6 +10,7 @@ import 'package:fritter_for_reddit/pages/photo_viewer_screen.dart';
 import 'package:fritter_for_reddit/widgets/feed/post_url_preview.dart';
 import 'package:fritter_for_reddit/widgets/feed/reddit_video_player.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 class DesktopFeedCard extends StatelessWidget {
   final PostsFeedDataChildrenData post;
@@ -24,7 +25,7 @@ class DesktopFeedCard extends StatelessWidget {
       return ExpansionTile(
         leading: Card(
           child: CachedNetworkImage(
-            imageUrl: post.preview.images.first.source.url,
+            imageUrl: post.preview.images.first.source.url.asSanitizedImageUrl,
             width: 50,
           ),
         ),
@@ -329,7 +330,8 @@ class FeedCardBodyImage extends StatelessWidget {
                         alignment: Alignment.center,
                         child: CircularProgressIndicator(),
                       ),
-                      imageUrl: postMetaData['url'],
+                      imageUrl:
+                          (postMetaData['url'] as String).asSanitizedImageUrl,
                       fadeOutDuration: Duration(milliseconds: 300),
                     ),
             ),

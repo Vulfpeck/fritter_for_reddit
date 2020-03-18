@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
+
 import 'package:fritter_for_reddit/helpers/functions/misc_functions.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
@@ -17,74 +19,88 @@ class FeedProvider with ChangeNotifier {
   Box<SubredditInfo> _cache;
 
   final SecureStorageHelper _storageHelper = SecureStorageHelper();
+
   BehaviorSubject<PostsFeedEntity> _postFeedStream = BehaviorSubject();
 
-  BehaviorSubject<String> _currentSubredditStream =
-      BehaviorSubject.seeded('frontPage');
+  PostsFeedEntity get postFeed => _postFeedStream.value;
 
-  BehaviorSubject<String> get currentSubredditStream => _currentSubredditStream;
+  BehaviorSubject<String> currentSubredditStream =
+      BehaviorSubject.seeded('frontpage');
+
+  String get currentSubreddit => currentSubredditStream.value;
 
   BehaviorSubject<SubredditInformationEntity>
       currentSubredditInformationStream = BehaviorSubject();
-  bool _subLoadingError = false;
+  BehaviorSubject<SubredditInfo> subStream;
+  bool subLoadingError = false;
 
   String sort = "Hot";
 
   String subListingFetchUrl = "";
 
-  bool _subInformationLoadingError = false;
+  bool subInformationLoadingError = false;
 
-  bool _feedInformationLoadingError = false;
+  bool feedInformationLoadingError = false;
+
   ViewState _state;
 
   ViewState _partialState;
   ViewState _loadMorePostsState = ViewState.Idle;
   CurrentPage currentPage;
 
+  ViewState get loadMorePostsState => _loadMorePostsState;
+
+  ViewState get partialState => _partialState;
+
+  ViewState get state => _state;
+
+  SubredditInformationEntity get subredditInformationEntity =>
+      currentSubredditInformationStream.value;
+
   FeedProvider(
       {this.currentPage = CurrentPage.frontPage,
       String currentSubreddit = ''}) {
-    _init(currentSubreddit);
+    _init();
   }
 
-  void _init(String currentSubreddit) {
+  void _init() {
     _cache = Hive.box<SubredditInfo>('feed');
 
-    fetchPostsListing(currentSubreddit: currentSubreddit);
-    currentSubredditStream.listen(_currentSubredditListener);
-    CombineLatestStream.combine2<PostsFeedEntity, SubredditInformationEntity,
-            SubredditInfo>(
-        _postFeedStream,
-        currentSubredditInformationStream,
-        (postFeed, currentSubredditInformation) => SubredditInfo(
-            name: currentSubreddit,
-            postsFeed: postFeed,
-            subredditInformation: currentSubredditInformation)).listen(
-        (subredditInfo) => _cache.put(subredditInfo.name, subredditInfo));
+    _fetchPostsListing(currentSubreddit: currentSubreddit);
+    currentSubredditStream.listen((name) {
+      debugPrint('updating currentSubredditStream to $name');
+    });
+    _postFeedStream.listen((feed) {
+      debugPrint('updating postFeedStream');
+    });
+    currentSubredditInformationStream.listen((subredditInformation) {
+      debugPrint('updating currentSubredditStream to '
+          '${subredditInformation?.data?.displayName ?? 'NO DATA for this sub'}');
+    });
+
+    subStream = ZipStream<dynamic, SubredditInfo>([
+      _postFeedStream,
+      currentSubredditInformationStream,
+      currentSubredditStream
+    ], (streams) {
+      final postFeed = streams[0];
+      final currentSubredditInformation = streams[1];
+      var currentSubreddit = streams[2];
+      return SubredditInfo(
+        name: currentSubreddit,
+        postsFeed: postFeed,
+        subredditInformation: currentSubredditInformation,
+      );
+    }).asBehaviorSubject
+      ..listen((subredditInfo) {
+        notifyListeners();
+        return _cache.put(subredditInfo.name, subredditInfo);
+      });
   }
 
   factory FeedProvider.openFromName(String currentSubreddit) {
     return FeedProvider(currentPage: CurrentPage.other);
   }
-
-  String get currentSubreddit => currentSubredditStream.value;
-
-  bool get feedInformationError => _feedInformationLoadingError;
-
-  ViewState get loadMorePostsState => _loadMorePostsState;
-
-  ViewState get partialState => _partialState;
-
-  PostsFeedEntity get postFeed => _postFeedStream.value;
-
-  ViewState get state => _state;
-
-  bool get subLoadingError => _subLoadingError;
-
-  SubredditInformationEntity get subredditInformationEntity =>
-      currentSubredditInformationStream.value;
-
-  bool get subredditInformationError => _subInformationLoadingError;
 
   Future<Stream<Map>> accessCodeServer() async {
     final StreamController<Map> onCode = StreamController();
@@ -149,15 +165,17 @@ class FeedProvider with ChangeNotifier {
   @override
   void dispose() {
     currentSubredditInformationStream.close();
-    _currentSubredditStream.close();
+    currentSubredditStream.close();
+    subStream.close();
     _postFeedStream.close();
     super.dispose();
   }
 
-  Future<void> fetchPostsListing({
+  Future<void> _fetchPostsListing({
     String currentSubreddit = '',
     String currentSort = "Hot",
-    loadingTop = false,
+    bool loadingTop = false,
+    int limit = 10,
   }) async {
     await _storageHelper.init();
 
@@ -165,8 +183,7 @@ class FeedProvider with ChangeNotifier {
 
     this.sort = currentSort;
 
-    if (false) {
-      //_cache.containsKey(currentSubreddit)) {
+    if (_cache.containsKey(currentSubreddit)) {
       _postFeedStream.value = _cache.get(currentSubreddit).postsFeed;
       debugPrint('returning data from cache');
       notifyListeners();
@@ -197,10 +214,10 @@ class FeedProvider with ChangeNotifier {
           currentPage = CurrentPage.frontPage;
           url = "https://www.reddit.com";
           if (loadingTop) {
-            url = url + currentSort.toString().toLowerCase() + "&limit=10";
+            url = url + currentSort.toString().toLowerCase() + "&limit=$limit";
           } else {
-            url =
-                url + "/${currentSort.toString().toLowerCase()}.json?limit=10";
+            url = url +
+                "/${currentSort.toString().toLowerCase()}.json?limit=$limit";
           }
         }
 
@@ -232,21 +249,20 @@ class FeedProvider with ChangeNotifier {
             url = url +
                 "/r/${currentSubreddit.toLowerCase()}" +
                 currentSort.toString().toLowerCase() +
-                "&limit=10";
+                "&limit=$limit";
           } else {
-            url = url +
-                "/r/${currentSubreddit.toLowerCase()}" +
+            url += "/r/${currentSubreddit.toLowerCase()}" +
                 "/${currentSort.toString().toLowerCase()}.json" +
-                "?limit=10";
+                "?limit=$limit";
           }
         } else {
           currentPage = CurrentPage.frontPage;
           url = "https://oauth.reddit.com";
           if (loadingTop) {
-            url = url + currentSort.toString().toLowerCase() + "&limit=10";
+            url += currentSort.toString().toLowerCase() + "&limit=$limit";
           } else {
-            url =
-                url + "/${currentSort.toString().toLowerCase()}.json?limit=10";
+            url = url +
+                "/${currentSort.toString().toLowerCase()}.json?limit=$limit";
           }
         }
         // // print("Feed fetch url is : " + url);
@@ -259,6 +275,7 @@ class FeedProvider with ChangeNotifier {
         ).catchError((e) {
           throw new Exception("Feed fetch error");
         });
+
         if (response.statusCode == 200) {
           _postFeedStream.value = appendMediaType(
               PostsFeedEntity.fromJson(json.decode(response.body)));
@@ -267,9 +284,7 @@ class FeedProvider with ChangeNotifier {
           throw Exception("Failed to load data: " + response.reasonPhrase);
         }
 
-        if (currentPage != CurrentPage.frontPage) {
-          await fetchSubredditInformationOAuth(token, currentSubreddit);
-        }
+        await fetchSubredditInformationOAuth(token, currentSubreddit);
       }
     } catch (e) {
       // // print(e.toString());
@@ -283,7 +298,7 @@ class FeedProvider with ChangeNotifier {
     String token,
     String currentSubreddit,
   ) async {
-    _subInformationLoadingError = false;
+    subInformationLoadingError = false;
     final url = "https://oauth.reddit.com/r/$currentSubreddit/about";
     try {
       final subInfoResponse = await http.get(
@@ -298,16 +313,19 @@ class FeedProvider with ChangeNotifier {
       });
 
       if (subInfoResponse.statusCode == 200) {
+        debugPrint('updating currentSubredditInformationStream');
+
         currentSubredditInformationStream.value =
             SubredditInformationEntity.fromJson(
                 json.decode(subInfoResponse.body));
 
         // // print(json.decode((subInfoResponse.body).toString()));
         if (subredditInformationEntity.data.title == null) {
-          _subInformationLoadingError = true;
+          subInformationLoadingError = true;
         }
       } else {
-        throw new Exception("Failed to get sub Information");
+        debugPrint('updating currentSubredditInformationStream');
+        currentSubredditInformationStream.value = null;
       }
     } catch (e) {
       // // print(e.toString());
@@ -315,21 +333,22 @@ class FeedProvider with ChangeNotifier {
     return subredditInformationEntity;
   }
 
-  Future<void> loadMorePosts() async {
+  Future<PostsFeedEntity> loadMorePosts() async {
     _loadMorePostsState = ViewState.Busy;
     notifyListeners();
 
     await _storageHelper.init();
     String url = "";
     try {
+      url = subListingFetchUrl + "&after=${postFeed.data.after}";
+      http.Response subredditResponse;
       if (_storageHelper.signInStatus) {
         if (await _storageHelper.needsTokenRefresh()) {
           await _storageHelper.performTokenRefresh();
         }
-        url = subListingFetchUrl + "&after=${postFeed.data.after}";
         // // print(url);
         String token = await _storageHelper.authToken;
-        http.Response subredditResponse = await http.get(
+        subredditResponse = await http.get(
           url,
           headers: {
             'Authorization': 'bearer ' + token,
@@ -341,38 +360,46 @@ class FeedProvider with ChangeNotifier {
         // // print("previous after: " + _postFeed.data.after);
         // // print("new after : " + newData.data.after);
       } else {
-        url = subListingFetchUrl + "&after=${postFeed.data.after}";
-        // // print(url);
-        http.Response subredditResponse = await http.get(
+        subredditResponse = await http.get(
           url,
           headers: {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
         );
-        // // print(subredditResponse.statusCode.toString() +
+        // print(subredditResponse.statusCode.toString() +
 //            subredditResponse.reasonPhrase);
-        final PostsFeedEntity newData =
-            PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
-        appendMediaType(newData);
-        _postFeedStream.value = postFeed.copyWith(
-            data: postFeed.data.copyWith(
-                children: postFeed.data.children..addAll(newData.data.children),
-                after: newData.data.after));
       }
+      final PostsFeedEntity newData =
+          PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+      appendMediaType(newData);
+      _postFeedStream.value = postFeed.copyWith(
+        data: postFeed.data.copyWith(
+          children: postFeed.data.children..addAll(newData.data.children),
+          after: newData.data.after,
+        ),
+      );
     } catch (e) {
-      // // print("EXCEPTION : " + e.toString());
+      print("EXCEPTION : " + e.toString());
     }
     _loadMorePostsState = ViewState.Idle;
     notifyListeners();
+    return postFeed;
   }
 
-  void navigateToSubreddit(String subreddit) {
+  Future<void> navigateToSubreddit(String subreddit) async {
     final String strippedSubreddit =
         subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
 
-    if (strippedSubreddit != currentSubreddit) {
-      currentSubredditStream.add(strippedSubreddit);
-      fetchPostsListing(currentSubreddit: strippedSubreddit);
+    if (strippedSubreddit != subStream.value.name) {
+      debugPrint('updating currentSubredditStream');
+
+      currentSubredditStream.value = strippedSubreddit;
+      return _fetchPostsListing(currentSubreddit: strippedSubreddit);
+    } else {
+      debugPrint('Requesting the same subreddit. Ignoring');
+      assert(subStream.value.name == strippedSubreddit,
+          "These don't actually match!");
+      return;
     }
   }
 
@@ -382,7 +409,7 @@ class FeedProvider with ChangeNotifier {
     _state = ViewState.Busy;
     notifyListeners();
     await _storageHelper.clearStorage();
-    await fetchPostsListing();
+    await _fetchPostsListing();
     _state = ViewState.Idle;
     notifyListeners();
   }
@@ -492,6 +519,16 @@ class FeedProvider with ChangeNotifier {
 
   static FeedProvider of(BuildContext context, {bool listen = false}) =>
       Provider.of<FeedProvider>(context, listen: listen);
+
+  Future<void> updateSorting({String sortBy, bool loadingTop}) {
+    return _fetchPostsListing(
+        currentSubreddit: currentSubreddit,
+        currentSort: sortBy,
+        loadingTop: loadingTop);
+  }
+  
+  Future<void> refresh() =>
+      _fetchPostsListing(currentSubreddit: currentSubreddit);
 }
 
 @HiveType(typeId: 1)

@@ -11,10 +11,10 @@ import 'package:html_unescape/html_unescape.dart';
 
 import 'comment_list_item.dart';
 
-class DesktopCommentsScreen extends StatelessWidget {
+class CommentsScreen extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
   static final _unescape = HtmlUnescape();
-  DesktopCommentsScreen({@required this.postData});
+  CommentsScreen({@required this.postData});
 
   @override
   Widget build(BuildContext context) {

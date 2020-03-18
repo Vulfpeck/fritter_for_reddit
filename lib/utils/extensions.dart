@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:html_unescape/html_unescape.dart';
+import 'package:rxdart/rxdart.dart';
+
 extension PlatformX on Platform {
   static bool get isDesktop =>
       Platform.isMacOS || Platform.isWindows || Platform.isLinux;
@@ -14,4 +17,16 @@ extension StringX on String {
         final convertedString = '[$content]($content)';
         return convertedString;
       });
+
+  String get asSanitizedImageUrl {
+    return HtmlUnescape().convert(this);
+  }
+}
+
+extension StreamX<T> on Stream<T> {
+  BehaviorSubject<T> get asBehaviorSubject {
+    BehaviorSubject<T> newSubject = BehaviorSubject<T>();
+    listen(newSubject.add);
+    return newSubject;
+  }
 }

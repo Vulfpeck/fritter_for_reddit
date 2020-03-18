@@ -258,8 +258,8 @@ class SignedInProfileContent extends StatelessWidget {
                     FeedProvider feedProvider =
                         Provider.of<FeedProvider>(context, listen: false);
                     await model.signOutUser();
-                    await feedProvider.fetchPostsListing(
-                      currentSort: "hot",
+                    await feedProvider.updateSorting(
+                      sortBy: "hot",
                     );
                   },
                 ),

@@ -4,11 +4,15 @@ class SubredditInformationEntity {
 
   SubredditInformationEntity({this.data, this.kind});
 
-  SubredditInformationEntity.fromJson(Map json) {
-    data = json['data'] != null
-        ? new SubredditInformationData.fromJson(json['data'])
+  factory SubredditInformationEntity.fromJson(Map json) {
+    if (json == null) {
+      return null;
+    }
+    final data = json['data'] != null
+        ? SubredditInformationData.fromJson(json['data'])
         : null;
-    kind = json['kind'];
+    final kind = json['kind'];
+    return SubredditInformationEntity(data: data, kind: kind);
   }
 
   Map<String, dynamic> toJson() {
