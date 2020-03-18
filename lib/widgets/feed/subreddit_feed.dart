@@ -56,8 +56,8 @@ class _SubredditFeedState extends State<SubredditFeed>
   Widget build(BuildContext context) {
     return Consumer<FeedProvider>(
       builder: (BuildContext context, FeedProvider model, _) {
-        bool hasError =
-            model.subredditInformationError || model.feedInformationError;
+        bool hasError = model.subInformationLoadingError ||
+            model.feedInformationLoadingError;
         return CustomScrollView(
           controller: _controller,
           physics: AlwaysScrollableScrollPhysics(),
@@ -99,9 +99,8 @@ class _SubredditFeedState extends State<SubredditFeed>
                                 Navigator.of(context, rootNavigator: false)
                                     .pop();
 
-                                model.fetchPostsListing(
-                                  currentSort: "/top/.json?sort=top&t=$value",
-                                  currentSubreddit: model.currentSubreddit,
+                                model.updateSorting(
+                                  sortBy: "/top/.json?sort=top&t=$value",
                                   loadingTop: true,
                                 );
                               },
@@ -112,9 +111,8 @@ class _SubredditFeedState extends State<SubredditFeed>
                     } else if (value == 'Close' || value == sortSelectorValue) {
                     } else {
                       sortSelectorValue = value;
-                      feedProvider.fetchPostsListing(
-                        currentSort: value,
-                        currentSubreddit: model.currentSubreddit,
+                      feedProvider.updateSorting(
+                        sortBy: value,
                         loadingTop: false,
                       );
                     }
@@ -609,7 +607,7 @@ class _SubredditFeedState extends State<SubredditFeed>
       CupertinoPageRoute(
         maintainState: true,
         builder: (BuildContext context) {
-          return CommentsScreen(
+          return DesktopCommentsScreen(
             postData: item,
           );
         },

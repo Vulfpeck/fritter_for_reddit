@@ -74,6 +74,10 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               title: 'Frontpage',
               subreddit: '',
               description: "Posts from subscriptions",
+              onTap: (subreddit) {
+                Provider.of<FeedProvider>(context, listen: false)
+                    .navigateToSubreddit(subreddit);
+              },
             ),
           if (widget.mode == Mode.mobile)
             MainSubredditTile(
@@ -86,6 +90,10 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               title: 'Popular',
               subreddit: 'popular',
               description: "Trending posts from subreddits",
+              onTap: (subreddit) {
+                Provider.of<FeedProvider>(context, listen: false)
+                    .navigateToSubreddit(subreddit);
+              },
             ),
           if (widget.mode == Mode.mobile)
             MainSubredditTile(
@@ -98,6 +106,10 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               title: 'All',
               subreddit: 'all',
               description: "Trending posts from all of Reddit",
+              onTap: (subreddit) {
+                Provider.of<FeedProvider>(context, listen: false)
+                    .navigateToSubreddit(subreddit);
+              },
             ),
         ],
       ),

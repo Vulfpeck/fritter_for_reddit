@@ -6,32 +6,31 @@ class DesktopMainSubredditTile extends StatelessWidget {
   final String subreddit;
   final String title;
   final String description;
+  final Function(String subreddit) onTap;
 
   const DesktopMainSubredditTile({
     Key key,
     @required this.subreddit,
     @required this.title,
     @required this.description,
+    @required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.subtitle1,
-      ),
       leading: CircleAvatar(
         backgroundImage: AssetImage('assets/default_icon.png'),
         backgroundColor: Theme.of(context).accentColor,
         maxRadius: 16,
       ),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.subtitle1,
+      ),
       subtitle: Text(description),
       dense: true,
-      onTap: () {
-        Provider.of<FeedProvider>(context, listen: false)
-            .fetchPostsListing(currentSubreddit: subreddit);
-      },
+      onTap: () => onTap(subreddit),
     );
   }
 }

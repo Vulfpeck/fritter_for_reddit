@@ -212,7 +212,7 @@ class _SearchPageState extends State<SearchPage> {
                                           CupertinoPageRoute(
                                             maintainState: true,
                                             builder: (BuildContext context) {
-                                              return CommentsScreen(
+                                              return DesktopCommentsScreen(
                                                 postData: item,
                                               );
                                             },

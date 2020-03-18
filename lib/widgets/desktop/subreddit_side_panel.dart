@@ -65,6 +65,7 @@ class AboutCommunity extends StatelessWidget {
             backgroundColor: Theme.of(context).secondaryHeaderColor,
           ),
           Markdown(
+            physics: NeverScrollableScrollPhysics(),
             data: description.withSubredditLinksAsMarkdownLinks,
             shrinkWrap: true,
             onTapLink: (link) =>

@@ -150,10 +150,12 @@ class DesktopHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SubredditInformationEntity>(
-        stream: FeedProvider.of(context).currentSubredditInformationStream,
+    return StreamBuilder<SubredditInfo>(
+        stream: FeedProvider.of(context).subStream,
         builder: (context, snapshot) {
-          final subredditInformationData = snapshot.data?.data;
+          final SubredditInfo subredditInfo = snapshot.data;
+          final SubredditInformationEntity subredditInformationData =
+              subredditInfo?.subredditInformation;
           if (!snapshot.hasData) {
             return Container();
           }
@@ -169,11 +171,9 @@ class DesktopHome extends StatelessWidget {
                     mode: Mode.desktop,
                   ),
                 ),
-                content: DesktopSubredditFeed(
-                  pageTitle: subredditInformationData.displayName,
-                ),
+                content: DesktopSubredditFeed(),
                 rightPanel: SubredditSidePanel(
-                  subredditInformation: snapshot.data,
+                  subredditInformation: subredditInformationData,
                 )),
           );
         });
