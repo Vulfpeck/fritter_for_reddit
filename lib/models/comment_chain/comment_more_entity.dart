@@ -1,7 +1,7 @@
 class CommentMoreEntity {
   CommentMoreJson json;
 
-  CommentMoreEntity.fromJson(Map<String, dynamic> json) {
+  CommentMoreEntity.fromJson(Map json) {
 //    // print(json);
     this.json = json['json'] != null
         ? new CommentMoreJson.fromJson(json['json'])
@@ -21,7 +21,7 @@ class CommentMoreJson {
   CommentMoreJsonData data;
   List<Null> errors;
 
-  CommentMoreJson.fromJson(Map<String, dynamic> json) {
+  CommentMoreJson.fromJson(Map json) {
 //    // print("data" + json["data"]);
     if (json['data'] != null) {
       data = CommentMoreJsonData.fromJson(json['data']);
@@ -50,7 +50,7 @@ class CommentMoreJsonData {
 
   CommentMoreJsonData({this.things});
 
-  CommentMoreJsonData.fromJson(Map<String, dynamic> json) {
+  CommentMoreJsonData.fromJson(Map json) {
     if (json['things'] != null) {
       things = new List<CommantMoreJsonDataThings>();
       (json['things'] as List).forEach((v) {
@@ -74,7 +74,7 @@ class CommantMoreJsonDataThings {
 
   CommantMoreJsonDataThings({this.data, this.kind});
 
-  CommantMoreJsonDataThings.fromJson(Map<String, dynamic> json) {
+  CommantMoreJsonDataThings.fromJson(Map json) {
     data = json['data'] != null
         ? new CommentMoreJsonDataThingsData.fromJson(json['data'])
         : null;
@@ -219,7 +219,7 @@ class CommentMoreJsonDataThingsData {
       this.allAwardings,
       this.bannedBy});
 
-  CommentMoreJsonDataThingsData.fromJson(Map<String, dynamic> json) {
+  CommentMoreJsonDataThingsData.fromJson(Map json) {
     bodyHtml = json['body_html'];
     if (json['author_flair_richtext'] != null) {
       authorFlairRichtext = new List<Null>();
@@ -383,7 +383,7 @@ class CommentMoreJsonDataThingsData {
 class CommentMoreJsonDataThingsDataGildings {
   CommentMoreJsonDataThingsDataGildings();
 
-  CommentMoreJsonDataThingsDataGildings.fromJson(Map<String, dynamic> json) {}
+  CommentMoreJsonDataThingsDataGildings.fromJson(Map json);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();

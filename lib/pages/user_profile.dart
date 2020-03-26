@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 import '../exports.dart';
 
@@ -75,7 +76,7 @@ class UserProfileScreen extends StatelessWidget {
                                             "You're not signed in",
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .headline,
+                                                .headline5,
                                             textAlign: TextAlign.center,
                                           ),
                                           SizedBox(
@@ -146,7 +147,7 @@ class SignedInProfileContent extends StatelessWidget {
               ),
               CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(
-                  model.userInformation.iconImg,
+                  model.userInformation.iconImg.asSanitizedImageUrl,
                 ),
                 minRadius: 56,
                 maxRadius: 56,
@@ -158,7 +159,7 @@ class SignedInProfileContent extends StatelessWidget {
                 model.userInformation.name,
                 style: Theme.of(context)
                     .textTheme
-                    .headline
+                    .headline5
                     .copyWith(fontWeight: FontWeight.w500),
               ),
               SizedBox(
@@ -187,7 +188,7 @@ class SignedInProfileContent extends StatelessWidget {
                           ),
                           Text(
                             model.userInformation.linkKarma.toString(),
-                            style: Theme.of(context).textTheme.title,
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ],
                       ),
@@ -213,7 +214,7 @@ class SignedInProfileContent extends StatelessWidget {
                           ),
                           Text(
                             model.userInformation.commentKarma.toString(),
-                            style: Theme.of(context).textTheme.title,
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ],
                       ),
@@ -255,9 +256,11 @@ class SignedInProfileContent extends StatelessWidget {
                   ),
                   subtitle: Text("Leaving already?"),
                   onTap: () async {
+                    FeedProvider feedProvider =
+                        Provider.of<FeedProvider>(context, listen: false);
                     await model.signOutUser();
-                    await Provider.of<FeedProvider>(context).fetchPostsListing(
-                      currentSort: "hot",
+                    await feedProvider.updateSorting(
+                      sortBy: "hot",
                     );
                   },
                 ),

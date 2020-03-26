@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:conditional_wrapper/conditional_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
@@ -6,23 +7,20 @@ import 'package:video_player/video_player.dart';
 class PhotoViewerScreen extends StatelessWidget {
   final String mediaUrl;
   final bool isVideo;
+  final bool fullScreen;
 
-  PhotoViewerScreen({@required this.mediaUrl, @required this.isVideo})
-      : assert(mediaUrl != null),
+  PhotoViewerScreen({
+    @required this.mediaUrl,
+    @required this.isVideo,
+    this.fullScreen = true,
+  })  : assert(mediaUrl != null),
         assert(isVideo != null);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      extendBody: true,
-      appBar: AppBar(
-        brightness: MediaQuery.of(context).platformBrightness,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: Theme.of(context).iconTheme,
-      ),
-      body: isVideo
+    return ConditionalWrapper(
+      condition: fullScreen,
+      child: isVideo
           ? VideoPlaySection(
               url: mediaUrl,
             )
@@ -33,6 +31,20 @@ class PhotoViewerScreen extends StatelessWidget {
                 mediaUrl,
               ),
             ),
+      builder: (context, child) {
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          extendBody: true,
+          appBar: AppBar(
+            brightness: MediaQuery.of(context).platformBrightness,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            iconTheme: Theme.of(context).iconTheme,
+          ),
+          body: child,
+        );
+      },
     );
   }
 }

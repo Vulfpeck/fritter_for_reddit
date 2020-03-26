@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter_provider_app/helpers/design_system/color_enums.dart';
-import 'package:flutter_provider_app/helpers/design_system/colors.dart';
-import 'package:flutter_provider_app/models/comment_chain/comment.dart'
+import 'package:fritter_for_reddit/helpers/design_system/color_enums.dart';
+import 'package:fritter_for_reddit/helpers/design_system/colors.dart';
+import 'package:fritter_for_reddit/models/comment_chain/comment.dart'
     as CommentPojo;
 
 import '../../exports.dart';
@@ -207,7 +207,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
               child: Text(
                 "🐶boop",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ),
           ),

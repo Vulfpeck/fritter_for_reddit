@@ -1,35 +1,67 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/pages/app_home.dart';
-import 'package:flutter_provider_app/providers/search_provider.dart';
+import 'dart:io';
 
-void main() {
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
+import 'package:fritter_for_reddit/pages/app_home.dart';
+import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_layout.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed.dart';
+import 'package:fritter_for_reddit/widgets/desktop/subreddit_side_panel.dart';
+import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Directory path = await getApplicationDocumentsDirectory();
+  Hive.registerAdapter(SubredditInfoAdapter());
+  Hive.registerAdapter(PostsFeedEntityAdapter());
+  Hive.registerAdapter(PostsFeedDataAdapter());
+  Hive.registerAdapter(PostsFeedDataChildAdapter());
+  Hive.init(path.path);
+  await Hive.openBox<SubredditInfo>('feed');
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          builder: (_) => UserInformationProvider(),
+          create: (_) => UserInformationProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => FeedProvider(),
+          create: (_) => CommentsProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => CommentsProvider(),
+          create: (_) => FeedProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => SearchProvider(),
+          create: (_) => SearchProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => SettingsNotifier(),
+        )
       ],
-      child: MyTestApp(),
+      child: Fritter(),
     ),
   );
 }
 
-class MyTestApp extends StatelessWidget {
+class Fritter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomePage(),
+      debugShowCheckedModeBanner: false,
+      home: PlatformBuilder(
+        macOS: (context) {
+          return DesktopHome();
+        },
+        fallback: (context) => HomePage(),
+      ),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         brightness: Brightness.light,
@@ -47,7 +79,7 @@ class MyTestApp extends StatelessWidget {
         cardColor: Colors.white,
         textTheme: Theme.of(context).textTheme.copyWith(
               headline6: TextStyle(
-                fontSize: 17,
+                fontSize: 16,
                 letterSpacing: 0,
                 fontWeight: FontWeight.w500,
               ),
@@ -69,8 +101,8 @@ class MyTestApp extends StatelessWidget {
             ),
       ),
       darkTheme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
-        cardColor: Colors.black,
+//        scaffoldBackgroundColor: Colors.black,
+//        cardColor: Colors.black,
         dividerTheme: DividerThemeData(
           color: Colors.white.withOpacity(0.2),
           thickness: 1,
@@ -79,7 +111,7 @@ class MyTestApp extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        accentColor: Colors.lightBlueAccent,
+        accentColor: Colors.redAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
               surface: Colors.lightBlue.shade900,
@@ -90,17 +122,18 @@ class MyTestApp extends StatelessWidget {
               headline6: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
+                letterSpacing: 0,
                 color: Colors.white.withOpacity(0.95),
               ),
               bodyText1: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: Colors.white.withOpacity(0.95),
+                color: Colors.white.withOpacity(0.8),
               ),
               caption: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withOpacity(0.9),
               ),
               subtitle2: TextStyle(
                 fontSize: 13,
@@ -110,7 +143,49 @@ class MyTestApp extends StatelessWidget {
                 ),
               ),
             ),
+        primaryIconTheme: IconThemeData(color: Colors.grey),
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.grey),
+        ),
       ),
     );
+  }
+}
+
+class DesktopHome extends StatelessWidget {
+  const DesktopHome({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<SubredditInfo>(
+        stream: FeedProvider.of(context).subStream,
+        builder: (context, snapshot) {
+          final SubredditInfo subredditInfo = snapshot.data;
+          final SubredditInformationEntity subredditInformationData =
+              subredditInfo?.subredditInformation;
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          return Scaffold(
+            body: DesktopLayout(
+              leftPanel: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(color: Colors.grey),
+                  ),
+                ),
+                child: LeftDrawer(
+                  mode: Mode.desktop,
+                ),
+              ),
+              content: DesktopSubredditFeed(),
+              rightPanel: SubredditSidePanel(
+                subredditInformation: subredditInformationData,
+              ),
+            ),
+          );
+        });
   }
 }

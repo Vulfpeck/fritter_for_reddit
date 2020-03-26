@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/models/search_results/subreddits/search_subreddits_repo_entity.dart';
-import 'package:flutter_provider_app/models/states.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/search_results/subreddits/search_subreddits_repo_entity.dart';
+import 'package:fritter_for_reddit/models/states.dart';
 import 'package:http/http.dart' as http;
 
 class SearchProvider with ChangeNotifier {
@@ -17,20 +17,26 @@ class SearchProvider with ChangeNotifier {
   PostsFeedEntity _postsQueryResult = PostsFeedEntity();
 
   ViewState get subredditQueryLoadingState => _subredditQueryLoadingState;
+
   ViewState get postsQueryLoadingState => _postsQueryLoadingState;
 
   SearchSubredditsRepoEntity get subQueryResult => _subQueryResult;
+
   PostsFeedEntity get postsQueryResult => _postsQueryResult;
 
   SearchProvider() {
     initProvider();
   }
 
+  static SearchProvider of(BuildContext context, {bool listen = false}) =>
+      Provider.of<SearchProvider>(context, listen: listen);
+
   Future<void> initProvider() async {
     await _secureStorageHelper.init();
   }
 
-  Future<void> searchSubreddits({@required String query}) async {
+  Future<SearchSubredditsRepoEntity> searchSubreddits(
+      {@required String query}) async {
     _subredditQueryLoadingState = ViewState.Busy;
     notifyListeners();
     await _secureStorageHelper.init();
@@ -80,6 +86,7 @@ class SearchProvider with ChangeNotifier {
 
     _subredditQueryLoadingState = ViewState.Idle;
     notifyListeners();
+    return _subQueryResult;
   }
 
   Future<void> searchPosts({

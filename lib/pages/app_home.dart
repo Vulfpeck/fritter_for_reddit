@@ -1,15 +1,30 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/widgets/drawer/drawer.dart';
+import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 
 import 'search_screen.dart';
 import 'user_profile.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final GlobalKey<NavigatorState> firstTabNavKey = GlobalKey<NavigatorState>();
+
   final GlobalKey<NavigatorState> secondTabNavKey = GlobalKey<NavigatorState>();
+
   final GlobalKey<NavigatorState> thirdTabNavKey = GlobalKey<NavigatorState>();
+
   final CupertinoTabController _tabController = CupertinoTabController();
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +67,7 @@ class HomePage extends StatelessWidget {
               return CupertinoTabView(
 //                navigatorKey: firstTabNavKey,
                 builder: (BuildContext context) => LeftDrawer(
+                  mode: Mode.mobile,
                   firstLaunch: true,
                 ),
                 defaultTitle: 'Feed',

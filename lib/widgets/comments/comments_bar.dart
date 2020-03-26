@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/providers/comments_provider.dart';
 
 class CommentsControlBar extends StatefulWidget {
   final PostsFeedDataChildrenData item;
@@ -36,7 +36,11 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
             FlatButton.icon(
               icon: Icon(
                 Icons.refresh,
-                color: Theme.of(context).textTheme.body1.color.withOpacity(0.6),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyText2
+                    .color
+                    .withOpacity(0.6),
               ),
               colorBrightness: MediaQuery.of(context).platformBrightness,
               label: Text(
@@ -44,7 +48,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 style: TextStyle(
                     color: Theme.of(context)
                         .textTheme
-                        .body1
+                        .bodyText2
                         .color
                         .withOpacity(0.8)),
               ),

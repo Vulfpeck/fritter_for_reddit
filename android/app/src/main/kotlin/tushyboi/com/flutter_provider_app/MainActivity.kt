@@ -1,4 +1,4 @@
-package tushyboi.com.flutter_provider_app
+package tushyboi.com.fritter_for_reddit
 
 import android.os.Bundle
 

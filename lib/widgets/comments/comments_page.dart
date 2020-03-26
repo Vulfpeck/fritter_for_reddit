@@ -1,20 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_provider_app/exports.dart';
-import 'package:flutter_provider_app/models/postsfeed/posts_feed_entity.dart';
-import 'package:flutter_provider_app/providers/comments_provider.dart';
-import 'package:flutter_provider_app/widgets/comments/comments_bar.dart';
-import 'package:flutter_provider_app/widgets/feed/feed_list_item.dart';
-import 'package:flutter_provider_app/widgets/feed/post_controls.dart';
+import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/providers/comments_provider.dart';
+import 'package:fritter_for_reddit/widgets/comments/comments_bar.dart';
+import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
+import 'package:fritter_for_reddit/widgets/feed/post_controls.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 import 'comment_list_item.dart';
 
-class CommentsScreen extends StatelessWidget {
+class DesktopCommentsScreen extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
   static final _unescape = HtmlUnescape();
-  CommentsScreen({@required this.postData});
+  DesktopCommentsScreen({@required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,8 @@ class CommentsScreen extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             if (postData.isSelf == false) {
-                              launchURL(context, postData.url);
+                              launchURL(
+                                  Theme.of(context).primaryColor, postData.url);
                             }
                           },
                           child: FeedCard(postData),
@@ -66,8 +67,6 @@ class CommentsScreen extends StatelessWidget {
                       CommentsControlBar(postData),
                       Divider(),
                     ],
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                   ),
                 ]),
               ),
@@ -110,12 +109,69 @@ class CommentsScreen extends StatelessWidget {
                                   model.commentsMap[postData.id].elementAt(
                                 (index),
                               );
+//                                String _htmlContent = _unescape
+//                                    .convert(commentItem.data.bodyHtml);
+//                                return ListTile(
+//                                  title: Row(
+//                                    children: <Widget>[
+//                                      SizedBox(
+//                                        width: commentItem.data.depth * 16.0,
+//                                      ),
+//                                      Html(
+//                                        data: commentItem.data.bodyHtml,
+//                                        useRichText: false,
+//                                      ),
+//                                    ],
+//                                  ),
+//                                );
                               return CommentItem(
                                 commentItem,
                                 postData.name,
                                 postData.id,
                                 index,
                               );
+//                                return ListTile(
+//                                  title: Html(
+//                                    padding: EdgeInsets.all(0),
+//                                    defaultTextStyle:
+//                                        Theme.of(context).textTheme.bodyText2,
+//                                    linkStyle: Theme.of(context)
+//                                        .textTheme
+//                                        .bodyText2
+//                                        .copyWith(
+//                                          color: Theme.of(context).accentColor,
+//                                        ),
+//                                    data: _htmlContent,
+//                                    useRichText: true,
+//                                    blockSpacing: 1,
+//                                    showImages: false,
+//                                    renderNewlines: false,
+//                                    onLinkTap: (url) {
+//                                      if (url.startsWith("/r/") ||
+//                                          url.startsWith("r/")) {
+//                                        Navigator.push(
+//                                          context,
+//                                          CupertinoPageRoute(
+//                                            fullscreenDialog: false,
+//                                            builder: (BuildContext context) {
+//                                              return SubredditFeedPage(
+//                                                  subreddit:
+//                                                      url.startsWith("/r/")
+//                                                          ? url.replaceFirst(
+//                                                              "/r/", "")
+//                                                          : url.replaceFirst(
+//                                                              "r/", ""));
+//                                            },
+//                                          ),
+//                                        );
+//                                      } else if (url.startsWith("/u/") ||
+//                                          url.startsWith("u/")) {
+//                                      } else {
+//                                        launchURL(Theme.of(context).primaryColor, url);
+//                                      }
+//                                    },
+//                                  ),
+//                                );
                             },
                             childCount: model.commentsMap[postData.id].length,
                           ),
