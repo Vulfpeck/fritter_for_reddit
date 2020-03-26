@@ -422,7 +422,6 @@ class FeedProvider with ChangeNotifier {
   Future<bool> votePost(
       {@required PostsFeedDataChildrenData postItem, @required int dir}) async {
     await _storageHelper.init();
-    notifyListeners();
     if (postItem.likes == true) {
       postItem.score--;
     } else if (postItem.likes == false) {
@@ -439,6 +438,7 @@ class FeedProvider with ChangeNotifier {
           postItem.likes == true ? postItem.score-- : postItem.score++;
       postItem.likes = null;
     }
+    notifyListeners();
     String url = "https://oauth.reddit.com/api/vote";
     final Uri uri = Uri.https(
       'oauth.reddit.com',
@@ -460,7 +460,6 @@ class FeedProvider with ChangeNotifier {
       },
     );
     // // print("vote result" + voteResponse.statusCode.toString());
-    notifyListeners();
     if (voteResponse.statusCode == 200) {
       return true;
     } else {

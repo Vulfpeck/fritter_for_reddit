@@ -47,6 +47,8 @@ class SecureStorageHelper {
     if (map.containsKey('signedIn') && map['signedIn'] == "true") {
       return true;
     } else {
+      print('not signed in');
+
       return false;
     }
   }
@@ -95,7 +97,14 @@ class SecureStorageHelper {
   }
 
   Future<void> fetchData() async {
-    map = await _storage.readAll();
+    if (Platform.operatingSystem != null) {
+      print('before');
+      map = await _storage.readAll();
+      print('after');
+    } else {
+      print("skip init");
+      map = new Map();
+    }
   }
 
   Future<void> clearStorage() async {
