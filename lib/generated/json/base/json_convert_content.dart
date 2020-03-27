@@ -65,9 +65,9 @@ class JsonConvert<T> {
       case SearchSubredditsRepoEntity:
         return searchSubredditsRepoEntityFromJson(
             data as SearchSubredditsRepoEntity, json) as T;
-      case SearchSubredditsRepoSubreddit:
+      case SubredditSearchResultEntry:
         return searchSubredditsRepoSubredditFromJson(
-            data as SearchSubredditsRepoSubreddit, json) as T;
+            data as SubredditSearchResultEntry, json) as T;
     }
     return data as T;
   }
@@ -115,9 +115,9 @@ class JsonConvert<T> {
       case SearchSubredditsRepoEntity:
         return searchSubredditsRepoEntityToJson(
             data as SearchSubredditsRepoEntity);
-      case SearchSubredditsRepoSubreddit:
+      case SubredditSearchResultEntry:
         return searchSubredditsRepoSubredditToJson(
-            data as SearchSubredditsRepoSubreddit);
+            data as SubredditSearchResultEntry);
     }
     return data as T;
   }
@@ -161,7 +161,7 @@ class JsonConvert<T> {
       case 'SearchSubredditsRepoEntity':
         return SearchSubredditsRepoEntity().fromJson(json) as T;
       case 'SearchSubredditsRepoSubreddit':
-        return SearchSubredditsRepoSubreddit().fromJson(json) as T;
+        return SubredditSearchResultEntry().fromJson(json) as T;
     }
     return null;
   }
