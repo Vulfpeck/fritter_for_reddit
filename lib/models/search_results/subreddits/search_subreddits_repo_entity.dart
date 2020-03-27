@@ -2,11 +2,10 @@ import 'package:fritter_for_reddit/generated/json/base/json_convert_content.dart
 import 'package:fritter_for_reddit/generated/json/base/json_filed.dart';
 
 class SearchSubredditsRepoEntity with JsonConvert<SearchSubredditsRepoEntity> {
-  List<SearchSubredditsRepoSubreddit> subreddits;
+  List<SubredditSearchResultEntry> subreddits;
 }
 
-class SearchSubredditsRepoSubreddit
-    with JsonConvert<SearchSubredditsRepoSubreddit> {
+class SubredditSearchResultEntry with JsonConvert<SubredditSearchResultEntry> {
   @JSONField(name: "active_user_count")
   int activeUserCount;
   @JSONField(name: "icon_img")

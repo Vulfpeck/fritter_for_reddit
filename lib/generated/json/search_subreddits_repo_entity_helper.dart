@@ -3,9 +3,9 @@ import 'package:fritter_for_reddit/models/search_results/subreddits/search_subre
 searchSubredditsRepoEntityFromJson(
     SearchSubredditsRepoEntity data, Map<String, dynamic> json) {
   if (json['subreddits'] != null) {
-    data.subreddits = new List<SearchSubredditsRepoSubreddit>();
+    data.subreddits = new List<SubredditSearchResultEntry>();
     (json['subreddits'] as List).forEach((v) {
-      data.subreddits.add(new SearchSubredditsRepoSubreddit().fromJson(v));
+      data.subreddits.add(new SubredditSearchResultEntry().fromJson(v));
     });
   }
   return data;
@@ -21,7 +21,7 @@ Map<String, dynamic> searchSubredditsRepoEntityToJson(
 }
 
 searchSubredditsRepoSubredditFromJson(
-    SearchSubredditsRepoSubreddit data, Map<String, dynamic> json) {
+    SubredditSearchResultEntry data, Map<String, dynamic> json) {
   data.activeUserCount = json['active_user_count']?.toInt();
   data.iconImg = json['icon_img']?.toString();
   data.keyColor = json['key_color']?.toString();
@@ -34,7 +34,7 @@ searchSubredditsRepoSubredditFromJson(
 }
 
 Map<String, dynamic> searchSubredditsRepoSubredditToJson(
-    SearchSubredditsRepoSubreddit entity) {
+    SubredditSearchResultEntry entity) {
   final Map<String, dynamic> data = new Map<String, dynamic>();
   data['active_user_count'] = entity.activeUserCount;
   data['icon_img'] = entity.iconImg;

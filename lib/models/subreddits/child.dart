@@ -1,4 +1,4 @@
-class Child {
+class SubredditListChild {
   final Object user_flair_background_color;
   final Object submit_text_html;
   final bool restrict_posting;
@@ -89,7 +89,7 @@ class Child {
   final String mobile_banner_image;
   final bool user_is_contributor;
 
-  Child.fromJsonMap(Map<String, dynamic> map)
+  SubredditListChild.fromJsonMap(Map<String, dynamic> map)
       : user_flair_background_color = map["user_flair_background_color"],
         submit_text_html = map["submit_text_html"],
         restrict_posting = map["restrict_posting"],

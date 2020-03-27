@@ -34,8 +34,8 @@ dependencies:
   flutter_markdown: ^0.3.4
   hive: ^1.4.1+1
   sticky_headers: ^0.1.8+1
-  flappy_search_bar: ^1.7.2
   conditional_builder: ^1.0.2
+  flutter_gifimage: ^1.0.1
 
 dev_dependencies:
   flutter_test:

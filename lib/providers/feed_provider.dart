@@ -103,7 +103,8 @@ class FeedProvider with ChangeNotifier {
   }
 
   factory FeedProvider.openFromName(String currentSubreddit) {
-    return FeedProvider(currentPage: CurrentPage.other);
+    return FeedProvider(
+        currentPage: CurrentPage.other, currentSubreddit: currentSubreddit);
   }
 
   Future<Stream<Map>> accessCodeServer() async {

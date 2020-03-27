@@ -393,14 +393,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     ),
                     onChanged: (String textValue) async {
                       if (textValue == "") return;
-                      Provider.of<SearchProvider>(context)
+                      Provider.of<SearchProvider>(context, listen: false)
                           .searchSubreddits(query: textValue);
                     },
                     onSubmitted: (String textValue) {
                       if (textValue != "") {
-                        Provider.of<SearchProvider>(context)
+                        Provider.of<SearchProvider>(context, listen: false)
                             .searchSubreddits(query: textValue);
-                        Provider.of<SearchProvider>(context)
+                        Provider.of<SearchProvider>(context, listen: false)
                             .searchPosts(query: textValue);
                       }
                     },

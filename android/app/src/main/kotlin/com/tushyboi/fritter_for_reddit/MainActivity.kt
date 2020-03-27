@@ -1,4 +1,4 @@
-package tushyboi.com.fritter_for_reddit
+package com.tushyboi.fritter_for_reddit
 
 import io.flutter.embedding.android.FlutterActivity
 

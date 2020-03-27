@@ -165,7 +165,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   Expanded(
                     child: Text(
                       model.currentPage != CurrentPage.frontPage
-                          ? '/r/' + model.currentSubreddit.toString()
+                          ? model.currentSubreddit.toString()
                           : 'Frontpage',
                       textAlign: TextAlign.center,
                     ),

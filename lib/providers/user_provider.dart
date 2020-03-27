@@ -10,6 +10,7 @@ import 'package:fritter_for_reddit/models/subreddits/child.dart';
 import 'package:fritter_for_reddit/models/subreddits/subreddits_subscribed.dart';
 import 'package:fritter_for_reddit/models/user_profile/user_information_entity.dart';
 import 'package:fritter_for_reddit/secrets.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 import 'package:http/http.dart' as http;
 
 class UserInformationProvider with ChangeNotifier {
@@ -185,7 +186,8 @@ class UserInformationProvider with ChangeNotifier {
       userSubreddits = new SubredditsSubscribed.fromJsonMap(
           json.decode(subredditResponse.body));
 
-      userSubreddits.data.children.sort((Child a, Child b) {
+      userSubreddits.data.children
+          .sort((SubredditListChild a, SubredditListChild b) {
         return a.display_name
             .toLowerCase()
             .compareTo(b.display_name.toLowerCase());
@@ -201,9 +203,13 @@ class UserInformationProvider with ChangeNotifier {
 
   void runAssertions() {
     // if signed in, make sure that userInformation isn't null
-    assert(!(signedIn && userInformation == null));
+    if (state == ViewState.Idle) {
+      assert(!(signedIn && userInformation == null));
+    }
     // and vice versa
-    assert(!(!signedIn && userInformation != null));
+    if (state == ViewState.Idle) {
+      assert(!(!signedIn && userInformation != null));
+    }
   }
 
   Future<void> authenticateUser(BuildContext context) async {
@@ -217,7 +223,7 @@ class UserInformationProvider with ChangeNotifier {
     if (res) {
       await Provider.of<FeedProvider>(context, listen: false)
           .navigateToSubreddit('');
-      if (Navigator.canPop(context) && !Platform.isMacOS) {
+      if (!PlatformX.isDesktop && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
     } else {

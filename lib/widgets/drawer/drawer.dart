@@ -6,13 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
+import 'package:fritter_for_reddit/models/search_results/subreddits/search_subreddits_repo_entity.dart';
+import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
+import 'package:fritter_for_reddit/widgets/common/circle_avatar_image.dart';
 import 'package:fritter_for_reddit/widgets/common/expansion_tile.dart';
 import 'package:fritter_for_reddit/widgets/common/filtered_dropdown_search.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
 import 'package:fritter_for_reddit/widgets/drawer/list_header.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
@@ -65,26 +69,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     controller: _controller,
                     slivers: <Widget>[
                       DrawerSliverAppBar(),
-                      SliverToBoxAdapter(
-                        child: FutureBuilder<List>(
-                            future: SearchProvider.of(context)
-                                .searchPosts(query: null),
-                            initialData: [],
-                            builder: (context, snapshot) {
-                              return FilteredDropdownSearch(
-                                onChanged: (value) {},
-                                asSliver: true,
-                                options: snapshot.data,
-                                itemBuilder:
-                                    (BuildContext context, dynamic item) {
-                                  return ListTile(
-                                    title: Text(item),
-                                  );
-                                },
-                                verticalOffset: 20,
-                              );
-                            }),
-                      ),
                       if (!model.signedIn)
                         Login()
                       else ...[
@@ -139,8 +123,54 @@ class _LeftDrawerState extends State<LeftDrawer> {
   }
 }
 
+class SubredditSearch extends StatefulWidget {
+  const SubredditSearch({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _SubredditSearchState createState() => _SubredditSearchState();
+}
+
+class _SubredditSearchState extends State<SubredditSearch> {
+  BehaviorSubject<SearchSubredditsRepoEntity> subredditResultsStream =
+      BehaviorSubject<SearchSubredditsRepoEntity>();
+
+  @override
+  void dispose() {
+    subredditResultsStream.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FilteredDropdownSearch<SubredditSearchResultEntry>(
+      onChanged: (value) async {
+        final queryResult =
+            await SearchProvider.of(context).searchSubreddits(query: value);
+        subredditResultsStream.add(queryResult);
+        setState(() {});
+      },
+      asSliver: true,
+      options: subredditResultsStream.value?.subreddits ?? [],
+      itemBuilder:
+          (BuildContext context, SubredditSearchResultEntry subreddit) {
+        return ListTile(
+          leading: subreddit.iconImg?.isNotEmpty ?? false
+              ? CircleAvatarImage(imageUrl: subreddit.iconImg)
+              : CircleAvatar(
+                  child: Text(subreddit.name[0]),
+                ),
+          title: Text(subreddit.name),
+        );
+      },
+      verticalOffset: 20,
+    );
+  }
+}
+
 class SubredditDrawerTile extends StatelessWidget {
-  final Child child;
+  final SubredditListChild child;
 
   const SubredditDrawerTile({
     Key key,
@@ -158,26 +188,9 @@ class SubredditDrawerTile extends StatelessWidget {
         child.display_name,
         style: Theme.of(context).textTheme.subtitle1,
       ),
-      leading: CircleAvatar(
-        maxRadius: 16,
-        backgroundImage: child.community_icon != ""
-            ? CachedNetworkImageProvider(
-                child.community_icon.asSanitizedImageUrl, errorListener: () {
-                debugger();
-              })
-            : child.icon_img != ""
-                ? CachedNetworkImageProvider(child.icon_img.asSanitizedImageUrl,
-                    errorListener: () {
-                    debugger();
-                  })
-                : AssetImage('assets/default_icon.png'),
-        backgroundColor: child.primary_color == ""
-            ? Theme.of(context).accentColor
-            : HexColor(
-                child.primary_color,
-              ),
-      ),
+      leading: UserAvatar(user: child),
       onTap: () {
+        FeedProvider.of(context).navigateToSubreddit(child.display_name);
         focusNode.unfocus();
         return Navigator.of(
           context,
@@ -191,6 +204,38 @@ class SubredditDrawerTile extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class UserAvatar extends StatelessWidget {
+  const UserAvatar({
+    Key key,
+    @required this.user,
+  }) : super(key: key);
+
+  final SubredditListChild user;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      maxRadius: 16,
+      backgroundImage: user.community_icon != ""
+          ? CachedNetworkImageProvider(user.community_icon.asSanitizedImageUrl,
+              errorListener: () {
+              debugger();
+            })
+          : user.icon_img != ""
+              ? CachedNetworkImageProvider(user.icon_img.asSanitizedImageUrl,
+                  errorListener: () {
+                  debugger();
+                })
+              : AssetImage('assets/default_icon.png'),
+      backgroundColor: user.primary_color == ""
+          ? Theme.of(context).accentColor
+          : HexColor(
+              user.primary_color,
+            ),
     );
   }
 }
@@ -303,22 +348,25 @@ class ProfileListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RestrictedExpansionTile(
-      leading: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 50),
-        child: CircleAvatar(
-          backgroundImage: CachedNetworkImageProvider(
-            imageUrl.asSanitizedImageUrl,
+    return Material(
+      elevation: 3,
+      child: RestrictedExpansionTile(
+        leading: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 50),
+          child: CircleAvatar(
+            backgroundImage: CachedNetworkImageProvider(
+              imageUrl.asSanitizedImageUrl,
+            ),
           ),
         ),
+        title: Text(name),
+        children: <Widget>[
+          ListTile(
+            title: Text('Logout'),
+            onTap: () => UserInformationProvider.of(context).signOutUser(),
+          )
+        ],
       ),
-      title: Text(name),
-      children: <Widget>[
-        ListTile(
-          title: Text('Logout'),
-          onTap: () => UserInformationProvider.of(context).signOutUser(),
-        )
-      ],
     );
   }
 }
