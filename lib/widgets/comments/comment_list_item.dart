@@ -16,7 +16,7 @@ import 'package:html_unescape/html_unescape.dart';
 
 import '../../exports.dart';
 
-class CommentItem extends StatelessWidget {
+class CommentItem extends StatefulWidget {
   final CommentPojo.Child _comment;
   final String name;
   final String postId;
@@ -25,56 +25,67 @@ class CommentItem extends StatelessWidget {
   CommentItem(this._comment, this.name, this.postId, this.commentIndex);
 
   @override
+  _CommentItemState createState() => _CommentItemState();
+}
+
+class _CommentItemState extends State<CommentItem> with SingleTickerProviderStateMixin{
+  @override
   Widget build(BuildContext context) {
-    return Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
-      SizedBox(
-        width: 16.0 * _comment.data.depth,
-      ),
-      Expanded(
-        child: _comment.data.collapseParent == true
-            ? Column(
-                children: <Widget>[
-                  CollapsedCommentParent(
-                    comment: _comment,
-                    postId: postId,
-                    commentIndex: commentIndex,
-                  ),
-                  Divider(),
-                ],
-              )
-            : _comment.data.collapse == true
-                ? Container()
-                : _comment.kind == CommentPojo.Kind.MORE
-                    ? Column(
-                        children: <Widget>[
-                          MoreCommentKind(
-                            comment: _comment,
-                            postFullName: name,
-                            id: postId,
-                          ),
-                          Divider(),
-                        ],
-                      )
-                    : Column(
-                        children: <Widget>[
-                          Swiper(
-                            comment: _comment,
-                            postId: postId,
-                            child: CommentBody(
-                              context: context,
-                              commentIndex: commentIndex,
-                              comment: _comment,
-                              postId: postId,
-                            ),
-                            commentIndex: commentIndex,
-                          ),
-                          Divider(
-                            indent: 16,
-                          ),
-                        ],
-                      ),
-      ),
-    ]);
+    return AnimatedSize(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+      reverseDuration: Duration(milliseconds: 60),
+      curve: Curves.fastLinearToSlowEaseIn,
+      child: Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
+        SizedBox(
+          width: 16.0 * widget._comment.data.depth,
+        ),
+        Expanded(
+          child: widget._comment.data.collapseParent == true
+              ? Column(
+            children: <Widget>[
+              CollapsedCommentParent(
+                comment: widget._comment,
+                postId: widget.postId,
+                commentIndex: widget.commentIndex,
+              ),
+              Divider(),
+            ],
+          )
+              : widget._comment.data.collapse == true
+              ? Container()
+              : widget._comment.kind == CommentPojo.Kind.MORE
+              ? Column(
+            children: <Widget>[
+              MoreCommentKind(
+                comment: widget._comment,
+                postFullName: widget.name,
+                id: widget.postId,
+              ),
+              Divider(),
+            ],
+          )
+              : Column(
+            children: <Widget>[
+              Swiper(
+                comment: widget._comment,
+                postId: widget.postId,
+                child: CommentBody(
+                  context: context,
+                  commentIndex: widget.commentIndex,
+                  comment: widget._comment,
+                  postId: widget.postId,
+                ),
+                commentIndex: widget.commentIndex,
+              ),
+              Divider(
+                indent: 16,
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
   }
 }
 

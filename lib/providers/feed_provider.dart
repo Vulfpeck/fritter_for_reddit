@@ -397,6 +397,11 @@ class FeedProvider with ChangeNotifier {
 
   Future<void> navigateToSubreddit(String subreddit) async {
     debugPrint("FeedProvider: navigateToSubreddit:" + subreddit);
+    if (subreddit.isEmpty || subreddit.compareTo("frontpage") == 0) {
+      currentSubredditStream.value = subreddit;
+      await this.navigateToFrontpage();
+      return;
+    }
     final String strippedSubreddit =
     subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
 

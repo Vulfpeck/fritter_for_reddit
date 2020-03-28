@@ -69,6 +69,28 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     controller: _controller,
                     slivers: <Widget>[
                       DrawerSliverAppBar(),
+                      SliverList(
+                        delegate: SliverChildListDelegate([
+                          GenericSubredditDrawerTile(
+                            focusNode: focusNode,
+                            location: "frontpage",
+                            title: "Frontpage",
+                            subtitle: "Posts from your subscriptions",
+                          ),
+                          GenericSubredditDrawerTile(
+                            focusNode: focusNode,
+                            location: "all",
+                            title: "All",
+                            subtitle: "Posts from all of Reddit",
+                          ),
+                          GenericSubredditDrawerTile(
+                            focusNode: focusNode,
+                            location: "popular",
+                            title: "Popular",
+                            subtitle: "Most popular posts across Reddit",
+                          ),
+                        ]),
+                      ),
                       if (!model.signedIn)
                         Login()
                       else ...[
@@ -109,7 +131,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     ],
                   ),
                 ),
-                if (model.userInformation != null)
+                if (model.userInformation != null &&
+                    widget.mode == Mode.desktop)
                   ProfileListTile(
                     name: model.userInformation.name,
                     imageUrl: model.userInformation.iconImg,
@@ -165,6 +188,53 @@ class _SubredditSearchState extends State<SubredditSearch> {
         );
       },
       verticalOffset: 20,
+    );
+  }
+}
+
+class GenericSubredditDrawerTile extends StatelessWidget {
+  final String location;
+  final String title;
+  final String subtitle;
+  const GenericSubredditDrawerTile({
+    Key key,
+    @required this.focusNode,
+    @required this.location,
+    @required this.title,
+    this.subtitle,
+  }) : super(key: key);
+
+  final FocusNode focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.subtitle1,
+      ),
+      leading: CircleAvatar(
+        backgroundImage: AssetImage('assets/default_icon.png'),
+        backgroundColor: Theme.of(context).accentColor,
+        radius: 16,
+      ),
+      subtitle: subtitle != null ? Text(subtitle) : null,
+      onTap: () {
+        FeedProvider.of(context).navigateToSubreddit(location);
+        focusNode.unfocus();
+        return Navigator.of(
+          context,
+          rootNavigator: false,
+        ).push(
+          CupertinoPageRoute(
+            builder: (context) => SubredditFeedPage(
+              subreddit: location,
+            ),
+            fullscreenDialog: false,
+          ),
+        );
+      },
     );
   }
 }
