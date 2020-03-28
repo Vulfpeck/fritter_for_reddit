@@ -77,9 +77,7 @@ class FeedCard extends StatelessWidget {
           data.preview != null &&
                   data.isSelf == false &&
                   data.postType != MediaType.Url
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                  child: FeedCardBodyImage(
+              ? FeedCardBodyImage(
                     images: data.preview.images,
                     data: data,
                     postMetaData: {
@@ -87,8 +85,7 @@ class FeedCard extends StatelessWidget {
                       'url': data.url
                     },
                     deviceWidth: MediaQuery.of(context).size.width,
-                  ),
-                )
+          )
               : Container(),
         ],
       ),
@@ -243,36 +240,29 @@ class FeedCardBodyImage extends StatelessWidget {
                 );
               },
               child:
-//            data.media != null
-//                ? Image(
-//                    image: CachedNetworkImageProvider(
-//                        data.media['oembed']['thumbnail_url']),
-//                  )
-//                :
-
-//                  Image(
-//
-//                image: CachedNetworkImageProvider(
-//                  url,
-//                ),
-//                fit: BoxFit.fitWidth,
-//                width: widget.deviceWidth,
-//                height: widget.images.first.source.height.toDouble() * ratio,
-//              ),
                   postMetaData['media_type'] == MediaType.Video
                       ? RedditVideoPlayer(uri: postMetaData['url'])
                       : CachedNetworkImage(
                           placeholder: (context, url) => Container(
                               alignment: Alignment.center,
-                              child: CircularProgressIndicator(),
+                            child: Container(color: Theme
+                                .of(context)
+                                .textTheme
+                                .subtitle1
+                                .color
+                                .withAlpha(10),
+                            ),
                               width: deviceWidth,
-                              height: 100
-//                                images.first.source.height.toDouble() * ratio,
+                            height:
+                            images.first.source.height.toDouble() * ratio,
                               ),
+                    errorWidget: (BuildContext context, String error, _) {
+                      return Text(error);
+                    },
                           imageUrl: postMetaData['url'],
-//                          width: deviceWidth,
-//                          height: images.first.source.height.toDouble() * ratio,
-                          fadeOutDuration: Duration(milliseconds: 300),
+                    width: deviceWidth,
+                    height: images.first.source.height.toDouble() * ratio,
+                    fadeOutDuration: Duration(milliseconds: 100),
                         ),
             ),
           ),

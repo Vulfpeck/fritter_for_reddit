@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/models/search_results/subreddits/search_subreddits_repo_entity.dart';
-import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
 import 'package:fritter_for_reddit/widgets/common/circle_avatar_image.dart';
 import 'package:fritter_for_reddit/widgets/common/expansion_tile.dart';
@@ -36,6 +35,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
   void initState() {
     if (widget.firstLaunch) {
       Future.delayed(Duration(milliseconds: 800)).then((_) {
+        Provider.of<FeedProvider>(context, listen: false).navigateToFrontpage();
         Navigator.of(context, rootNavigator: false).push(
           CupertinoPageRoute(
             maintainState: true,

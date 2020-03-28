@@ -25,7 +25,7 @@ class FeedProvider with ChangeNotifier {
   PostsFeedEntity get postFeed => _postFeedStream.value;
 
   BehaviorSubject<String> currentSubredditStream =
-      BehaviorSubject.seeded('frontpage');
+  BehaviorSubject.seeded('');
 
   String get currentSubreddit => currentSubredditStream.value;
 
@@ -103,14 +103,16 @@ class FeedProvider with ChangeNotifier {
   }
 
   factory FeedProvider.openFromName(String currentSubreddit) {
+    debugPrint("FeedProvider: openFromName");
     return FeedProvider(
         currentPage: CurrentPage.other, currentSubreddit: currentSubreddit);
   }
 
   Future<Stream<Map>> accessCodeServer() async {
+    debugPrint("FeedProvider: accessCodeServer");
     final StreamController<Map> onCode = StreamController();
     HttpServer server =
-        await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
+    await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
 //      // print("Server started");
       final Map<String, String> response = request.uri.queryParameters;
@@ -129,6 +131,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   PostsFeedEntity appendMediaType(PostsFeedEntity postFeed) {
+    debugPrint("FeedProvider: appendMediaType");
     for (var x in postFeed.data.children) {
       x.data.postType = getMediaType(x.data)['media_type'];
     }
@@ -137,6 +140,7 @@ class FeedProvider with ChangeNotifier {
 
   /// action being true results in subscribing to a subreddit
   Future<void> changeSubscriptionStatus(String subId, bool action) async {
+    debugPrint("FeedProvider: changeSubscriptionStatus");
     _partialState = ViewState.Busy;
     notifyListeners();
 
@@ -162,13 +166,14 @@ class FeedProvider with ChangeNotifier {
       );
     }
     subredditInformationEntity.data.userIsSubscriber =
-        !subredditInformationEntity.data.userIsSubscriber;
+    !subredditInformationEntity.data.userIsSubscriber;
     _partialState = ViewState.Idle;
     notifyListeners();
   }
 
   @override
   void dispose() {
+    debugPrint("FeedProvider: dispose");
     currentSubredditInformationStream.close();
     currentSubredditStream.close();
     subStream.close();
@@ -182,20 +187,16 @@ class FeedProvider with ChangeNotifier {
     bool loadingTop = false,
     int limit = 10,
   }) async {
+    debugPrint("FeedProvider: _fetchPostsListing");
     await _storageHelper.init();
 
     await _storageHelper.fetchData();
 
     this.sort = currentSort;
 
-    if (_cache.containsKey(currentSubreddit)) {
-      _postFeedStream.value = _cache.get(currentSubreddit).postsFeed;
-      debugPrint('returning data from cache');
-      notifyListeners();
-    } else {
-      _state = ViewState.Busy;
-      notifyListeners();
-    }
+    _state = ViewState.Busy;
+    notifyListeners();
+
     http.Response response;
     try {
       if (_storageHelper.signInStatus == false) {
@@ -261,6 +262,7 @@ class FeedProvider with ChangeNotifier {
                 "?limit=$limit";
           }
         } else {
+          debugPrint("loading frontpage: oauth mode");
           currentPage = CurrentPage.frontPage;
           url = "https://oauth.reddit.com";
           if (loadingTop) {
@@ -270,6 +272,8 @@ class FeedProvider with ChangeNotifier {
                 "/${currentSort.toString().toLowerCase()}.json?limit=$limit";
           }
         }
+
+        print(url);
         // // print("Feed fetch url is : " + url);
         response = await http.get(
           url,
@@ -301,6 +305,7 @@ class FeedProvider with ChangeNotifier {
     String token,
     String currentSubreddit,
   ) async {
+    debugPrint("FeedProvider: fetchSubredditInformationOauth");
     subInformationLoadingError = false;
     final url = "https://oauth.reddit.com/r/$currentSubreddit/about";
     try {
@@ -337,6 +342,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<PostsFeedEntity> loadMorePosts() async {
+    debugPrint("FeedProvider: loadMorePosts");
     _loadMorePostsState = ViewState.Busy;
     notifyListeners();
 
@@ -373,7 +379,7 @@ class FeedProvider with ChangeNotifier {
 //            subredditResponse.reasonPhrase);
       }
       final PostsFeedEntity newData =
-          PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
+      PostsFeedEntity.fromJson(json.decode(subredditResponse.body));
       appendMediaType(newData);
       _postFeedStream.value = postFeed.copyWith(
         data: postFeed.data.copyWith(
@@ -390,8 +396,9 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<void> navigateToSubreddit(String subreddit) async {
+    debugPrint("FeedProvider: navigateToSubreddit:" + subreddit);
     final String strippedSubreddit =
-        subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
+    subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
 
     if (strippedSubreddit != subStream.value.name) {
       debugPrint('updating currentSubredditStream');
@@ -404,14 +411,22 @@ class FeedProvider with ChangeNotifier {
     } else {
       debugPrint('Requesting the same subreddit. Ignoring');
       assert(subStream.value.name == strippedSubreddit,
-          "These don't actually match!");
+      "These don't actually match!");
       return;
     }
+  }
+
+  Future<void> navigateToFrontpage() async {
+    debugPrint("FeedProvider: navigateToFrontpage");
+    currentSubredditStream.value = "";
+    await _fetchPostsListing();
+    notifyListeners();
   }
 
   void selectProperPreviewImage() {}
 
   Future<void> signOutUser() async {
+    debugPrint("FeedProvider: signOutUser");
     _state = ViewState.Busy;
     notifyListeners();
     await _storageHelper.clearStorage();
@@ -422,6 +437,7 @@ class FeedProvider with ChangeNotifier {
 
   Future<bool> votePost(
       {@required PostsFeedDataChildrenData postItem, @required int dir}) async {
+    debugPrint("FeedProvider: votePost");
     await _storageHelper.init();
     notifyListeners();
     if (postItem.likes == true) {
@@ -437,7 +453,7 @@ class FeedProvider with ChangeNotifier {
       postItem.likes = false;
     } else if (dir == 0) {
       postItem.score =
-          postItem.likes == true ? postItem.score-- : postItem.score++;
+      postItem.likes == true ? postItem.score-- : postItem.score++;
       postItem.likes = null;
     }
     String url = "https://oauth.reddit.com/api/vote";
@@ -470,6 +486,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   void _currentSubredditListener(dynamic value) async {
+    debugPrint("FeedProvider: currentSubredditListener");
     final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
     final subInfoResponse = await http.get(
       infoUrl,
@@ -527,14 +544,17 @@ class FeedProvider with ChangeNotifier {
       Provider.of<FeedProvider>(context, listen: listen);
 
   Future<void> updateSorting({String sortBy, bool loadingTop}) {
+    debugPrint("FeedProvider: updateSorting");
     return _fetchPostsListing(
         currentSubreddit: currentSubreddit,
         currentSort: sortBy,
         loadingTop: loadingTop);
   }
 
-  Future<void> refresh() =>
-      _fetchPostsListing(currentSubreddit: currentSubreddit);
+  Future<void> refresh() {
+    debugPrint("FeedProvider: refresh");
+    return _fetchPostsListing(currentSubreddit: currentSubreddit);
+  }
 }
 
 enum QueryType { subreddit, user, post }
