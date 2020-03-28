@@ -143,10 +143,12 @@ class PostVoteControls extends StatelessWidget {
                 slivers: <Widget>[
                   SliverList(
                     delegate: SliverChildListDelegate(<Widget>[
+                      // TODO: extract this into a different component
                       ListTile(
                         title: Text('View Profile'),
                         leading: CircleAvatar(
                           child: Icon(Icons.person),
+                          backgroundColor: Theme.of(context).accentColor,
                         ),
                       ),
                       ListTile(
@@ -155,9 +157,11 @@ class PostVoteControls extends StatelessWidget {
                           backgroundImage: AssetImage(
                             'assets/default_icon.png',
                           ),
+                          backgroundColor: Theme.of(context).accentColor,
                         ),
                         onTap: () {
                           Navigator.of(context).pop();
+                          feedProvider(context).navigateToSubreddit(postData.subreddit);
                           return Navigator.of(
                             context,
                             rootNavigator: false,

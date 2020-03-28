@@ -41,21 +41,21 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.library_books,
-                size: 24,
+                size: 26,
               ),
               title: Text("Feed"),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.search,
-                size: 24,
+                size: 26,
               ),
               title: Text("Search"),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.account_circle,
-                size: 24,
+                size: 26,
               ),
               title: Text("Account"),
             ),
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
           switch (index) {
             case 0:
               return CupertinoTabView(
-//                navigatorKey: firstTabNavKey,
+               navigatorKey: firstTabNavKey,
                 builder: (BuildContext context) => LeftDrawer(
                   mode: Mode.mobile,
                   firstLaunch: true,
@@ -75,14 +75,14 @@ class _HomePageState extends State<HomePage> {
               break;
             case 1:
               return CupertinoTabView(
-//                navigatorKey: secondTabNavKey,
+               navigatorKey: secondTabNavKey,
                 builder: (BuildContext context) => SearchPage(),
                 defaultTitle: 'Search',
               );
               break;
             case 2:
               return CupertinoTabView(
-//                navigatorKey: thirdTabNavKey,
+               navigatorKey: thirdTabNavKey,
                 builder: (BuildContext context) => UserProfileScreen(),
                 defaultTitle: 'Profile',
               );

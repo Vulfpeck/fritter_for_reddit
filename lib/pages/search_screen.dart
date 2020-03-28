@@ -110,20 +110,21 @@ class _SearchPageState extends State<SearchPage> {
                                       : Theme.of(context).accentColor,
                                 ),
                                 onTap: () {
+                                  FeedProvider.of(context).navigateToSubreddit(model.subQueryResult.subreddits
+                                      .elementAt(index)
+                                      .name);
                                   focusNode.unfocus();
-                                  return Navigator.of(context,
-                                          rootNavigator: false)
-                                      .push(
+                                  return Navigator.of(
+                                    context,
+                                    rootNavigator: false,
+                                  ).push(
                                     CupertinoPageRoute(
-                                      maintainState: true,
-                                      fullscreenDialog: false,
-                                      builder: (BuildContext context) =>
-                                          SubredditFeedPage(
-                                        subreddit: model
-                                            .subQueryResult.subreddits
+                                      builder: (context) => SubredditFeedPage(
+                                        subreddit: model.subQueryResult.subreddits
                                             .elementAt(index)
                                             .name,
                                       ),
+                                      fullscreenDialog: false,
                                     ),
                                   );
                                 },

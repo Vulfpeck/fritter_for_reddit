@@ -53,7 +53,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                         .withOpacity(0.8)),
               ),
               onPressed: () {
-                Provider.of<CommentsProvider>(context).fetchComments(
+                Provider.of<CommentsProvider>(context, listen: false).fetchComments(
                   subredditName: widget.item.subreddit,
                   requestingRefresh: true,
                   postId: widget.item.id,

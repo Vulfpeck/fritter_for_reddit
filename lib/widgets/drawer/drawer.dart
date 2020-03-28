@@ -74,11 +74,21 @@ class _LeftDrawerState extends State<LeftDrawer> {
                       else ...[
                         SliverListHeader(title: 'Subscribed Subreddits'),
                         SliverList(
+                          delegate: SliverChildListDelegate([
+                            if (widget.mode == Mode.mobile) ...[
+                              GenericSubredditDrawerTile(
+                                focusNode: focusNode,
+                                title: "Frontpage",
+                              )
+                            ]
+                          ]),
+                        ),
+                        SliverList(
                           delegate: model.state == ViewState.Idle
                               ? SliverChildBuilderDelegate(
                                   (BuildContext context, int index) {
                                     if (widget.mode == Mode.mobile) {
-                                      return SubredditDrawerTile(
+                                      return GenericSubredditDrawerTile(
                                         focusNode: focusNode,
                                         child: model.userSubreddits.data
                                             .children[index],
@@ -109,11 +119,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     ],
                   ),
                 ),
-                if (model.userInformation != null)
-                  ProfileListTile(
-                    name: model.userInformation.name,
-                    imageUrl: model.userInformation.iconImg,
-                  ),
               ],
             ),
           );
@@ -168,6 +173,50 @@ class _SubredditSearchState extends State<SubredditSearch> {
     );
   }
 }
+
+class GenericSubredditDrawerTile extends StatelessWidget {
+  final SubredditListChild child;
+  final FocusNode focusNode;
+  final String title;
+
+  const GenericSubredditDrawerTile({
+    Key key,
+    @required this.focusNode,
+    this.child,
+    this.title,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (child != null) {
+      return SubredditDrawerTile(focusNode: focusNode, child: child,);
+    } else {
+      return ListTile(
+        dense: true,
+        title: Text(
+          this.title,
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        onTap: () {
+          FeedProvider.of(context).navigateToSubreddit(title);
+          focusNode.unfocus();
+          return Navigator.of(
+            context,
+            rootNavigator: false,
+          ).push(
+            CupertinoPageRoute(
+              builder: (context) => SubredditFeedPage(
+                subreddit: this.title,
+              ),
+              fullscreenDialog: false,
+            ),
+          );
+        },
+      );
+    }
+  }
+}
+
 
 class SubredditDrawerTile extends StatelessWidget {
   final SubredditListChild child;
@@ -332,41 +381,6 @@ class Login extends StatelessWidget {
           ),
         ),
       ]),
-    );
-  }
-}
-
-class ProfileListTile extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-
-  const ProfileListTile({
-    Key key,
-    @required this.imageUrl,
-    @required this.name,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 3,
-      child: RestrictedExpansionTile(
-        leading: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 50),
-          child: CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(
-              imageUrl.asSanitizedImageUrl,
-            ),
-          ),
-        ),
-        title: Text(name),
-        children: <Widget>[
-          ListTile(
-            title: Text('Logout'),
-            onTap: () => UserInformationProvider.of(context).signOutUser(),
-          )
-        ],
-      ),
     );
   }
 }

@@ -101,17 +101,18 @@ class Fritter extends StatelessWidget {
             ),
       ),
       darkTheme: ThemeData(
-//        scaffoldBackgroundColor: Colors.black,
-//        cardColor: Colors.black,
-        dividerTheme: DividerThemeData(
-          color: Colors.white.withOpacity(0.2),
-          thickness: 1,
-        ),
         brightness: Brightness.dark,
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        accentColor: Colors.redAccent,
+        scaffoldBackgroundColor: Colors.grey.shade900,
+        cardColor: Colors.grey.shade900,
+        // dividerTheme: DividerThemeData(
+        //   color: Colors.white.withOpacity(0.2),
+        //   thickness: 1,
+        // ),
+        // brightness: Brightness.dark,
+        // iconTheme: IconThemeData(
+        //   color: Colors.white,
+        // ),
+        accentColor: Colors.orangeAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
               surface: Colors.lightBlue.shade900,

@@ -25,7 +25,7 @@ class FeedProvider with ChangeNotifier {
   PostsFeedEntity get postFeed => _postFeedStream.value;
 
   BehaviorSubject<String> currentSubredditStream =
-      BehaviorSubject.seeded('frontpage');
+      BehaviorSubject.seeded('');
 
   String get currentSubreddit => currentSubredditStream.value;
 
@@ -64,10 +64,10 @@ class FeedProvider with ChangeNotifier {
     _init();
   }
 
-  void _init() {
+  void _init() async {
     _cache = Hive.box<SubredditInfo>('feed');
 
-    _fetchPostsListing(currentSubreddit: currentSubreddit);
+    await _fetchPostsListing(currentSubreddit: currentSubreddit);
     currentSubredditStream.listen((name) {
       debugPrint('updating currentSubredditStream to $name');
     });
@@ -100,11 +100,8 @@ class FeedProvider with ChangeNotifier {
         notifyListeners();
         return _cache.put(subredditInfo.name, subredditInfo);
       });
-  }
-
-  factory FeedProvider.openFromName(String currentSubreddit) {
-    return FeedProvider(
-        currentPage: CurrentPage.other, currentSubreddit: currentSubreddit);
+    
+    notifyListeners();
   }
 
   Future<Stream<Map>> accessCodeServer() async {
@@ -188,12 +185,12 @@ class FeedProvider with ChangeNotifier {
 
     this.sort = currentSort;
 
+    _state = ViewState.Busy;
+    notifyListeners();
+
     if (_cache.containsKey(currentSubreddit)) {
       _postFeedStream.value = _cache.get(currentSubreddit).postsFeed;
       debugPrint('returning data from cache');
-      notifyListeners();
-    } else {
-      _state = ViewState.Busy;
       notifyListeners();
     }
     http.Response response;
@@ -292,6 +289,7 @@ class FeedProvider with ChangeNotifier {
     } catch (e) {
       // // print(e.toString());
     } finally {
+      debugPrint("here");
       _state = ViewState.Idle;
       notifyListeners();
     }
@@ -332,6 +330,8 @@ class FeedProvider with ChangeNotifier {
       }
     } catch (e) {
       // // print(e.toString());
+    } finally {
+      notifyListeners();
     }
     return subredditInformationEntity;
   }
@@ -389,7 +389,21 @@ class FeedProvider with ChangeNotifier {
     return postFeed;
   }
 
-  Future<void> navigateToSubreddit(String subreddit) async {
+  Future<void> navigateToSubreddit(String subreddit,{ bool refresh}) async {
+    if (subreddit.toLowerCase().compareTo("frontpage")==0) {
+      debugPrint("frontpage");
+      await _fetchPostsListing(currentSubreddit: "");
+      notifyListeners();
+      return;
+    } else if (subreddit.toLowerCase().compareTo("popular") == 0) {
+      await _fetchPostsListing(currentSubreddit: subreddit);
+      notifyListeners();
+      return;
+    } else if (subreddit.toLowerCase().compareTo("all") == 0) {
+      await _fetchPostsListing(currentSubreddit: subreddit);
+      notifyListeners();
+      return;
+    }
     final String strippedSubreddit =
         subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
 
@@ -401,6 +415,7 @@ class FeedProvider with ChangeNotifier {
 
       String token = await _storageHelper.authToken;
       await fetchSubredditInformationOAuth(token, currentSubreddit);
+      notifyListeners();
     } else {
       debugPrint('Requesting the same subreddit. Ignoring');
       assert(subStream.value.name == strippedSubreddit,
@@ -533,8 +548,8 @@ class FeedProvider with ChangeNotifier {
         loadingTop: loadingTop);
   }
 
-  Future<void> refresh() =>
-      _fetchPostsListing(currentSubreddit: currentSubreddit);
+  Future<void> refresh() {
+  }
 }
 
 enum QueryType { subreddit, user, post }

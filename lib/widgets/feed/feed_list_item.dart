@@ -35,38 +35,15 @@ class FeedCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'in r/' + data.subreddit + ' by ' + data.author,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                if (data.over18)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          'NSFW',
-                          style: TextStyle(color: Colors.red),
-                        )
-                      ],
-                    ),
-                  ),
-              ],
-            ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'in r/' + data.subreddit + ' by ' + data.author,
+                style: Theme.of(context).textTheme.subtitle2,
+              ),
+            ],
           ),
           data.isSelf == false && data.postType == MediaType.Url
               ? PostUrlPreview(
@@ -117,9 +94,6 @@ class FeedCardTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: 4.0,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -133,46 +107,46 @@ class FeedCardTitle extends StatelessWidget {
           SizedBox(
             height: 4.0,
           ),
-//          nsfw == true || linkFlairText != null
-//              ? RichText(
-//                  textScaleFactor: 0.9,
-//                  text: TextSpan(
-//                    children: <TextSpan>[
-//                      nsfw != null && nsfw
-//                          ? TextSpan(
-//                              text: "NSFW ",
-//                              style: TextStyle(
-//                                color: Colors.red.withOpacity(
-//                                  0.9,
-//                                ),
-//                              ),
-//                            )
-//                          : TextSpan(),
-//                      linkFlairText != null
-//                          ? TextSpan(
-//                              text: linkFlairText,
-//                              style: Theme.of(context)
-//                                  .textTheme
-//                                  .subtitle
-//                                  .copyWith(
-//                                      color: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.8),
-//                                      backgroundColor: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.15),
-//                                      decorationThickness: 2),
-//                            )
-//                          : TextSpan(),
-//                    ],
-//                    style: Theme.of(context).textTheme.subtitle2,
-//                  ),
-//                )
-//              : Container(),
+          nsfw == true || linkFlairText != null
+              ? RichText(
+                  textScaleFactor: 0.9,
+                  text: TextSpan(
+                    children: <TextSpan>[
+                      nsfw != null && nsfw
+                          ? TextSpan(
+                              text: "NSFW ",
+                              style: TextStyle(
+                                color: Colors.red.withOpacity(
+                                  0.9,
+                                ),
+                              ),
+                            )
+                          : TextSpan(),
+                      linkFlairText != null
+                          ? TextSpan(
+                              text: linkFlairText,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .subtitle
+                                          .color
+                                          .withOpacity(0.8),
+                                      backgroundColor: Theme.of(context)
+                                          .textTheme
+                                          .subtitle
+                                          .color
+                                          .withOpacity(0.15),
+                                      decorationThickness: 2),
+                            )
+                          : TextSpan(),
+                    ],
+                    style: Theme.of(context).textTheme.subtitle2,
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
@@ -268,12 +242,12 @@ class FeedCardBodyImage extends StatelessWidget {
                               alignment: Alignment.center,
                               child: CircularProgressIndicator(),
                               width: deviceWidth,
-                              height: 100
-//                                images.first.source.height.toDouble() * ratio,
+                              height: 
+                               images.first.source.height.toDouble() * ratio,
                               ),
                           imageUrl: postMetaData['url'],
-//                          width: deviceWidth,
-//                          height: images.first.source.height.toDouble() * ratio,
+                         width: deviceWidth,
+                         height: images.first.source.height.toDouble() * ratio,
                           fadeOutDuration: Duration(milliseconds: 300),
                         ),
             ),

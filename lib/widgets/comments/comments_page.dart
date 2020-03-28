@@ -31,7 +31,7 @@ class DesktopCommentsScreen extends StatelessWidget {
                 backgroundColor: Theme.of(context).cardColor,
                 floating: true,
                 brightness: MediaQuery.of(context).platformBrightness,
-                pinned: false,
+                pinned: true,
                 snap: true,
                 elevation: 0,
                 textTheme: Theme.of(context).textTheme,

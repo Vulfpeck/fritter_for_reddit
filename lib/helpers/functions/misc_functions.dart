@@ -12,7 +12,7 @@ Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
       {
         if (data.media == null) {
           result['media_type'] = MediaType.Image;
-          result['url'] = data.url;
+          result['url'] = data.preview.images.first.source.url;
           return result;
         } else {
           result['media_type'] = MediaType.Video;
@@ -41,6 +41,9 @@ Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
               result['media_type'] = MediaType.Video;
               result['url'] = data.url.replaceAll('gifv', 'mp4');
               return result;
+            } else if (data.preview.images.first.variants.toJson()["mp4"] != null){
+              result['media_type'] = MediaType.Video;
+              result['url'] = data.preview.images.first.variants.toJson()["mp4"]["source"]["url"];
             } else {
               result['media_type'] = MediaType.Image;
               result['url'] = data.url;

@@ -18,52 +18,45 @@ class PostUrlPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 16.0,
-        right: 16.0,
-        top: 12.0,
-        bottom: 4.0,
+    return Container(
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: Theme.of(context).accentColor.withOpacity(0.1),
       ),
-      child: Container(
-        foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: Theme.of(context).accentColor.withOpacity(0.1),
+      margin: EdgeInsets.only(top: 8.0, bottom: 8.0),
+      child: ListTile(
+        dense: true,
+        onTap: () {
+          launchURL(Theme.of(context).primaryColor, data.url);
+        },
+        title: Text(
+          data.url,
+          style: Theme.of(context).textTheme.subtitle2.copyWith(
+                color:
+                    Theme.of(context).textTheme.subtitle2.color.withOpacity(
+                          0.8,
+                        ),
+              ),
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.fade,
+          textAlign: TextAlign.left,
         ),
-        child: ListTile(
-          dense: true,
-          onTap: () {
-            launchURL(Theme.of(context).primaryColor, data.url);
-          },
-          title: Text(
-            data.url,
-            style: Theme.of(context).textTheme.subtitle2.copyWith(
-                  color:
-                      Theme.of(context).textTheme.subtitle2.color.withOpacity(
-                            0.8,
-                          ),
+        trailing: data.preview != null
+            ? CircleAvatar(
+                radius: 16,
+                backgroundImage: CachedNetworkImageProvider(
+                  data.preview.images.last.source.url.asSanitizedImageUrl,
                 ),
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.fade,
-            textAlign: TextAlign.left,
-          ),
-          trailing: data.preview != null
-              ? CircleAvatar(
-                  radius: 16,
-                  backgroundImage: CachedNetworkImageProvider(
-                    data.preview.images.last.source.url.asSanitizedImageUrl,
-                  ),
-                )
-              : CircleAvatar(
-                  radius: 16,
-                  child: Icon(
-                    Icons.link,
-                    color: Colors.white,
-                  ),
-                  backgroundColor: Theme.of(context).accentColor,
+              )
+            : CircleAvatar(
+                radius: 16,
+                child: Icon(
+                  Icons.link,
+                  color: Colors.white,
                 ),
-        ),
+                backgroundColor: Theme.of(context).accentColor,
+              ),
       ),
     );
   }
