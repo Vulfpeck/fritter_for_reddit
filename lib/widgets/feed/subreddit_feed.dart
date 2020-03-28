@@ -60,7 +60,7 @@ class _SubredditFeedState extends State<SubredditFeed>
         bool hasError = model.subInformationLoadingError ||
             model.feedInformationLoadingError;
         bool userInfoProviderIsIdle =
-            Provider.of<UserInformationProvider>(context, listen: false)
+            Provider.of<UserInformationProvider>(context)
                     .state ==
                 ViewState.Idle;
         bool feedProviderIsIdle = model.state == ViewState.Idle;
