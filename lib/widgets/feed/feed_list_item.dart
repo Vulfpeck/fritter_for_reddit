@@ -35,38 +35,38 @@ class FeedCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'in r/' + data.subreddit + ' by ' + data.author,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                if (data.over18)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          'NSFW',
-                          style: TextStyle(color: Colors.red),
-                        )
-                      ],
-                    ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'in r/' + data.subreddit + ' by ' + data.author,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .subtitle2,
+              ),
+              if (data.over18)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.warning,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Text(
+                        'NSFW',
+                        style: TextStyle(color: Colors.red),
+                      )
+                    ],
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
           data.isSelf == false && data.postType == MediaType.Url
               ? PostUrlPreview(
@@ -117,9 +117,7 @@ class FeedCardTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: 4.0,
+        bottom: 8.0,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -378,7 +376,7 @@ class StickyTag extends StatelessWidget {
             ),
           )
         : Padding(
-            padding: EdgeInsets.only(top: 16.0),
+      padding: EdgeInsets.only(top: 8.0),
           );
   }
 }
