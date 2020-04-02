@@ -180,7 +180,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                           builder: (context) => LeftDrawer(
                             mode: Mode.mobile,
                           ),
-                          fullscreenDialog: true,
+                          fullscreenDialog: false,
                         ),
                       ),
                       color: Theme.of(context).accentColor,

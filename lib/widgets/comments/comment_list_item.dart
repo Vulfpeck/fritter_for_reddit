@@ -191,16 +191,17 @@ class CommentBody extends StatelessWidget {
               padding: const EdgeInsets.all(0),
               onLinkTap: (url) {
                 if (url.startsWith("/r/") || url.startsWith("r/")) {
+                  final String subreddit = url.startsWith("/r/")
+                      ? url.replaceFirst("/r/", "")
+                      : url.replaceFirst("r/", "");
+                  Provider.of<FeedProvider>(context, listen: false).navigateToSubreddit(subreddit);
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      maintainState: true,
                       fullscreenDialog: false,
                       builder: (BuildContext context) {
                         return SubredditFeedPage(
-                          subreddit: url.startsWith("/r/")
-                              ? url.replaceFirst("/r/", "")
-                              : url.replaceFirst("r/", ""),
+                          subreddit: subreddit
                         );
                       },
                     ),

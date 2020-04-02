@@ -158,6 +158,10 @@ class PostVoteControls extends StatelessWidget {
                         ),
                         onTap: () {
                           Navigator.of(context).pop();
+                          Provider.of<FeedProvider>(
+                            context, listen:false
+                          )
+                              .navigateToSubreddit(postData.subreddit);
                           return Navigator.of(
                             context,
                             rootNavigator: false,

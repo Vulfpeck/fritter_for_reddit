@@ -221,7 +221,7 @@ class FeedCardBodyImage extends StatelessWidget {
                               postMetaData['media_type'] == MediaType.Video,
                         );
                       },
-                      fullscreenDialog: true,
+                      fullscreenDialog: false,
                     ),
                   );
                 } else {}
