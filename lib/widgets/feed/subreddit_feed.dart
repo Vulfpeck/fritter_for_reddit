@@ -62,7 +62,7 @@ class _SubredditFeedState extends State<SubredditFeed>
         if (!notification.overscroll.isNegative &&
             Provider.of<FeedProvider>(context, listen: false)
                     .loadMorePostsState !=
-                ViewState.busy) {
+                ViewState.Busy) {
           Provider.of<FeedProvider>(context, listen: false).loadMorePosts();
         }
 
@@ -213,57 +213,51 @@ class _SubredditFeedState extends State<SubredditFeed>
                     ],
                   ),
                 ),
-                ConditionalBuilder(
-                  condition: settingsNotifier.state.viewMode == ViewMode.card,
-                  builder: (context) => ConditionalBuilder(
-                    condition: hasError,
-                    builder: (context) => SliverList(
-                        delegate: SliverChildListDelegate([
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          Icon(Icons.error_outline),
-                          Text("Couldn't Load subreddit")
-                        ],
-                      )
-                    ])),
-                    fallback: (context) {
-                      SliverChildDelegate delegate;
-                      if (feedProviderIsIdle && userInfoProviderIsIdle) {
-                        delegate = SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            var item = model.postFeed.data.children[index].data;
-                            return InkWell(
-                              onDoubleTap: () {
-                                if (item.isTextPost == false) {
-                                  launchURL(
-                                      Theme.of(context).primaryColor, item.url);
-                                }
-                              },
-                              onTap: () {
-                                _openComments(item, context, index);
-                              },
-                              child: PostCard(item: item),
-                            );
-                          },
-                          childCount:
-                              model.postFeed.data.children.length * 2 + 1,
-                        );
-                      } else {
-                        delegate = SliverChildListDelegate([
-                          Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: LinearProgressIndicator(),
-                          )
-                        ]);
-                      }
-                      return SliverList(delegate: delegate);
-                    },
-                  ),
-                  fallback: (context) => PhotoGrid(
+                if (settingsNotifier.state.viewMode == ViewMode.card)
+                  SliverList(
+                    delegate: (hasError)
+                        ? SliverChildListDelegate([
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(Icons.error_outline),
+                                Text("Couldn't Load subreddit")
+                              ],
+                            )
+                          ])
+                        : feedProviderIsIdle && userInfoProviderIsIdle
+                            ? SliverChildBuilderDelegate(
+                                (BuildContext context, int index) {
+                                  var item =
+                                      model.postFeed.data.children[index].data;
+                                  return InkWell(
+                                    onDoubleTap: () {
+                                      if (item.isTextPost == false) {
+                                        launchURL(
+                                            Theme.of(context).primaryColor,
+                                            item.url);
+                                      }
+                                    },
+                                    onTap: () {
+                                      _openComments(item, context, index);
+                                    },
+                                    child: PostCard(item: item),
+                                  );
+                                },
+                                childCount:
+                                    model.postFeed.data.children.length * 2 + 1,
+                              )
+                            : SliverChildListDelegate([
+                                Padding(
+                                  padding: const EdgeInsets.all(24.0),
+                                  child: LinearProgressIndicator(),
+                                )
+                              ]),
+                  )
+                else
+                  PhotoGrid(
                     postsFeed: model.postFeed,
-                  ),
-                )
+                  )
               ],
             ),
           );
