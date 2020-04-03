@@ -72,13 +72,13 @@ class DesktopFeedCard extends StatelessWidget {
               ],
             ),
           ),
-          if (post.isSelf == false && post.postType == MediaType.Url)
+          if (post.isTextPost == false && post.postType == MediaType.Url)
             PostUrlPreview(
               data: post,
               htmlUnescape: _htmlUnescape,
             ),
           if (post.preview != null &&
-              post.isSelf == false &&
+              post.isTextPost == false &&
               post.postType != MediaType.Url)
             Padding(
               padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
@@ -145,14 +145,14 @@ class DesktopFeedCard extends StatelessWidget {
                 ],
               ),
             ),
-            post.isSelf == false && post.postType == MediaType.Url
+            post.isTextPost == false && post.postType == MediaType.Url
                 ? PostUrlPreview(
                     data: post,
                     htmlUnescape: _htmlUnescape,
                   )
                 : Container(),
             post.preview != null &&
-                    post.isSelf == false &&
+                    post.isTextPost == false &&
                     post.postType != MediaType.Url
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),

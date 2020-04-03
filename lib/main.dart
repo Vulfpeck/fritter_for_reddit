@@ -8,6 +8,7 @@ import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_e
 import 'package:fritter_for_reddit/pages/app_home.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
 import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
+import 'package:fritter_for_reddit/widgets/common/gif_player.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_layout.dart';

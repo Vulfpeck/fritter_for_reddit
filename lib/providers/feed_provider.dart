@@ -31,6 +31,9 @@ class FeedProvider with ChangeNotifier {
 
   BehaviorSubject<SubredditInformationEntity>
       currentSubredditInformationStream = BehaviorSubject.seeded(null);
+
+  /// Note: This stream is only updated when the SubredditInfo and the subreddit feed has been updated.
+  /// It will not update if you add more data to an existing stream. It's a ZipStream, not a CombineLatestStream.
   BehaviorSubject<SubredditInfo> subStream;
   bool subLoadingError = false;
 

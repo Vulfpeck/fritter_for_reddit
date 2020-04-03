@@ -68,28 +68,21 @@ class FeedCard extends StatelessWidget {
               ],
             ),
           ),
-          data.isSelf == false && data.postType == MediaType.Url
-              ? PostUrlPreview(
-                  data: data,
-                  htmlUnescape: _htmlUnescape,
-                )
-              : Container(),
-          data.preview != null &&
-                  data.isSelf == false &&
-                  data.postType != MediaType.Url
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-                  child: FeedCardBodyImage(
-                    images: data.preview.images,
-                    data: data,
-                    postMetaData: {
-                      'media_type': data.postType,
-                      'url': data.url
-                    },
-                    deviceWidth: MediaQuery.of(context).size.width,
-                  ),
-                )
-              : Container(),
+          if (data.postType == MediaType.Url)
+            PostUrlPreview(
+              data: data,
+              htmlUnescape: _htmlUnescape,
+            ),
+          if (data.hasPreview)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+              child: FeedCardBodyImage(
+                images: data.preview.images,
+                data: data,
+                postMetaData: {'media_type': data.postType, 'url': data.url},
+                deviceWidth: MediaQuery.of(context).size.width,
+              ),
+            )
         ],
       ),
     );
@@ -195,9 +188,9 @@ class FeedCardBodyImage extends StatelessWidget {
     @required this.data,
     @required this.postMetaData,
     @required this.deviceWidth,
-  })  : url = _htmlUnescape.convert(images.first.resolutions
-            .elementAt(images.first.resolutions.length ~/ 2)
-            .url),
+  })  : url = images.isNotEmpty
+            ? _htmlUnescape.convert(images.first.source.url)
+            : null,
         ratio = (deviceWidth) / images.first.source.width,
         assert(postMetaData != null);
 

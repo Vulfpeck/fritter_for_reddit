@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fritter_for_reddit/exports.dart';
 import 'package:hive/hive.dart';
 
 /// Every time notifyListeners is called, the state is persisted to allow easy app persistence.

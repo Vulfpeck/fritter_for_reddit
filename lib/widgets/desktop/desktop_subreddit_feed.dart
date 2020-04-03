@@ -8,12 +8,12 @@ import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
 import 'package:fritter_for_reddit/widgets/comments/comments_page.dart';
+import 'package:fritter_for_reddit/widgets/common/gallery_card.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_feed_list_item.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 import 'package:fritter_for_reddit/widgets/feed/post_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fritter_for_reddit/utils/extensions.dart';
 
 class DesktopSubredditFeed extends StatefulWidget {
   DesktopSubredditFeed();
@@ -632,7 +632,7 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
         for (final postFeedItem in postsWithImages)
           Card(
             elevation: 3,
-            child: GalleryCard(postFeedItem: postFeedItem),
+            child: GalleryImage(postFeedItem: postFeedItem),
           )
       ]);
     } else {
@@ -685,7 +685,7 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
                       _openComments(item, context, index);
                     },
                     onDoubleTap: () {
-                      if (item.isSelf == false) {
+                      if (item.isTextPost == false) {
                         launchURL(Theme.of(context).primaryColor, item.url);
                       }
                     },
@@ -751,48 +751,6 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
           );
         },
       ),
-    );
-  }
-}
-
-class GalleryCard extends StatefulWidget {
-  const GalleryCard({
-    Key key,
-    @required this.postFeedItem,
-  }) : super(key: key);
-
-  final PostsFeedDataChild postFeedItem;
-
-  @override
-  _GalleryCardState createState() => _GalleryCardState();
-}
-
-class _GalleryCardState extends State<GalleryCard> {
-  double opacity = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Positioned.fill(
-          child: CachedNetworkImage(
-            fit: BoxFit.cover,
-            imageUrl: widget.postFeedItem.data.preview.images.first.source.url
-                .asSanitizedImageUrl,
-          ),
-        ),
-        AnimatedOpacity(
-          opacity: opacity,
-          duration: Duration(milliseconds: 500),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Icon(Icons.file_download),
-              Icon(Icons.file_download),
-            ],
-          ),
-        )
-      ],
     );
   }
 }

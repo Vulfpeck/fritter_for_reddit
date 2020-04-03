@@ -1,13 +1,21 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:conditional_builder/conditional_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/helpers/functions/conversion_functions.dart';
 import 'package:fritter_for_reddit/helpers/functions/hex_to_color_class.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
+import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
+import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
 import 'package:fritter_for_reddit/widgets/comments/comments_page.dart';
+import 'package:fritter_for_reddit/widgets/common/gallery_card.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
+import 'package:fritter_for_reddit/widgets/common/photo_grid.dart';
+import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 import 'package:fritter_for_reddit/widgets/feed/feed_list_item.dart';
 
@@ -29,19 +37,13 @@ class _SubredditFeedState extends State<SubredditFeed>
   String sortSelectorValue = "Best";
   GlobalKey key = new GlobalKey();
 
+  SettingsNotifier get settingsNotifier =>
+      SettingsNotifier.of(context, listen: false);
+
   @override
   void initState() {
     _controller = new ScrollController();
-    _controller.addListener(_scrollListener);
     super.initState();
-  }
-
-  void _scrollListener() async {
-    if (_controller.position.maxScrollExtent - _controller.offset <= 400 &&
-        Provider.of<FeedProvider>(context, listen: false).loadMorePostsState !=
-            ViewState.Busy) {
-      Provider.of<FeedProvider>(context, listen: false).loadMorePosts();
-    }
   }
 
   @override
@@ -55,209 +57,210 @@ class _SubredditFeedState extends State<SubredditFeed>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FeedProvider>(
-      builder: (BuildContext context, FeedProvider model, _) {
-        bool hasError = model.subInformationLoadingError ||
-            model.feedInformationLoadingError;
-        bool userInfoProviderIsIdle =
-            Provider.of<UserInformationProvider>(context, listen: false)
-                    .state ==
-                ViewState.Idle;
-        bool feedProviderIsIdle = model.state == ViewState.Idle;
-        return CustomScrollView(
-          controller: _controller,
-          physics: AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverAppBar(
-              iconTheme: Theme.of(context).iconTheme,
-              actions: <Widget>[
-                PopupMenuButton<String>(
-                  key: key,
-                  icon: Icon(
-                    Icons.sort,
-                  ),
-                  onSelected: (value) {
-                    final RenderBox box = key.currentContext.findRenderObject();
-                    final positionDropDown = box.localToGlobal(Offset.zero);
-                    // print(
-                    if (value == "Top") {
-                      sortSelectorValue = "Top";
-                      showMenu(
-                        position: RelativeRect.fromLTRB(
-                          positionDropDown.dx,
-                          positionDropDown.dy,
-                          0,
-                          0,
-                        ),
-                        context: context,
-                        items: <String>[
-                          'Day',
-                          'Week',
-                          'Month',
-                          'Year',
-                          'All',
-                        ].map((value) {
-                          return PopupMenuItem<String>(
-                            value: value,
-                            child: ListTile(
-                              title: Text(value),
-                              onTap: () {
-                                Navigator.of(context, rootNavigator: false)
-                                    .pop();
+    return NotificationListener<OverscrollNotification>(
+      onNotification: (OverscrollNotification notification) {
+        if (!notification.overscroll.isNegative &&
+            Provider.of<FeedProvider>(context, listen: false)
+                    .loadMorePostsState !=
+                ViewState.Busy) {
+          Provider.of<FeedProvider>(context, listen: false).loadMorePosts();
+        }
 
-                                model.updateSorting(
-                                  sortBy: "/top/.json?sort=top&t=$value",
-                                  loadingTop: true,
-                                );
-                              },
+        return false;
+      },
+      child: Consumer<FeedProvider>(
+        builder: (BuildContext context, FeedProvider model, _) {
+          bool hasError = model.subInformationLoadingError ||
+              model.feedInformationLoadingError;
+          bool userInfoProviderIsIdle =
+              Provider.of<UserInformationProvider>(context, listen: false)
+                      .state ==
+                  ViewState.Idle;
+          bool feedProviderIsIdle = model.state == ViewState.Idle;
+          return Scrollbar(
+            child: CustomScrollView(
+              controller: _controller,
+              physics: AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                SliverAppBar(
+                  iconTheme: Theme.of(context).iconTheme,
+                  actions: <Widget>[
+                    PopupMenuButton<String>(
+                      key: key,
+                      icon: Icon(
+                        Icons.sort,
+                      ),
+                      onSelected: (value) {
+                        final RenderBox box =
+                            key.currentContext.findRenderObject();
+                        final positionDropDown = box.localToGlobal(Offset.zero);
+                        // print(
+                        if (value == "Top") {
+                          sortSelectorValue = "Top";
+                          showMenu(
+                            position: RelativeRect.fromLTRB(
+                              positionDropDown.dx,
+                              positionDropDown.dy,
+                              0,
+                              0,
                             ),
+                            context: context,
+                            items: <String>[
+                              'Day',
+                              'Week',
+                              'Month',
+                              'Year',
+                              'All',
+                            ].map((value) {
+                              return PopupMenuItem<String>(
+                                value: value,
+                                child: ListTile(
+                                  title: Text(value),
+                                  onTap: () {
+                                    Navigator.of(context, rootNavigator: false)
+                                        .pop();
+
+                                    model.updateSorting(
+                                      sortBy: "/top/.json?sort=top&t=$value",
+                                      loadingTop: true,
+                                    );
+                                  },
+                                ),
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      );
-                    } else if (value == 'Close' || value == sortSelectorValue) {
-                    } else {
-                      sortSelectorValue = value;
-                      feedProvider.updateSorting(
-                        sortBy: value,
-                        loadingTop: false,
-                      );
-                    }
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return <String>[
-                      'Best',
-                      'Hot',
-                      'Top',
-                      'New',
-                      'Controversial',
-                      'Rising'
-                    ].map((String value) {
-                      return new PopupMenuItem<String>(
-                        value: value,
-                        child: new Text(value),
-                      );
-                    }).toList();
-                  },
-                  onCanceled: () {},
-                  initialValue: sortSelectorValue,
-                ),
-                IconButton(
-                  icon: Icon(Icons.info_outline),
-                  color: Theme.of(context).iconTheme.color,
-                  onPressed: () {
-                    showSubInformationSheet(context);
-                  },
-                )
-              ],
-              pinned: true,
-              snap: true,
-              floating: true,
-              primary: true,
-              elevation: 0,
-              brightness: MediaQuery.of(context).platformBrightness,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              textTheme: Theme.of(context).textTheme,
-              centerTitle: true,
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      model.currentPage != CurrentPage.frontPage
-                          ? model.currentSubreddit.toString()
-                          : 'Frontpage',
-                      textAlign: TextAlign.center,
+                        } else if (value == 'Close' ||
+                            value == sortSelectorValue) {
+                        } else {
+                          sortSelectorValue = value;
+                          feedProvider.updateSorting(
+                            sortBy: value,
+                            loadingTop: false,
+                          );
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return <String>[
+                          'Best',
+                          'Hot',
+                          'Top',
+                          'New',
+                          'Controversial',
+                          'Rising'
+                        ].map((String value) {
+                          return new PopupMenuItem<String>(
+                            value: value,
+                            child: new Text(value),
+                          );
+                        }).toList();
+                      },
+                      onCanceled: () {},
+                      initialValue: sortSelectorValue,
                     ),
-                  ),
-                  Flexible(
-                    child: IconButton(
-                      icon: Icon(Icons.expand_more),
-                      onPressed: () =>
-                          Navigator.of(context, rootNavigator: false).push(
-                        CupertinoPageRoute(
-                          maintainState: true,
-                          builder: (context) => LeftDrawer(
-                            mode: Mode.mobile,
-                          ),
-                          fullscreenDialog: true,
+                    ViewSwitcherIconButton(
+                      viewMode: SettingsNotifier.of(context, listen: true)
+                          .state
+                          .viewMode,
+                      onChanged: (viewMode) {
+                        settingsNotifier.changeViewMode(viewMode);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.info_outline),
+                      color: Theme.of(context).iconTheme.color,
+                      onPressed: () {
+                        showSubInformationSheet(context);
+                      },
+                    )
+                  ],
+                  pinned: true,
+                  snap: true,
+                  floating: true,
+                  primary: true,
+                  elevation: 0,
+                  brightness: MediaQuery.of(context).platformBrightness,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  textTheme: Theme.of(context).textTheme,
+                  centerTitle: true,
+                  title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          model.currentPage != CurrentPage.frontPage
+                              ? model.currentSubreddit.toString()
+                              : 'Frontpage',
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      color: Theme.of(context).accentColor,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SliverList(
-              delegate: (hasError)
-                  ? SliverChildListDelegate([
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          Icon(Icons.error_outline),
-                          Text("Couldn't Load subreddit")
-                        ],
+                      Flexible(
+                        child: IconButton(
+                          icon: Icon(Icons.expand_more),
+                          onPressed: () =>
+                              Navigator.of(context, rootNavigator: false).push(
+                            CupertinoPageRoute(
+                              maintainState: true,
+                              builder: (context) => LeftDrawer(
+                                mode: Mode.mobile,
+                              ),
+                              fullscreenDialog: true,
+                            ),
+                          ),
+                          color: Theme.of(context).accentColor,
+                        ),
                       )
-                    ])
-                  : feedProviderIsIdle && userInfoProviderIsIdle
-                      ? SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            if (index ==
-                                model.postFeed.data.children.length * 2) {
-                              if (model.loadMorePostsState == ViewState.Busy) {
-                                return Material(
-                                  color: Theme.of(context).cardColor,
-                                  child: Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        title: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .padding
-                                                  .bottom *
-                                              2),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }
-
-                            if (index % 2 == 1) {
-                              return Divider();
-                            }
-                            var item =
-                                model.postFeed.data.children[(index ~/ 2)].data;
-                            return InkWell(
-                              onDoubleTap: () {
-                                if (item.isSelf == false) {
-                                  launchURL(
-                                      Theme.of(context).primaryColor, item.url);
-                                }
-                              },
-                              onTap: () {
-                                _openComments(item, context, index);
-                              },
-                              child: PostCard(item: item),
-                            );
-                          },
-                          childCount:
-                              model.postFeed.data.children.length * 2 + 1,
-                        )
-                      : SliverChildListDelegate([
-                          Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: LinearProgressIndicator(),
-                          )
-                        ]),
-            )
-          ],
-        );
+                    ],
+                  ),
+                ),
+                if (settingsNotifier.state.viewMode == ViewMode.card)
+                  SliverList(
+                    delegate: (hasError)
+                        ? SliverChildListDelegate([
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(Icons.error_outline),
+                                Text("Couldn't Load subreddit")
+                              ],
+                            )
+                          ])
+                        : feedProviderIsIdle && userInfoProviderIsIdle
+                            ? SliverChildBuilderDelegate(
+                                (BuildContext context, int index) {
+                                  var item =
+                                      model.postFeed.data.children[index].data;
+                                  return InkWell(
+                                    onDoubleTap: () {
+                                      if (item.isTextPost == false) {
+                                        launchURL(
+                                            Theme.of(context).primaryColor,
+                                            item.url);
+                                      }
+                                    },
+                                    onTap: () {
+                                      _openComments(item, context, index);
+                                    },
+                                    child: PostCard(item: item),
+                                  );
+                                },
+                                childCount:
+                                    model.postFeed.data.children.length * 2 + 1,
+                              )
+                            : SliverChildListDelegate([
+                                Padding(
+                                  padding: const EdgeInsets.all(24.0),
+                                  child: LinearProgressIndicator(),
+                                )
+                              ]),
+                  )
+                else
+                  PhotoGrid(
+                    postsFeed: model.postFeed,
+                  )
+              ],
+            ),
+          );
 //        return ListView.builder(
 //          itemBuilder: (BuildContext context, int index) {
 //            var item = model.postFeed.data.children[index].data;
@@ -293,7 +296,8 @@ class _SubredditFeedState extends State<SubredditFeed>
 //          cacheExtent: 20,
 //          addAutomaticKeepAlives: false,
 //        );
-      },
+        },
+      ),
     );
   }
 

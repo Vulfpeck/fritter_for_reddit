@@ -4,6 +4,7 @@ import 'package:fritter_for_reddit/helpers/media_type_enum.dart';
 import 'package:hive/hive.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
+
 part 'posts_feed_entity.g.dart';
 
 @HiveType(typeId: 2)
@@ -29,6 +30,8 @@ class PostsFeedEntity {
     data['kind'] = this.kind;
     return data;
   }
+
+  List<PostsFeedDataChild> get children => data.children;
 
   PostsFeedEntity copyWith({
     PostsFeedData data,
@@ -128,6 +131,8 @@ class PostsFeedDataChild {
     data['kind'] = this.kind;
     return data;
   }
+
+  String get title => data.title;
 }
 
 class PostsFeedDataChildrenData {
@@ -167,7 +172,7 @@ class PostsFeedDataChildrenData {
   bool archived;
   dynamic authorFlairTextColor;
   bool canModPost;
-  bool isSelf;
+  bool isTextPost;
   String authorFullname;
   dynamic linkFlairCssClass;
   String selftext;
@@ -213,7 +218,14 @@ class PostsFeedDataChildrenData {
   bool authorPatreonFlair;
   dynamic modNote;
   dynamic media;
-  String title;
+  String _title;
+
+  String get title => _title;
+
+  set title(String title) {
+    _title = title;
+  }
+
   dynamic authorFlairText;
   int numCrossposts;
   int thumbnailWidth;
@@ -235,7 +247,9 @@ class PostsFeedDataChildrenData {
   MediaType postType;
 
   bool get hasLinkFlairText => linkFlairText != null;
+
   bool get hasPreview => preview?.images?.isNotEmpty ?? false;
+
   String get previewUrl => preview.images.first.source.url.asSanitizedImageUrl;
 
   PostsFeedDataChildrenData({
@@ -275,7 +289,7 @@ class PostsFeedDataChildrenData {
     this.archived,
     this.authorFlairTextColor,
     this.canModPost,
-    this.isSelf,
+    this.isTextPost,
     this.authorFullname,
     this.linkFlairCssClass,
     this.selftext,
@@ -321,7 +335,6 @@ class PostsFeedDataChildrenData {
     this.authorPatreonFlair,
     this.modNote,
     this.media,
-    this.title,
     this.authorFlairText,
     this.numCrossposts,
     this.thumbnailWidth,
@@ -386,7 +399,7 @@ class PostsFeedDataChildrenData {
     archived = json['archived'];
     authorFlairTextColor = json['author_flair_text_color'];
     canModPost = json['can_mod_post'];
-    isSelf = json['is_self'];
+    isTextPost = json['is_self'];
     authorFullname = json['author_fullname'];
     linkFlairCssClass = json['link_flair_css_class'];
     selftext = json['selftext'];
@@ -518,7 +531,7 @@ class PostsFeedDataChildrenData {
     data['archived'] = this.archived;
     data['author_flair_text_color'] = this.authorFlairTextColor;
     data['can_mod_post'] = this.canModPost;
-    data['is_self'] = this.isSelf;
+    data['is_self'] = this.isTextPost;
     data['author_fullname'] = this.authorFullname;
     data['link_flair_css_class'] = this.linkFlairCssClass;
     data['selftext'] = this.selftext;

@@ -47,7 +47,7 @@ class DesktopCommentsScreen extends StatelessWidget {
                         color: Theme.of(context).cardColor,
                         child: InkWell(
                           onTap: () {
-                            if (postData.isSelf == false) {
+                            if (postData.isTextPost == false) {
                               launchURL(
                                   Theme.of(context).primaryColor, postData.url);
                             }
@@ -55,7 +55,7 @@ class DesktopCommentsScreen extends StatelessWidget {
                           child: FeedCard(postData),
                         ),
                       ),
-                      postData.isSelf && postData.selftextHtml != null
+                      postData.isTextPost && postData.selftextHtml != null
                           ? FeedCardBodySelfText(
                               selftextHtml: postData.selftextHtml,
                             )

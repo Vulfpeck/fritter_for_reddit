@@ -221,10 +221,11 @@ class UserInformationProvider with ChangeNotifier {
     bool res = await this.performAuthentication();
     // print("final res: " + res.toString());
     if (res) {
+      final NavigatorState navigator = Navigator.of(context);
       await Provider.of<FeedProvider>(context, listen: false)
           .navigateToSubreddit('');
-      if (!PlatformX.isDesktop && Navigator.canPop(context)) {
-        Navigator.pop(context);
+      if (!PlatformX.isDesktop && navigator.canPop()) {
+        navigator.pop();
       }
     } else {
       showDialog(

@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fritter_for_reddit/providers/state_persisting_change_notifier.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifier extends StatePersistingChangeNotifier<SettingsState> {
   @override
   SettingsState get initialState => SettingsState.initial();
+
+  static SettingsNotifier of(BuildContext context, {bool listen = false}) =>
+      Provider.of<SettingsNotifier>(context, listen: listen);
 
   void changeViewMode(ViewMode viewMode) =>
       state = state.copyWith(viewMode: viewMode);

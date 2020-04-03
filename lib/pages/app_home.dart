@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fritter_for_reddit/widgets/common/gif_player.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
 
@@ -28,6 +29,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+//    return GifPlayer(
+//        imageUrl:
+////          'https://www.thedesignwork.com/wp-content/uploads/2014/01/animation-gif-2.gif',
+//            'https://media2.giphy.com/media/8z2mlSy0xxwkw/giphy.gif');
     return WillPopScope(
       onWillPop: () async {
         return !await currentNavigatorKey().currentState.maybePop();
