@@ -26,7 +26,7 @@ class UserProfileScreen extends StatelessWidget {
                   controller: controller,
                   physics: AlwaysScrollableScrollPhysics(),
                   slivers: <Widget>[
-                    model.state == ViewState.Busy
+                    model.state == ViewState.busy
                         ? SliverList(
                             delegate: SliverChildListDelegate(
                               [

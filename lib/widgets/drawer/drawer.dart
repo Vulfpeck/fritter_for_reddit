@@ -84,7 +84,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                             .children[index],
                                       );
                                     } else {
-                                      return DesktopSubredditDrawerTile(
+                                      return DesktopSubredditDrawerTile
+                                          .fromSubredditListChild(
                                         subreddit: model.userSubreddits.data
                                             .children[index],
                                       );
@@ -96,7 +97,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                               : SliverChildListDelegate([
                                   Padding(
                                     padding: const EdgeInsets.all(16.0),
-                                    child: LinearProgressIndicator(),
+                                    child: Center(
+                                        child: Text('Loading your Subreddits')),
                                   ),
                                 ]),
                         ),

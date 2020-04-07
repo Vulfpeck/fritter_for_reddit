@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -12,12 +13,29 @@ extension PlatformX on Platform {
 }
 
 extension StringX on String {
-  String get withSubredditLinksAsMarkdownLinks =>
-      replaceAllMapped(RegExp(r'(\/r\/[\w_-]+\b)'), (Match match) {
-        final String content = match[0];
-        final convertedString = '[$content]($content)';
-        return convertedString;
-      });
+  String get withSubredditLinksAsMarkdownLinks {
+    return replaceAllMapped(RegExp(r'(\/r\/[\w_-]+\b)'), (Match match) {
+      final String content = match[0];
+      final convertedString = '[$content]($content)';
+      return convertedString;
+    });
+  }
+
+  String cleanupMarkdown() {
+    return replaceAllMapped(RegExp(r'(#+\S)'), (Match match) {
+      final String content = match[0];
+      String convertedString;
+      if (content.endsWith('#')) {
+        convertedString =
+            '${content.substring(0, content.length)}${content.toList.last}';
+      } else {
+        convertedString =
+            '${content.substring(0, content.length)} ${content.toList.last}';
+      }
+
+      return convertedString;
+    });
+  }
 
   String get asSanitizedImageUrl {
     if (contains('.html')) {
@@ -33,7 +51,12 @@ extension StringX on String {
     return convertedString;
   }
 
-  String get htmlUnescaped => HtmlUnescape().convert(this);
+  String get htmlUnescaped {
+    var unescaped = HtmlUnescape().convert(this);
+    return unescaped;
+  }
+
+  List<String> get toList => split('');
 }
 
 extension StreamX<T> on Stream<T> {

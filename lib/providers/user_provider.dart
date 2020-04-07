@@ -45,7 +45,7 @@ class UserInformationProvider with ChangeNotifier {
   Future<void> validateAuthentication() async {
 //    // print("*** Validating authentication ****");
     await _storageHelper.init();
-    _state = ViewState.Busy;
+    _state = ViewState.busy;
     notifyListeners();
 
     if (_storageHelper.signInStatus) {
@@ -61,7 +61,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<bool> performAuthentication() async {
-    _authenticationStatus = ViewState.Busy;
+    _authenticationStatus = ViewState.busy;
     notifyListeners();
     bool authResult = true;
     if (server != null) {
@@ -78,7 +78,7 @@ class UserInformationProvider with ChangeNotifier {
 //    // print("local host response");
 
     notifyListeners();
-    _authenticationStatus = ViewState.Busy;
+    _authenticationStatus = ViewState.busy;
     if (accessCode == null) {
 //      // print("isNull");
       authResult = false;
@@ -140,7 +140,7 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> signOutUser() async {
-    _state = ViewState.Busy;
+    _state = ViewState.busy;
     notifyListeners();
     await _storageHelper.clearStorage();
     userInformation = null;
@@ -213,9 +213,10 @@ class UserInformationProvider with ChangeNotifier {
   }
 
   Future<void> authenticateUser(BuildContext context) async {
-    const url = "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
-        CLIENT_ID +
-        "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
+    final url =
+        "https://www.reddit.com/api/v1/${PlatformX.isDesktop ? 'authorize' : 'authorize.compact'}?client_id=" +
+            CLIENT_ID +
+            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
     // TODO: Embed a WebView for macOS when this is supported.
     launchURL(Theme.of(context).primaryColor, url);
     bool res = await this.performAuthentication();

@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.39.4"
+  animated_layout:
+    dependency: "direct main"
+    description:
+      path: "../animated_layout"
+      relative: true
+    source: path
+    version: "0.0.2"
   archive:
     dependency: transitive
     description:
@@ -226,9 +233,11 @@ packages:
   flutter_gifimage:
     dependency: "direct main"
     description:
-      path: "../flutter_gifimage"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "80c64d50e4628161205b5c335cb0fb4d923c8250"
+      url: "https://github.com/ThinkDigitalSoftware/flutter_gifimage.git"
+    source: git
     version: "1.1.0"
   flutter_html:
     dependency: "direct main"
@@ -548,6 +557,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2+4"
+  shelf:
+    dependency: transitive
+    description:
+      name: shelf
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.5"
+  shelf_web_socket:
+    dependency: transitive
+    description:
+      name: shelf_web_socket
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
+  skeleton_text:
+    dependency: "direct main"
+    description:
+      name: skeleton_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   sky_engine:
     dependency: transitive
     description: flutter

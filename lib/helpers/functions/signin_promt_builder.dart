@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/utils/extensions.dart';
 
 void buildSnackBar(BuildContext context) {
   Scaffold.of(context).hideCurrentSnackBar();
@@ -10,7 +11,7 @@ void buildSnackBar(BuildContext context) {
         Provider.of<UserInformationProvider>(context).performAuthentication();
         launchURL(
             Theme.of(context).primaryColor,
-            "https://www.reddit.com/api/v1/authorize.compact?client_id=" +
+            "https://www.reddit.com/api/v1/${PlatformX.isDesktop ? 'authorize' : 'authorize.compact'}?client_id=" +
                 CLIENT_ID +
                 "&response_type=code&state=samplestate&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
       },

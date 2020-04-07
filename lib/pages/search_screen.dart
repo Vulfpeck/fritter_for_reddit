@@ -288,8 +288,8 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   SliverList(
                     delegate:
-                        model.subredditQueryLoadingState == ViewState.Busy ||
-                                model.postsQueryLoadingState == ViewState.Busy
+                        model.subredditQueryLoadingState == ViewState.busy ||
+                                model.postsQueryLoadingState == ViewState.busy
                             ? SliverChildListDelegate([
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),

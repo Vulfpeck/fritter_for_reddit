@@ -37,7 +37,7 @@ class SearchProvider with ChangeNotifier {
 
   Future<SearchSubredditsRepoEntity> searchSubreddits(
       {@required String query}) async {
-    _subredditQueryLoadingState = ViewState.Busy;
+    _subredditQueryLoadingState = ViewState.busy;
     notifyListeners();
     await _secureStorageHelper.init();
     if (_secureStorageHelper.signInStatus) {
@@ -94,7 +94,7 @@ class SearchProvider with ChangeNotifier {
     String subreddit = "",
   }) async {
     await _secureStorageHelper.init();
-    _postsQueryLoadingState = ViewState.Busy;
+    _postsQueryLoadingState = ViewState.busy;
     notifyListeners();
 
     if (_secureStorageHelper.signInStatus) {

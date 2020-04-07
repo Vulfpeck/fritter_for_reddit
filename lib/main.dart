@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:animated_layout/animated_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fritter_for_reddit/exports.dart';
@@ -8,10 +9,8 @@ import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_e
 import 'package:fritter_for_reddit/pages/app_home.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
 import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
-import 'package:fritter_for_reddit/widgets/common/gif_player.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
 import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
-import 'package:fritter_for_reddit/widgets/desktop/desktop_layout.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed.dart';
 import 'package:fritter_for_reddit/widgets/desktop/subreddit_side_panel.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
@@ -52,7 +51,68 @@ void main() async {
   );
 }
 
-class Fritter extends StatelessWidget {
+class Fritter extends StatefulWidget {
+  @override
+  _FritterState createState() => _FritterState();
+}
+
+class _FritterState extends State<Fritter> {
+  AnimatedLayoutController animatedLayoutController;
+
+  @override
+  void initState() {
+    animatedLayoutController = AnimatedLayoutController(
+        duration: kThemeAnimationDuration,
+        children: <Widget>[
+          SizedBox.expand(
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.red,
+              child: Column(children: [
+                Text('Subreddit List'),
+                for (int i = 0; i < 10; i++)
+                  LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return ListTile(
+                        leading: Icon(Icons.image),
+                        title: constraints.maxWidth > 200
+                            ? Text(
+                                'Subreddit Title',
+//                              overflow: TextOverflow.fade,
+                                softWrap: true,
+                              )
+                            : null,
+//                            subtitle: Text(constraints.maxWidth.toString()),
+                      );
+                    },
+                  )
+              ]),
+            ),
+          ),
+          SizedBox.expand(
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.blue,
+              child: Text('Posts Feed'),
+            ),
+          ),
+          SizedBox.expand(
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.green,
+              child: Text('Post/Comments'),
+            ),
+          )
+        ],
+        initialDivisions: [
+          20,
+          60,
+          20
+        ]);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -153,25 +213,59 @@ class Fritter extends StatelessWidget {
   }
 }
 
-class DesktopHome extends StatelessWidget {
+class DesktopHome extends StatefulWidget {
   const DesktopHome({
     Key key,
   }) : super(key: key);
 
   @override
+  _DesktopHomeState createState() => _DesktopHomeState();
+}
+
+class _DesktopHomeState extends State<DesktopHome> {
+  AnimatedLayoutController animatedLayoutController;
+
+  @override
+  void initState() {
+    super.initState();
+    animatedLayoutController ??=
+        AnimatedLayoutController(duration: kThemeAnimationDuration, children: [
+      Container(
+        decoration: BoxDecoration(
+          border: Border(
+            right: BorderSide(color: Colors.grey),
+          ),
+        ),
+        child: LeftDrawer(
+          mode: Mode.desktop,
+        ),
+      ),
+      DesktopSubredditFeed(),
+      SubredditSidePanel(
+        subredditInformation: null,
+      ),
+    ], initialDivisions: [
+      20,
+      60,
+      20
+    ]);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SubredditInfo>(
-        stream: FeedProvider.of(context).subStream,
-        builder: (context, snapshot) {
-          final SubredditInfo subredditInfo = snapshot.data;
-          final SubredditInformationEntity subredditInformationData =
-              subredditInfo?.subredditInformation;
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          return Scaffold(
-            body: DesktopLayout(
-              leftPanel: Container(
+    return Provider.value(
+      value: animatedLayoutController,
+      child: StreamBuilder<SubredditInfo>(
+          stream: FeedProvider.of(context).subStream,
+          builder: (context, snapshot) {
+            final SubredditInfo subredditInfo = snapshot.data;
+            final SubredditInformationEntity subredditInformationData =
+                subredditInfo?.subredditInformation;
+            if (!snapshot.hasData) {
+              return Container();
+            }
+            animatedLayoutController.updateChildren([
+              Container(
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(color: Colors.grey),
@@ -181,12 +275,24 @@ class DesktopHome extends StatelessWidget {
                   mode: Mode.desktop,
                 ),
               ),
-              content: DesktopSubredditFeed(),
-              rightPanel: SubredditSidePanel(
+              DesktopSubredditFeed(),
+              SubredditSidePanel(
                 subredditInformation: subredditInformationData,
               ),
-            ),
-          );
-        });
+            ]);
+            return Scaffold(
+              body: AnimatedLayout(
+                controller: animatedLayoutController,
+                direction: Axis.horizontal,
+              ),
+              floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.list),
+                onPressed: () {
+                  FeedProvider.of(context).getSubredditRules('AskReddit');
+                },
+              ),
+            );
+          }),
+    );
   }
 }

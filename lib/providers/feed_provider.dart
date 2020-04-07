@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
+import 'package:fritter_for_reddit/models/subreddit_info/rule.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
 
 import 'package:fritter_for_reddit/helpers/functions/misc_functions.dart';
@@ -140,7 +141,7 @@ class FeedProvider with ChangeNotifier {
 
   /// action being true results in subscribing to a subreddit
   Future<void> changeSubscriptionStatus(String subId, bool action) async {
-    _partialState = ViewState.Busy;
+    _partialState = ViewState.busy;
     notifyListeners();
 
     String authToken = await _storageHelper.authToken;
@@ -191,12 +192,12 @@ class FeedProvider with ChangeNotifier {
 
     this.sort = currentSort;
 
-    if (_cache.containsKey(currentSubreddit)) {
+    if (false /*_cache.containsKey(currentSubreddit)*/) {
       _postFeedStream.value = _cache.get(currentSubreddit).postsFeed;
       debugPrint('returning data from cache');
       notifyListeners();
     } else {
-      _state = ViewState.Busy;
+      _state = ViewState.busy;
       notifyListeners();
     }
     http.Response response;
@@ -340,7 +341,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<PostsFeedEntity> loadMorePosts() async {
-    _loadMorePostsState = ViewState.Busy;
+    _loadMorePostsState = ViewState.busy;
     notifyListeners();
 
     await _storageHelper.init();
@@ -415,7 +416,7 @@ class FeedProvider with ChangeNotifier {
   void selectProperPreviewImage() {}
 
   Future<void> signOutUser() async {
-    _state = ViewState.Busy;
+    _state = ViewState.busy;
     notifyListeners();
     await _storageHelper.clearStorage();
     await _fetchPostsListing();
@@ -538,6 +539,39 @@ class FeedProvider with ChangeNotifier {
 
   Future<void> refresh() =>
       _fetchPostsListing(currentSubreddit: currentSubreddit);
+  List<SubredditInformationEntity> _popularSubreddits;
+
+  Future<List<SubredditInformationEntity>> fetchPopularSubreddits() async {
+    if (_popularSubreddits != null) {
+      return _popularSubreddits;
+    }
+    final result = await _fetch(endpoint: Endpoints.popular);
+    List<SubredditInformationEntity> subs = (result['data']['children'] as List)
+        .map((json) => SubredditInformationEntity.fromJson(json))
+        .toList();
+    return _popularSubreddits = subs;
+  }
+
+  Future<List<Rule>> getSubredditRules(String subreddit) async {
+    final Map json =
+        await _fetch(endpoint: Endpoints.subredditRules(subreddit));
+    final rules = Rule.listFromJson(json);
+    return rules;
+  }
+
+  Future<Map> _fetch({String endpoint, String token, int limit}) async {
+    final url =
+        "https://www.reddit.com$endpoint.json${limit != null ? '?limit=$limit' : ''}";
+    http.Response response = await http.get(
+      url,
+      headers: {
+        if (token != null) 'Authorization': 'bearer ' + token,
+        'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
+      },
+    );
+    final json = jsonDecode(response.body);
+    return json;
+  }
 }
 
 enum QueryType { subreddit, user, post }
@@ -606,4 +640,11 @@ class SubredditInfo {
   }
 
 //</editor-fold>
+}
+
+class Endpoints {
+  static const String trendingSubreddits = '/api/trending_subreddits';
+  static const String popular = '/subreddits/popular';
+
+  static String subredditRules(String subreddit) => '/r/$subreddit/about/rules';
 }

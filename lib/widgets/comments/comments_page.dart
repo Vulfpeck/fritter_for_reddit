@@ -71,7 +71,7 @@ class DesktopCommentsScreen extends StatelessWidget {
                 ]),
               ),
               SliverList(
-                delegate: model.commentsLoadingState == ViewState.Busy
+                delegate: model.commentsLoadingState == ViewState.busy
                     ? SliverChildListDelegate(
                         <Widget>[
                           SizedBox(

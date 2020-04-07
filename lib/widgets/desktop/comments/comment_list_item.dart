@@ -391,7 +391,7 @@ class MoreCommentKind extends StatelessWidget {
                       width: 8.0,
                       height: 32.0,
                     ),
-                    model.commentsMoreLoadingState == ViewState.Busy &&
+                    model.commentsMoreLoadingState == ViewState.busy &&
                             model.moreParentLoadingId != "" &&
                             model.moreParentLoadingId == comment.data.id
                         ? Container(

@@ -33,7 +33,7 @@ class CommentsProvider with ChangeNotifier {
     @required CommentSortTypes sort,
     @required bool requestingRefresh,
   }) async {
-    _commentsLoadingState = ViewState.Busy;
+    _commentsLoadingState = ViewState.busy;
     notifyListeners();
     if (requestingRefresh || commentsMap[postId] == null) {
       await _storageHelper.init();
@@ -130,7 +130,7 @@ class CommentsProvider with ChangeNotifier {
     @required String postFullName,
     @required String moreParentId,
   }) async {
-    _commentsMoreLoadingState = ViewState.Busy;
+    _commentsMoreLoadingState = ViewState.busy;
     moreParentLoadingId = moreParentId;
     notifyListeners();
 
