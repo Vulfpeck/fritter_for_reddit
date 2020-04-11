@@ -69,14 +69,11 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
               if (index == widget.posts.length) {
                 if (widget.isLoading) {
                   return Material(
-                    color: Theme.of(context).cardColor,
+                    color: Colors.transparent,
                     child: Column(
                       children: <Widget>[
                         ListTile(
                           title: Center(child: CircularProgressIndicator()),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).padding.bottom * 2,
                         ),
                       ],
                     ),
@@ -90,7 +87,6 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Divider(),
                   DesktopPostCard(
                     item: item,
                     onTap: () {
@@ -102,6 +98,7 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
                       }
                     },
                   ),
+                  Divider(),
                 ],
               );
             },
@@ -126,28 +123,6 @@ class _DesktopFeedListState extends State<DesktopFeedList> {
           : CommentSortTypes.Best,
     );
     Navigator.of(context).push(
-//      PageRouteBuilder(
-//        pageBuilder: (BuildContext context, _, __) {
-//          return CommentsSheet(item);
-//        },
-//        fullscreenDialog: false,
-//        opaque: true,
-//        transitionsBuilder:
-//            (context, primaryanimation, secondaryanimation, child) {
-//          return FadeTransition(
-//            child: child,
-//            opacity: CurvedAnimation(
-//              parent: primaryanimation,
-//              curve: Curves.easeInToLinear,
-//              reverseCurve: Curves.linearToEaseOut,
-//            ),
-//          );
-//        },
-//        transitionDuration: Duration(
-//          milliseconds: 250,
-//        ),
-//      ),
-
       CupertinoPageRoute(
         maintainState: true,
         builder: (BuildContext context) {

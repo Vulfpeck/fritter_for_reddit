@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:animated_layout/animated_layout.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fritter_for_reddit/exports.dart';
@@ -57,66 +58,16 @@ class Fritter extends StatefulWidget {
 }
 
 class _FritterState extends State<Fritter> {
-  AnimatedLayoutController animatedLayoutController;
-
   @override
   void initState() {
-    animatedLayoutController = AnimatedLayoutController(
-        duration: kThemeAnimationDuration,
-        children: <Widget>[
-          SizedBox.expand(
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.red,
-              child: Column(children: [
-                Text('Subreddit List'),
-                for (int i = 0; i < 10; i++)
-                  LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return ListTile(
-                        leading: Icon(Icons.image),
-                        title: constraints.maxWidth > 200
-                            ? Text(
-                                'Subreddit Title',
-//                              overflow: TextOverflow.fade,
-                                softWrap: true,
-                              )
-                            : null,
-//                            subtitle: Text(constraints.maxWidth.toString()),
-                      );
-                    },
-                  )
-              ]),
-            ),
-          ),
-          SizedBox.expand(
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.blue,
-              child: Text('Posts Feed'),
-            ),
-          ),
-          SizedBox.expand(
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.green,
-              child: Text('Post/Comments'),
-            ),
-          )
-        ],
-        initialDivisions: [
-          20,
-          60,
-          20
-        ]);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
+      debugShowMaterialGrid: false,
       home: PlatformBuilder(
         macOS: (context) {
           return DesktopHome();
@@ -140,9 +91,10 @@ class _FritterState extends State<Fritter> {
         cardColor: Colors.white,
         textTheme: Theme.of(context).textTheme.copyWith(
               headline6: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 letterSpacing: 0,
                 fontWeight: FontWeight.w500,
+                color: Colors.grey.shade900,
               ),
               bodyText1: TextStyle(
                 fontSize: 14,
@@ -162,16 +114,18 @@ class _FritterState extends State<Fritter> {
             ),
       ),
       darkTheme: ThemeData(
-//        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Color(0xff1e1e1e),
+        cardColor: Color(0xff1e1e1e),
 //        cardColor: Colors.black,
         dividerTheme: DividerThemeData(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withOpacity(0.1),
           thickness: 1,
         ),
         brightness: Brightness.dark,
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
+        dialogBackgroundColor: Color(0xff313031),
         accentColor: Colors.redAccent,
         colorScheme: Theme.of(context).colorScheme.copyWith(
               background: Colors.black,
@@ -223,76 +177,127 @@ class DesktopHome extends StatefulWidget {
 }
 
 class _DesktopHomeState extends State<DesktopHome> {
-  AnimatedLayoutController animatedLayoutController;
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey key = new GlobalKey();
+  FeedProvider get feedProvider => FeedProvider.of(context);
+  String sortSelectorValue = "Best";
 
   @override
   void initState() {
     super.initState();
-    animatedLayoutController ??=
-        AnimatedLayoutController(duration: kThemeAnimationDuration, children: [
-      Container(
-        decoration: BoxDecoration(
-          border: Border(
-            right: BorderSide(color: Colors.grey),
-          ),
-        ),
-        child: LeftDrawer(
-          mode: Mode.desktop,
-        ),
-      ),
-      DesktopSubredditFeed(),
-      SubredditSidePanel(
-        subredditInformation: null,
-      ),
-    ], initialDivisions: [
-      20,
-      60,
-      20
-    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Provider.value(
-      value: animatedLayoutController,
-      child: StreamBuilder<SubredditInfo>(
-          stream: FeedProvider.of(context).subStream,
-          builder: (context, snapshot) {
-            final SubredditInfo subredditInfo = snapshot.data;
-            final SubredditInformationEntity subredditInformationData =
-                subredditInfo?.subredditInformation;
-            if (!snapshot.hasData) {
-              return Container();
-            }
-            animatedLayoutController.updateChildren([
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(color: Colors.grey),
-                  ),
-                ),
-                child: LeftDrawer(
-                  mode: Mode.desktop,
-                ),
-              ),
-              DesktopSubredditFeed(),
-              SubredditSidePanel(
-                subredditInformation: subredditInformationData,
-              ),
-            ]);
-            return Scaffold(
-              body: AnimatedLayout(
-                controller: animatedLayoutController,
-                direction: Axis.horizontal,
-              ),
-              /*floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.list),
-                onPressed: () {
-                  FeedProvider.of(context).getSubredditRules('AskReddit');
+    return StreamBuilder<SubredditInfo>(
+      stream: FeedProvider.of(context).subStream,
+      builder: (context, snapshot) {
+        final SubredditInfo subredditInfo = snapshot.data;
+        final SubredditInformationEntity subredditInformationData =
+            subredditInfo?.subredditInformation;
+        if (!snapshot.hasData) {
+          return Center(child: CupertinoActivityIndicator());
+        }
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text("Fritter for Reddit"),
+            elevation: 0,
+            actions: <Widget>[
+              ViewSwitcherIconButton(
+                viewMode: Provider.of<SettingsNotifier>(context).state.viewMode,
+                onChanged: (viewMode) {
+                  Provider.of<SettingsNotifier>(context, listen: false)
+                      .changeViewMode(viewMode);
                 },
-              ),*/
-            );
-          }),
+              ),
+              PopupMenuButton<String>(
+                key: key,
+                icon: Icon(
+                  Icons.sort,
+                ),
+                onSelected: (value) {
+                  final RenderBox box = key.currentContext.findRenderObject();
+                  final positionDropDown = box.localToGlobal(Offset.zero);
+                  // print(
+                  if (value == "Top") {
+                    sortSelectorValue = "Top";
+                    showMenu(
+                      position: RelativeRect.fromLTRB(
+                        positionDropDown.dx,
+                        positionDropDown.dy,
+                        0,
+                        0,
+                      ),
+                      context: context,
+                      items: <String>[
+                        'Day',
+                        'Week',
+                        'Month',
+                        'Year',
+                        'All',
+                      ].map((value) {
+                        return PopupMenuItem<String>(
+                          value: value,
+                          child: ListTile(
+                            title: Text(value),
+                            onTap: () {
+                              Navigator.of(context, rootNavigator: false).pop();
+
+                              feedProvider.updateSorting(
+                                sortBy: "/top/.json?sort=top&t=$value",
+                                loadingTop: true,
+                              );
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  } else if (value == 'Close' || value == sortSelectorValue) {
+                  } else {
+                    sortSelectorValue = value;
+                    feedProvider.updateSorting(
+                      sortBy: value,
+                      loadingTop: false,
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return <String>[
+                    'Best',
+                    'Hot',
+                    'Top',
+                    'New',
+                    'Controversial',
+                    'Rising'
+                  ].map((String value) {
+                    return new PopupMenuItem<String>(
+                      value: value,
+                      child: new Text(value),
+                    );
+                  }).toList();
+                },
+                onCanceled: () {},
+                initialValue: sortSelectorValue,
+              ),
+              IconButton(icon: Icon(Icons.info_outline), onPressed: () {
+                _scaffoldKey.currentState.openEndDrawer();
+              },)
+            ],
+          ),
+          body: Row(
+            children: <Widget>[
+              Container(child: LeftDrawer(mode: Mode.desktop,), constraints: BoxConstraints.tightForFinite(width: 250),),
+              Expanded(
+                child: Center(child: DesktopSubredditFeed()),
+              ),
+            ],
+          ),
+          endDrawer: SubredditSidePanel(
+            subredditInformation: subredditInformationData,
+          ),
+        );
+      },
     );
   }
 }

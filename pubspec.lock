@@ -18,9 +18,11 @@ packages:
   animated_layout:
     dependency: "direct main"
     description:
-      path: "../animated_layout"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "01fa0b62c7bf986075091ea0b7c6cfa6df15b6f4"
+      url: "https://github.com/ThinkDigitalSoftware/animated_layout.git"
+    source: git
     version: "0.0.2"
   args:
     dependency: transitive

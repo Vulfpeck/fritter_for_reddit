@@ -19,96 +19,91 @@ class DesktopCommentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Comments"), elevation: 0,),
       body: Consumer(
         builder: (BuildContext context, CommentsProvider model, _) {
-          return CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              SliverAppBar(
-                title: Text("Comments"),
-                automaticallyImplyLeading: true,
-                iconTheme: Theme.of(context).iconTheme,
-                backgroundColor: Theme.of(context).cardColor,
-                floating: true,
-                brightness: MediaQuery.of(context).platformBrightness,
-                pinned: false,
-                snap: true,
-                elevation: 0,
-                textTheme: Theme.of(context).textTheme,
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                border:  Border(
+                  left: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+                  right: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+                ),
               ),
-//                BlurredSliverAppBar(
-//                  title: "Comments",
-//                ),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  Column(
-                    children: <Widget>[
-                      Material(
-                        color: Theme.of(context).cardColor,
-                        child: InkWell(
-                          onTap: () {
-                            if (postData.isTextPost == false) {
-                              launchURL(
-                                  Theme.of(context).primaryColor, postData.url);
-                            }
-                          },
-                          child: FeedCard(postData),
-                        ),
-                      ),
-                      postData.isTextPost && postData.selftextHtml != null
-                          ? FeedCardBodySelfText(
-                              selftextHtml: postData.selftextHtml,
-                            )
-                          : Container(),
-                      PostControls(
-                        postData: postData,
-                      ),
-                      Divider(),
-                      CommentsControlBar(postData),
-                      Divider(),
-                    ],
-                  ),
-                ]),
-              ),
-              SliverList(
-                delegate: model.commentsLoadingState == ViewState.busy
-                    ? SliverChildListDelegate(
-                        <Widget>[
-                          SizedBox(
-                            height: 64.0,
+              constraints: BoxConstraints(maxWidth: 700),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      Column(
+                        children: <Widget>[
+                          Material(
+                            color: Theme.of(context).cardColor,
+                            child: InkWell(
+                              onTap: () {
+                                if (postData.isTextPost == false) {
+                                  launchURL(
+                                      Theme.of(context).primaryColor, postData.url);
+                                }
+                              },
+                              child: FeedCard(postData),
+                            ),
                           ),
-                          Center(
-                            child: CircularProgressIndicator(),
+                          postData.isTextPost && postData.selftextHtml != null
+                              ? FeedCardBodySelfText(
+                                  selftextHtml: postData.selftextHtml,
+                                )
+                              : Container(),
+                          PostControls(
+                            postData: postData,
                           ),
-                          SizedBox(
-                            height: 32.0,
-                          ),
+                          Divider(),
+                          CommentsControlBar(postData),
+                          Divider(),
                         ],
-                      )
-                    : model.commentsMap[postData.id] == null ||
-                            model.commentsMap[postData.id].length == 0
+                      ),
+                    ]),
+                  ),
+                  SliverList(
+                    delegate: model.commentsLoadingState == ViewState.busy
                         ? SliverChildListDelegate(
                             <Widget>[
                               SizedBox(
                                 height: 64.0,
                               ),
                               Center(
-                                child: Icon(Icons.info_outline),
-                              ),
-                              Center(
-                                child: Text("No Comments"),
+                                child: CircularProgressIndicator(),
                               ),
                               SizedBox(
                                 height: 32.0,
                               ),
                             ],
                           )
-                        : SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              var commentItem =
-                                  model.commentsMap[postData.id].elementAt(
-                                (index),
-                              );
+                        : model.commentsMap[postData.id] == null ||
+                                model.commentsMap[postData.id].length == 0
+                            ? SliverChildListDelegate(
+                                <Widget>[
+                                  SizedBox(
+                                    height: 64.0,
+                                  ),
+                                  Center(
+                                    child: Icon(Icons.info_outline),
+                                  ),
+                                  Center(
+                                    child: Text("No Comments"),
+                                  ),
+                                  SizedBox(
+                                    height: 32.0,
+                                  ),
+                                ],
+                              )
+                            : SliverChildBuilderDelegate(
+                                (BuildContext context, int index) {
+                                  var commentItem =
+                                      model.commentsMap[postData.id].elementAt(
+                                    (index),
+                                  );
 //                                String _htmlContent = _unescape
 //                                    .convert(commentItem.data.bodyHtml);
 //                                return ListTile(
@@ -124,12 +119,12 @@ class DesktopCommentsScreen extends StatelessWidget {
 //                                    ],
 //                                  ),
 //                                );
-                              return CommentItem(
-                                commentItem,
-                                postData.name,
-                                postData.id,
-                                index,
-                              );
+                                  return CommentItem(
+                                    commentItem,
+                                    postData.name,
+                                    postData.id,
+                                    index,
+                                  );
 //                                return ListTile(
 //                                  title: Html(
 //                                    padding: EdgeInsets.all(0),
@@ -172,21 +167,23 @@ class DesktopCommentsScreen extends StatelessWidget {
 //                                    },
 //                                  ),
 //                                );
-                            },
-                            childCount: model.commentsMap[postData.id].length,
-                          ),
+                                },
+                                childCount: model.commentsMap[postData.id].length,
+                              ),
 //
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    SizedBox(
-                      height: MediaQuery.of(context).padding.bottom,
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        SizedBox(
+                          height: MediaQuery.of(context).padding.bottom,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         },
       ),

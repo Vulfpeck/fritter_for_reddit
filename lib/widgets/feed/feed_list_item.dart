@@ -22,69 +22,45 @@ class FeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: FeedCardTitle(
-        title: data.title,
-        stickied: data.stickied,
-        linkFlairText: data.linkFlairText,
-        nsfw: data.over18,
-        locked: data.locked,
-      ),
-      subtitle: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        FeedCardTitle(
+          title: data.title,
+          stickied: data.stickied,
+          linkFlairText: data.linkFlairText,
+          nsfw: data.over18,
+          locked: data.locked,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'in r/' + data.subreddit + ' by ' + data.author,
+                style: Theme.of(context).textTheme.subtitle2,
+              ),
+            ],
+          ),
+        ),
+        if (data.postType == MediaType.Url)
+          PostUrlPreview(
+            data: data,
+            htmlUnescape: _htmlUnescape,
+          ),
+        if (data.hasPreview)
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'in r/' + data.subreddit + ' by ' + data.author,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                if (data.over18)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 3,
-                        ),
-                        Text(
-                          'NSFW',
-                          style: TextStyle(color: Colors.red),
-                        )
-                      ],
-                    ),
-                  ),
-              ],
+            padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
+            child: FeedCardBodyImage(
+              images: data.preview.images,
+              data: data,
+              postMetaData: {'media_type': data.postType, 'url': data.url},
+              deviceWidth: MediaQuery.of(context).size.width,
             ),
           ),
-          if (data.postType == MediaType.Url)
-            PostUrlPreview(
-              data: data,
-              htmlUnescape: _htmlUnescape,
-            ),
-          if (data.hasPreview)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
-              child: FeedCardBodyImage(
-                images: data.preview.images,
-                data: data,
-                postMetaData: {'media_type': data.postType, 'url': data.url},
-                deviceWidth: MediaQuery.of(context).size.width,
-              ),
-            )
-        ],
-      ),
+      ],
     );
   }
 }

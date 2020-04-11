@@ -25,11 +25,15 @@ class DesktopFeedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConditionalBuilder(
       condition: post.hasPreview,
-      builder: (_) => RestrictedExpansionTile(
-        leading: Card(
+        builder: (_) => RestrictedExpansionTile(
+        trailing: Container(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
           child: CachedNetworkImage(
             imageUrl: post.previewUrl,
-            width: 50,
+            width: 56,
             fit: BoxFit.cover,
             errorWidget: (context, url, error) => ErrorWidget(url),
           ),
@@ -41,6 +45,7 @@ class DesktopFeedCard extends StatelessWidget {
           nsfw: post.over18,
           locked: post.locked,
           author: post.author,
+          subreddit: post.subredditNamePrefixed,
         ),
         children: <Widget>[
           Padding(
@@ -73,9 +78,12 @@ class DesktopFeedCard extends StatelessWidget {
             ),
           ),
           if (post.isTextPost == false && post.postType == MediaType.Url)
-            PostUrlPreview(
-              data: post,
-              htmlUnescape: _htmlUnescape,
+            Padding(
+              padding: const EdgeInsets.only(bottom:16.0),
+              child: PostUrlPreview(
+                data: post,
+                htmlUnescape: _htmlUnescape,
+              ),
             ),
           if (post.preview != null &&
               post.isTextPost == false &&
@@ -92,17 +100,12 @@ class DesktopFeedCard extends StatelessWidget {
         ],
       ),
       fallback: (_) => ListTile(
-        leading: Card(
-          child: ConditionalBuilder(
-            condition: post.linkFlairText != null,
-            builder: (_) => Chip(
-              label: Text(post.linkFlairText),
-              backgroundColor: HexColor(post.linkFlairBackgroundColor),
-            ),
-            fallback: (_) => Icon(
-              Icons.message,
-              size: 60,
-            ),
+        trailing: CircleAvatar(
+          backgroundColor: Theme.of(context).dividerColor,
+          child: Icon(
+            Icons.message,
+            size: 24,
+            color: Theme.of(context).textTheme.subtitle1.color,
           ),
         ),
         title: FeedCardTitle(
@@ -116,35 +119,6 @@ class DesktopFeedCard extends StatelessWidget {
         subtitle: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  if (post.over18)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.warning,
-                            color: Colors.red,
-                            size: 15,
-                          ),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          Text(
-                            'NSFW',
-                            style: TextStyle(color: Colors.red),
-                          )
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
             post.isTextPost == false && post.postType == MediaType.Url
                 ? PostUrlPreview(
                     data: post,
@@ -182,7 +156,7 @@ class FeedCardTitle extends StatelessWidget {
   final bool locked;
   final String author;
   final bool isCrossPost;
-
+  final String subreddit;
   final String escapedTitle;
 
   FeedCardTitle({
@@ -192,7 +166,7 @@ class FeedCardTitle extends StatelessWidget {
     @required this.nsfw,
     @required this.locked,
     @required this.author,
-    this.isCrossPost = false,
+    this.isCrossPost = false, @required this.subreddit,
   }) : escapedTitle = HtmlUnescape().convert(title);
 
   String get postSuffix => isCrossPost ? 'Crossposted' : 'Posted';
@@ -201,67 +175,67 @@ class FeedCardTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
         bottom: 4.0,
+        top: 16.0
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            '$postSuffix by u/$author',
-            style: TextStyle(
-                fontWeight: FontWeight.w300, fontSize: 12, color: Colors.grey),
-          ),
           StickyTag(stickied),
           Text(
             title.htmlUnescaped,
           ),
-          SizedBox(
-            height: 4.0,
+          SizedBox(height: 8.0,),
+          Text(
+            '$postSuffix by u/$author in $subreddit',
+            style: TextStyle(
+                fontWeight: FontWeight.w300, fontSize: 12, color: Colors.grey),
           ),
-//          nsfw == true || linkFlairText != null
-//              ? RichText(
-//                  textScaleFactor: 0.9,
-//                  text: TextSpan(
-//                    children: <TextSpan>[
-//                      nsfw != null && nsfw
-//                          ? TextSpan(
-//                              text: "NSFW ",
-//                              style: TextStyle(
-//                                color: Colors.red.withOpacity(
-//                                  0.9,
-//                                ),
-//                              ),
-//                            )
-//                          : TextSpan(),
-//                      linkFlairText != null
-//                          ? TextSpan(
-//                              text: linkFlairText,
-//                              style: Theme.of(context)
-//                                  .textTheme
-//                                  .subtitle
-//                                  .copyWith(
-//                                      color: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.8),
-//                                      backgroundColor: Theme.of(context)
-//                                          .textTheme
-//                                          .subtitle
-//                                          .color
-//                                          .withOpacity(0.15),
-//                                      decorationThickness: 2),
-//                            )
-//                          : TextSpan(),
-//                    ],
-//                    style: Theme.of(context).textTheme.subtitle2,
-//                  ),
-//                )
-//              : Container(),
+            nsfw == true || linkFlairText != null
+                ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical:8.0),
+                  child: RichText(
+                      textScaleFactor: 0.9,
+                      text: TextSpan(
+                        children: <TextSpan>[
+                          nsfw != null && nsfw
+                              ? TextSpan(
+                                  text: "NSFW ",
+                                  style: TextStyle(
+                                    color: Colors.red.withOpacity(
+                                      0.9,
+                                    ),
+                                  ),
+                                )
+                              : TextSpan(),
+                          linkFlairText != null
+                              ? TextSpan(
+                                  text: linkFlairText,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .subtitle
+                                              .color
+                                              .withOpacity(0.8),
+                                          backgroundColor: Theme.of(context)
+                                              .textTheme
+                                              .subtitle
+                                              .color
+                                              .withOpacity(0.15),
+                                          decorationThickness: 2),
+                                )
+                              : TextSpan(),
+                        ],
+                        style: Theme.of(context).textTheme.subtitle2,
+                      ),
+                    ),
+                )
+                : Container(),
         ],
       ),
     );
@@ -404,7 +378,7 @@ class StickyTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return _isStickied
         ? Padding(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+            padding: const EdgeInsets.only( bottom: 8.0),
             child: Container(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -446,8 +420,6 @@ class StickyTag extends StatelessWidget {
               ),
             ),
           )
-        : Padding(
-            padding: EdgeInsets.only(top: 16.0),
-          );
+        : Container();
   }
 }

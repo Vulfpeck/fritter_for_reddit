@@ -64,55 +64,59 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
         if (feedProvider.postFeed == null) {
           return LinearProgressIndicator();
         }
-        return CustomScrollView(
-          controller: _controller,
-          physics: AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            DesktopSliverAppBar(
-              subredditInfo: subredditInfo,
-              onInfoButtonPressed: () {
-                showSubInformationSheet(context);
-              },
-            ),
-            ConditionalBuilder(
-              condition: feedProvider.state == ViewState.busy,
-              builder: (context) => SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                return ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: SkeletonAnimation(
-                      child: Container(
-                        width: 60,
-                        height: 40,
+        return Container(
+          constraints: BoxConstraints(maxWidth: 700),
+          child: CustomScrollView(
+            controller: _controller,
+            physics: AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              ConditionalBuilder(
+                condition: feedProvider.state == ViewState.busy,
+                builder: (context) => SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                  return ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: SkeletonAnimation(
+                        gradientColor: Theme.of(context).dividerColor,
+                        shimmerColor: Theme.of(context).dividerColor,
+                        child: Container(
+                          width: 60,
+                          height: 40,
+                        ),
                       ),
                     ),
-                  ),
-                  title: SkeletonAnimation(
-                    child: SizedBox(
-                      width: 40,
-                      height: 10,
-                      child: Container(),
+                    title: SkeletonAnimation(
+                      gradientColor: Theme.of(context).dividerColor,
+                      shimmerColor: Theme.of(context).dividerColor,
+
+                      child: SizedBox(
+                        width: 40,
+                        height: 10,
+                        child: Container(),
+                      ),
                     ),
-                  ),
-                  subtitle: SkeletonAnimation(
-                    child: SizedBox(
-                      width: 40,
-                      height: 10,
-                      child: Container(),
+                    subtitle: SkeletonAnimation(
+                      shimmerColor: Theme.of(context).dividerColor,
+
+                      child: SizedBox(
+                        width: 40,
+                        height: 10,
+                        child: Container(),
+                      ),
                     ),
-                  ),
-                );
-              })),
-              fallback: (context) => DesktopFeedList(
-                posts: feedProvider.postFeed.data.children,
-                viewMode: settingsNotifier.state.viewMode,
-                hasError: feedProvider.subLoadingError ||
-                    feedProvider.feedInformationLoadingError,
-                isLoading: feedProvider.loadMorePostsState == ViewState.busy,
-              ),
-            )
-          ],
+                  );
+                })),
+                fallback: (context) => DesktopFeedList(
+                  posts: feedProvider.postFeed.data.children,
+                  viewMode: settingsNotifier.state.viewMode,
+                  hasError: feedProvider.subLoadingError ||
+                      feedProvider.feedInformationLoadingError,
+                  isLoading: feedProvider.loadMorePostsState == ViewState.busy,
+                ),
+              )
+            ],
+          ),
         );
       },
     );

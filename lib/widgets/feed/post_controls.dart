@@ -21,13 +21,14 @@ class PostControls extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 5.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           VotesCountWidget(postData: postData),
           SizedBox(width: 8.0),
           Icon(
             Icons.chat_bubble_outline,
-            size: 16,
+            size: 14,
             color: Theme.of(context).textTheme.subtitle2.color,
           ),
           SizedBox(width: 4.0),
@@ -38,7 +39,7 @@ class PostControls extends StatelessWidget {
           SizedBox(width: 8.0),
           Icon(
             Icons.access_time,
-            size: 16,
+            size: 14,
             color: Theme.of(context).textTheme.subtitle2.color,
           ),
           SizedBox(width: 4.0),
@@ -246,10 +247,12 @@ class VotesCountWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Icon(
           Icons.arrow_upward,
-          size: 16,
+          size: 14,
           color: postData.likes == null
               ? Theme.of(context).textTheme.subtitle2.color
               : postData.likes == true ? Colors.orange : Colors.purple,

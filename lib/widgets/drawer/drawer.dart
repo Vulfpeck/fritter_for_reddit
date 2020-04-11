@@ -54,7 +54,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Drawer(
+      elevation: 20,
       child: CupertinoPageScaffold(
         child: Consumer<UserInformationProvider>(
             builder: (BuildContext context, UserInformationProvider model, _) {
@@ -68,7 +69,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     physics: AlwaysScrollableScrollPhysics(),
                     controller: _controller,
                     slivers: <Widget>[
-                      DrawerSliverAppBar(),
                       if (!model.signedIn)
                         Login()
                       else ...[
@@ -158,6 +158,7 @@ class _SubredditSearchState extends State<SubredditSearch> {
       itemBuilder:
           (BuildContext context, SubredditSearchResultEntry subreddit) {
         return ListTile(
+          dense: true,
           leading: subreddit.iconImg?.isNotEmpty ?? false
               ? CircleAvatarImage(imageUrl: subreddit.iconImg)
               : CircleAvatar(
@@ -251,9 +252,9 @@ class DrawerSliverAppBar extends StatelessWidget {
       floating: true,
       pinned: true,
       snap: false,
-      centerTitle: true,
+      centerTitle: false,
       elevation: 0,
-      expandedHeight: 56,
+      expandedHeight: 48,
       title: Text(
         "Subreddits",
         style: Theme.of(context).textTheme.headline6,
@@ -351,7 +352,7 @@ class ProfileListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 3,
+      elevation: 0,
       child: RestrictedExpansionTile(
         leading: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 50),
@@ -365,6 +366,7 @@ class ProfileListTile extends StatelessWidget {
         children: <Widget>[
           ListTile(
             title: Text('Logout'),
+            dense: true,
             onTap: () => UserInformationProvider.of(context).signOutUser(),
           )
         ],

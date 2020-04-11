@@ -42,9 +42,8 @@ dependencies:
       url: https://github.com/ThinkDigitalSoftware/flutter_gifimage.git
   flutter_pagewise: ^1.2.3
   animated_layout:
-#    git:
-#      url: https://github.com/ThinkDigitalSoftware/animated_layout.git
-    path: ../animated_layout
+    git:
+      url: https://github.com/ThinkDigitalSoftware/animated_layout.git
   skeleton_text: ^1.0.0
 
 dev_dependencies:

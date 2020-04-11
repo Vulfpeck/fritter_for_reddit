@@ -24,6 +24,7 @@ class DesktopSubredditDrawerTile extends StatelessWidget {
         iconImg = subreddit.icon_img,
         primaryColor = subreddit.primary_color,
         super(key: key);
+
   DesktopSubredditDrawerTile.fromSubredditInformationEntity({
     Key key,
     @required SubredditInformationEntity subreddit,
@@ -41,13 +42,14 @@ class DesktopSubredditDrawerTile extends StatelessWidget {
           dense: true,
           title: Text(
             displayName,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.caption,
             overflow: TextOverflow.fade,
             softWrap: false,
           ),
           leading: CircleAvatarImage(
-              imageUrl: communityIcon != "" ? communityIcon : iconImg,
-              backgroundColor: HexColor(primaryColor)),
+            imageUrl: communityIcon != "" ? communityIcon : iconImg,
+            backgroundColor: HexColor(primaryColor),
+          ),
           onTap: () {
             FeedProvider.of(context).navigateToSubreddit(displayName);
           },

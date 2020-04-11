@@ -21,22 +21,24 @@ class SubredditSidePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (subredditInformation == null) {
-      return PopularSubsSidePanelList();
+      return Drawer(child: PopularSubsSidePanelList());
     } else {
-      return ListView(
+      return Drawer(
+        child: ListView(
 //        shrinkWrap: true,
-        children: <Widget>[
-          AboutCommunity(
-            subredditName: subredditInformation.data.displayName,
-            activeUserAccounts: subredditInformation.data.activeUserCount,
-            description: subredditInformation.data.description,
-            isNsfw: subredditInformation.data.over18,
-            createdDate: DateTime.fromMillisecondsSinceEpoch(
-                subredditInformation.data.createdUtc.toInt() * 1000,
-                isUtc: true),
-          ),
-          Divider()
-        ],
+          children: <Widget>[
+            AboutCommunity(
+              subredditName: subredditInformation.data.displayName,
+              activeUserAccounts: subredditInformation.data.activeUserCount,
+              description: subredditInformation.data.description,
+              isNsfw: subredditInformation.data.over18,
+              createdDate: DateTime.fromMillisecondsSinceEpoch(
+                  subredditInformation.data.createdUtc.toInt() * 1000,
+                  isUtc: true),
+            ),
+            Divider()
+          ],
+        ),
       );
     }
   }
