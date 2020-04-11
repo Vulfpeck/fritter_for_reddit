@@ -259,8 +259,8 @@ class SignedInProfileContent extends StatelessWidget {
                     FeedProvider feedProvider =
                         Provider.of<FeedProvider>(context);
                     await model.signOutUser();
-                    await feedProvider.fetchPostsListing(
-                      currentSort: "hot",
+                    await feedProvider.navigateToSubreddit(
+                      '',
                     );
                   },
                 ),

@@ -62,7 +62,7 @@ class _SubredditFeedState extends State<SubredditFeed>
         if (!notification.overscroll.isNegative &&
             Provider.of<FeedProvider>(context, listen: false)
                     .loadMorePostsState !=
-                ViewState.Busy) {
+                ViewState.busy) {
           Provider.of<FeedProvider>(context, listen: false).loadMorePosts();
         }
 

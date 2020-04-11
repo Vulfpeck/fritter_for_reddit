@@ -25,7 +25,7 @@ class DesktopFeedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConditionalBuilder(
       condition: post.hasPreview,
-        builder: (_) => RestrictedExpansionTile(
+      builder: (_) => RestrictedExpansionTile(
         trailing: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
           decoration: BoxDecoration(
@@ -79,7 +79,7 @@ class DesktopFeedCard extends StatelessWidget {
           ),
           if (post.isTextPost == false && post.postType == MediaType.Url)
             Padding(
-              padding: const EdgeInsets.only(bottom:16.0),
+              padding: const EdgeInsets.only(bottom: 16.0),
               child: PostUrlPreview(
                 data: post,
                 htmlUnescape: _htmlUnescape,
@@ -115,6 +115,7 @@ class DesktopFeedCard extends StatelessWidget {
           nsfw: post.over18,
           locked: post.locked,
           author: post.author,
+          subreddit: post.subreddit,
         ),
         subtitle: Column(
           mainAxisSize: MainAxisSize.min,
@@ -166,7 +167,8 @@ class FeedCardTitle extends StatelessWidget {
     @required this.nsfw,
     @required this.locked,
     @required this.author,
-    this.isCrossPost = false, @required this.subreddit,
+    this.isCrossPost = false,
+    @required this.subreddit,
   }) : escapedTitle = HtmlUnescape().convert(title);
 
   String get postSuffix => isCrossPost ? 'Crossposted' : 'Posted';
@@ -174,10 +176,7 @@ class FeedCardTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: 4.0,
-        top: 16.0
-      ),
+      padding: EdgeInsets.only(bottom: 4.0, top: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -187,55 +186,57 @@ class FeedCardTitle extends StatelessWidget {
           Text(
             title.htmlUnescaped,
           ),
-          SizedBox(height: 8.0,),
+          SizedBox(
+            height: 8.0,
+          ),
           Text(
             '$postSuffix by u/$author in $subreddit',
             style: TextStyle(
                 fontWeight: FontWeight.w300, fontSize: 12, color: Colors.grey),
           ),
-            nsfw == true || linkFlairText != null
-                ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical:8.0),
+          nsfw == true || linkFlairText != null
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: RichText(
-                      textScaleFactor: 0.9,
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          nsfw != null && nsfw
-                              ? TextSpan(
-                                  text: "NSFW ",
-                                  style: TextStyle(
-                                    color: Colors.red.withOpacity(
-                                      0.9,
-                                    ),
+                    textScaleFactor: 0.9,
+                    text: TextSpan(
+                      children: <TextSpan>[
+                        nsfw != null && nsfw
+                            ? TextSpan(
+                                text: "NSFW ",
+                                style: TextStyle(
+                                  color: Colors.red.withOpacity(
+                                    0.9,
                                   ),
-                                )
-                              : TextSpan(),
-                          linkFlairText != null
-                              ? TextSpan(
-                                  text: linkFlairText,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .subtitle
-                                              .color
-                                              .withOpacity(0.8),
-                                          backgroundColor: Theme.of(context)
-                                              .textTheme
-                                              .subtitle
-                                              .color
-                                              .withOpacity(0.15),
-                                          decorationThickness: 2),
-                                )
-                              : TextSpan(),
-                        ],
-                        style: Theme.of(context).textTheme.subtitle2,
-                      ),
+                                ),
+                              )
+                            : TextSpan(),
+                        linkFlairText != null
+                            ? TextSpan(
+                                text: linkFlairText,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .subtitle
+                                            .color
+                                            .withOpacity(0.8),
+                                        backgroundColor: Theme.of(context)
+                                            .textTheme
+                                            .subtitle
+                                            .color
+                                            .withOpacity(0.15),
+                                        decorationThickness: 2),
+                              )
+                            : TextSpan(),
+                      ],
+                      style: Theme.of(context).textTheme.subtitle2,
                     ),
+                  ),
                 )
-                : Container(),
+              : Container(),
         ],
       ),
     );
@@ -378,7 +379,7 @@ class StickyTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return _isStickied
         ? Padding(
-            padding: const EdgeInsets.only( bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 8.0),
             child: Container(
               child: Row(
                 mainAxisSize: MainAxisSize.min,

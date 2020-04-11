@@ -74,8 +74,6 @@ class FeedCardTitle extends StatelessWidget {
 
   final String escapedTitle;
 
-  String escapedTitle;
-
   FeedCardTitle({
     @required this.title,
     @required this.stickied,
