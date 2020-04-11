@@ -285,12 +285,12 @@ class _DesktopHomeState extends State<DesktopHome> {
                 controller: animatedLayoutController,
                 direction: Axis.horizontal,
               ),
-              floatingActionButton: FloatingActionButton(
+              /*floatingActionButton: FloatingActionButton(
                 child: Icon(Icons.list),
                 onPressed: () {
                   FeedProvider.of(context).getSubredditRules('AskReddit');
                 },
-              ),
+              ),*/
             );
           }),
     );

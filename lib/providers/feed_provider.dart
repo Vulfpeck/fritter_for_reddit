@@ -395,7 +395,7 @@ class FeedProvider with ChangeNotifier {
 
   Future<void> navigateToSubreddit(String subreddit) async {
     final String strippedSubreddit =
-        subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '');
+        subreddit.replaceFirst(RegExp(r'\/r\/| r\/'), '').replaceAll('.', '');
 
     if (strippedSubreddit != subStream.value.name) {
       debugPrint('updating currentSubredditStream');
@@ -472,6 +472,8 @@ class FeedProvider with ChangeNotifier {
       return false;
     }
   }
+
+  getUserPost(String user) {}
 
   void _currentSubredditListener(dynamic value) async {
     final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";

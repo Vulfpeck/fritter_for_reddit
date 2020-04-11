@@ -66,3 +66,17 @@ extension StreamX<T> on Stream<T> {
     return newSubject;
   }
 }
+
+extension ListX<E> on List<E> {
+  takeAndRemoveWhile(bool test(E value)) {
+    List<E> take = [];
+    for (var i = 0; i < length; ++i) {
+      if (test(this[i])) {
+        take.add(removeAt(i));
+      } else {
+        break;
+      }
+    }
+    return take;
+  }
+}

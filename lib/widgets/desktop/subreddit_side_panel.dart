@@ -7,6 +7,7 @@ import 'package:fritter_for_reddit/models/subreddit_info/rule.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';
+import 'package:fritter_for_reddit/widgets/subreddit_aware_text.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class SubredditSidePanel extends StatelessWidget {
@@ -147,7 +148,13 @@ class AboutCommunity extends StatelessWidget {
                                   ListTile(
                                       subtitle: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(rule.description),
+                                    child: SubredditAwareClickableText(
+                                      rule.description,
+                                      onClick: (String subreddit) {
+                                        FeedProvider.of(context)
+                                            .navigateToSubreddit(subreddit);
+                                      },
+                                    ),
                                   ))
                                 ],
                               )
