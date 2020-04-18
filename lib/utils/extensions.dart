@@ -1,7 +1,9 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -78,5 +80,25 @@ extension ListX<E> on List<E> {
       }
     }
     return take;
+  }
+
+  List<E> uniqueBy<R>({
+    @required bool equals(E e1, E e2),
+    @required int hashCode(E e),
+  }) =>
+      LinkedHashSet<E>(equals: equals, hashCode: hashCode).toList();
+
+  Future<List<E>> uniqueWhereAsync<S>(Future<S> test(E value)) async {
+    List<E> newList = [];
+    List<S> asyncValues = [];
+
+    for (final element in this) {
+      S result = await test(element);
+      if (!asyncValues.contains(result)) {
+        asyncValues.add(result);
+        newList.add(element);
+      }
+    }
+    return newList;
   }
 }

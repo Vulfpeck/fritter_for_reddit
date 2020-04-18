@@ -51,4 +51,5 @@ abstract class StatePersistingChangeNotifier<T extends SerializableClass>
 
 abstract class SerializableClass<T> {
   Map<String, dynamic> toJson();
+  T fromJson();
 }

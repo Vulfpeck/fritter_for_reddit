@@ -1,9 +1,9 @@
 import 'package:conditional_builder/conditional_builder.dart';
+import 'package:draw/draw.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fritter_for_reddit/exports.dart';
-import 'package:fritter_for_reddit/models/subreddit_info/rule.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_drawer_tile.dart';

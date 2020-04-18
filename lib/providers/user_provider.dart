@@ -70,11 +70,10 @@ class UserInformationProvider with ChangeNotifier {
     await _storageHelper.clearStorage();
 //    // print("*** Performing authentication ****");
     // start a new instance of the server that listens to localhost requests
-    Stream<String> onCode = await accessCodeServer();
 
     // server returns the first access_code it receives
 
-    final String accessCode = await onCode.first;
+    final String accessCode = await accessCodeServer();
 //    // print("local host response");
 
     notifyListeners();
@@ -119,9 +118,9 @@ class UserInformationProvider with ChangeNotifier {
     return authResult;
   }
 
-  Future<Stream<String>> accessCodeServer() async {
+  Future<String> accessCodeServer() async {
     final StreamController<String> onCode = new StreamController();
-    server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
     server.listen((HttpRequest request) async {
 //      // print("Server started");
       final String code = request.uri.queryParameters["code"];
@@ -136,7 +135,7 @@ class UserInformationProvider with ChangeNotifier {
       onCode.add(code);
       await onCode.close();
     });
-    return onCode.stream;
+    return onCode.stream.first;
   }
 
   Future<void> signOutUser() async {

@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:animated_layout/animated_layout.dart';
+import 'package:draw/draw.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fritter_for_reddit/exports.dart';
-import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
 import 'package:fritter_for_reddit/pages/app_home.dart';
+import 'package:fritter_for_reddit/pages/user_page/user_page.dart';
 import 'package:fritter_for_reddit/providers/search_provider.dart';
 import 'package:fritter_for_reddit/providers/settings_change_notifier.dart';
 import 'package:fritter_for_reddit/widgets/common/go_to_subreddit.dart';
@@ -15,18 +15,27 @@ import 'package:fritter_for_reddit/widgets/common/platform_builder.dart';
 import 'package:fritter_for_reddit/widgets/desktop/desktop_subreddit_feed.dart';
 import 'package:fritter_for_reddit/widgets/desktop/subreddit_side_panel.dart';
 import 'package:fritter_for_reddit/widgets/drawer/drawer.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:fritter_for_reddit/secrets.dart' as secrets;
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory path = await getApplicationDocumentsDirectory();
-  Hive.registerAdapter(SubredditInfoAdapter());
-  Hive.registerAdapter(PostsFeedEntityAdapter());
-  Hive.registerAdapter(PostsFeedDataAdapter());
-  Hive.registerAdapter(PostsFeedDataChildAdapter());
+
+  final reddit = await _getAuthenticatedRedditClient();
+
+  GetIt.I.registerSingleton<Reddit>(
+    reddit,
+  );
+//  Hive.registerAdapter(SubredditInfoAdapter());
+//  Hive.registerAdapter(PostsFeedEntityAdapter());
+//  Hive.registerAdapter(PostsFeedDataAdapter());
+//  Hive.registerAdapter(PostsFeedDataChildAdapter());
   Hive.init(path.path);
-  await Hive.openBox<SubredditInfo>('feed');
+//  await Hive.openBox<SubredditInfo>('feed');
 
   runApp(
     MultiProvider(
@@ -50,6 +59,39 @@ void main() async {
       child: Fritter(),
     ),
   );
+}
+
+Future<Reddit> _getAuthenticatedRedditClient() async {
+  final userAgent = 'fritter';
+
+  // Create a `Reddit` instance using a configuration file in the current
+  // directory. Unlike the web authentication example, a client secret does
+  // not need to be provided in the configuration file.
+  final reddit = Reddit.createInstalledFlowInstance(
+      userAgent: userAgent,
+      clientId: secrets.CLIENT_ID,
+      redirectUri: Uri.http('localhost:8080', '/'));
+
+  // Build the URL used for authentication. See `WebAuthenticator`
+  // documentation for parameters.
+  final Uri authUrl = reddit.auth.url(['*'], 'default');
+
+  final String authCode = await authenticate(authUrl);
+
+  // ...
+  // Complete authentication at `auth_url` in the browser and retrieve
+  // the `code` query parameter from the redirect URL.
+  // ...
+
+  // Assuming the `code` query parameter is stored in a variable
+  // `auth_code`, we pass it to the `authorize` method in the
+  // `WebAuthenticator`.
+  await reddit.auth.authorize(authCode);
+
+  // If everything worked correctly, we should be able to retrieve
+  // information about the authenticated account.
+  print(await reddit.user.me());
+  return reddit;
 }
 
 class Fritter extends StatefulWidget {
@@ -179,6 +221,7 @@ class DesktopHome extends StatefulWidget {
 class _DesktopHomeState extends State<DesktopHome> {
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey key = new GlobalKey();
+
   FeedProvider get feedProvider => FeedProvider.of(context);
   String sortSelectorValue = "Best";
 
@@ -195,9 +238,9 @@ class _DesktopHomeState extends State<DesktopHome> {
         final SubredditInfo subredditInfo = snapshot.data;
         final SubredditInformationEntity subredditInformationData =
             subredditInfo?.subredditInformation;
-        if (!snapshot.hasData) {
-          return Center(child: CupertinoActivityIndicator());
-        }
+//        if (!snapshot.hasData) {
+//          return Center(child: CupertinoActivityIndicator());
+//        }
         return Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
@@ -280,14 +323,22 @@ class _DesktopHomeState extends State<DesktopHome> {
                 onCanceled: () {},
                 initialValue: sortSelectorValue,
               ),
-              IconButton(icon: Icon(Icons.info_outline), onPressed: () {
-                _scaffoldKey.currentState.openEndDrawer();
-              },)
+              IconButton(
+                icon: Icon(Icons.info_outline),
+                onPressed: () {
+                  _scaffoldKey.currentState.openEndDrawer();
+                },
+              )
             ],
           ),
           body: Row(
             children: <Widget>[
-              Container(child: LeftDrawer(mode: Mode.desktop,), constraints: BoxConstraints.tightForFinite(width: 250),),
+              Container(
+                child: LeftDrawer(
+                  mode: Mode.desktop,
+                ),
+                constraints: BoxConstraints.tightForFinite(width: 250),
+              ),
               Expanded(
                 child: Center(child: DesktopSubredditFeed()),
               ),
@@ -296,8 +347,41 @@ class _DesktopHomeState extends State<DesktopHome> {
           endDrawer: SubredditSidePanel(
             subredditInformation: subredditInformationData,
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .push(CupertinoPageRoute(builder: (BuildContext context) {
+                return UserPage(username: '_thinkdigital');
+              }));
+            },
+          ),
         );
       },
     );
   }
+}
+
+Future<String> authenticate(Uri authUrl) {
+  launch(authUrl.toString());
+  return accessCodeServer();
+}
+
+Future<String> accessCodeServer() async {
+  final StreamController<String> onCode = new StreamController();
+  final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
+  server.listen((HttpRequest request) async {
+//      // print("Server started");
+    final String code = request.uri.queryParameters["code"];
+//      // print(request.uri.pathSegments);
+    request.response
+      ..statusCode = 200
+      ..headers.set("Content-Type", ContentType.html.mimeType)
+      ..write(
+          '<html><meta name="viewport" content="width=device-width, initial-scale=1.0"><body> <h2 style="text-align: center; position: absolute; top: 50%; left: 0: right: 0">Welcome to Fritter</h2><h3>You can close this window<script type="javascript">window.close()</script> </h3></body></html>');
+    await request.response.close();
+    await server.close(force: true);
+    onCode.add(code);
+    await onCode.close();
+  });
+  return onCode.stream.first;
 }

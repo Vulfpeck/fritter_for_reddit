@@ -66,4 +66,10 @@ class SettingsState extends SerializableClass {
       SettingsState(
         viewMode: viewMode ?? this.viewMode,
       );
+
+  @override
+  SettingsState fromJson() {
+    // TODO: implement fromJson
+    throw UnimplementedError();
+  }
 }

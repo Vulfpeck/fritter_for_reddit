@@ -2,14 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:draw/draw.dart';
 import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/exports.dart';
-import 'package:fritter_for_reddit/models/subreddit_info/rule.dart';
+
+//import 'package:fritter_for_reddit/models/subreddit_info/rule.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
 
 import 'package:fritter_for_reddit/helpers/functions/misc_functions.dart';
 import 'package:fritter_for_reddit/models/postsfeed/posts_feed_entity.dart';
 import 'package:fritter_for_reddit/models/subreddit_info/subreddit_information_entity.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
@@ -19,6 +22,7 @@ part 'feed_provider.g.dart';
 class FeedProvider with ChangeNotifier {
   Box<SubredditInfo> _cache;
 
+  final Reddit reddit = GetIt.I.get<Reddit>();
   final SecureStorageHelper _storageHelper = SecureStorageHelper();
 
   BehaviorSubject<PostsFeedEntity> _postFeedStream = BehaviorSubject();
@@ -69,9 +73,7 @@ class FeedProvider with ChangeNotifier {
   }
 
   void _init() {
-    _cache = Hive.box<SubredditInfo>('feed');
-
-    _fetchPostsListing(currentSubreddit: currentSubreddit);
+    _fetchPostsListing(subredditName: currentSubreddit);
     currentSubredditStream.listen((name) {
       debugPrint('updating currentSubredditStream to $name');
     });
@@ -102,7 +104,7 @@ class FeedProvider with ChangeNotifier {
     }).asBehaviorSubject
       ..listen((subredditInfo) {
         notifyListeners();
-        return _cache.put(subredditInfo.name, subredditInfo);
+//        return _cache.put(subredditInfo.name, subredditInfo); TODO: Uncomment when we re-enable caching
       });
   }
 
@@ -181,123 +183,38 @@ class FeedProvider with ChangeNotifier {
   }
 
   Future<void> _fetchPostsListing({
-    String currentSubreddit = '',
-    String currentSort = "Hot",
+    String subredditName = '',
+    Sort sortType = Sort.hot,
     bool loadingTop = false,
     int limit = 10,
   }) async {
-    await _storageHelper.init();
-
-    await _storageHelper.fetchData();
-
-    this.sort = currentSort;
-
-    if (false /*_cache.containsKey(currentSubreddit)*/) {
-      _postFeedStream.value = _cache.get(currentSubreddit).postsFeed;
-      debugPrint('returning data from cache');
-      notifyListeners();
-    } else {
-      _state = ViewState.busy;
-      notifyListeners();
+    if (subredditName == 'frontPage') {
+      return reddit.front.hot();
     }
-    http.Response response;
-    try {
-      if (_storageHelper.signInStatus == false) {
-        // // print("fetch Posts: not signed in ");
-        String url = "";
-        if (currentSubreddit.isNotEmpty) {
-          currentPage = CurrentPage.other;
-          url = "https://www.reddit.com";
-          if (loadingTop) {
-            url = url +
-                "/r/${currentSubreddit.toLowerCase()}" +
-                currentSort.toString().toLowerCase() +
-                "&limit=10";
-          } else {
-            url = url +
-                "/r/${currentSubreddit.toLowerCase()}" +
-                "/${currentSort.toString().toLowerCase()}.json" +
-                "?limit=10";
-          }
-        } else {
-          currentPage = CurrentPage.frontPage;
-          url = "https://www.reddit.com";
-          if (loadingTop) {
-            url = url + currentSort.toString().toLowerCase() + "&limit=$limit";
-          } else {
-            url = url +
-                "/${currentSort.toString().toLowerCase()}.json?limit=$limit";
-          }
-        }
+    final SubredditRef subreddit = reddit.subreddit(subredditName);
+    return;
+  }
 
-        // // print(url);
-        response = await http.get(url).catchError((e) {
-          // // print("Feed fetch error");
-          notifyListeners();
-          throw new Exception("Feed fetch error");
-        });
-        if (response.statusCode == 200) {
-          subListingFetchUrl = url;
-          _postFeedStream.value = appendMediaType(
-              PostsFeedEntity.fromJson(json.decode(response.body)));
-        } else {
-          // // print("****************");
-          // // print(response.statusCode);
-        }
-      } else {
-        if (await _storageHelper.needsTokenRefresh()) {
-          await _storageHelper.performTokenRefresh();
-        }
+  RedditorRef fetchUserInfo(String username) {
+    return reddit.redditor(username);
+  }
 
-        String token = await _storageHelper.authToken;
-        String url;
-        if (currentSubreddit.isNotEmpty) {
-          currentPage = CurrentPage.other;
-          url = "https://oauth.reddit.com";
-          if (loadingTop) {
-            url = url +
-                "/r/${currentSubreddit.toLowerCase()}" +
-                currentSort.toString().toLowerCase() +
-                "&limit=$limit";
-          } else {
-            url += "/r/${currentSubreddit.toLowerCase()}" +
-                "/${currentSort.toString().toLowerCase()}.json" +
-                "?limit=$limit";
-          }
-        } else {
-          currentPage = CurrentPage.frontPage;
-          url = "https://oauth.reddit.com";
-          if (loadingTop) {
-            url += currentSort.toString().toLowerCase() + "&limit=$limit";
-          } else {
-            url = url +
-                "/${currentSort.toString().toLowerCase()}.json?limit=$limit";
-          }
-        }
-        // // print("Feed fetch url is : " + url);
-        response = await http.get(
-          url,
-          headers: {
-            'Authorization': 'bearer ' + token,
-            'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
-          },
-        ).catchError((e) {
-          throw new Exception("Feed fetch error");
-        });
-
-        if (response.statusCode == 200) {
-          _postFeedStream.value = appendMediaType(
-              PostsFeedEntity.fromJson(json.decode(response.body)));
-          subListingFetchUrl = url;
-        } else {
-          throw Exception("Failed to load data: " + response.reasonPhrase);
-        }
+  Future<void> authenticateUser(BuildContext context) async {
+    final url =
+        "https://www.reddit.com/api/v1/${PlatformX.isDesktop ? 'authorize' : 'authorize.compact'}?client_id=" +
+            CLIENT_ID +
+            "&response_type=code&state=randichid&redirect_uri=http://localhost:8080/&duration=permanent&scope=identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread";
+    // TODO: Embed a WebView for macOS when this is supported.
+    launchURL(Theme.of(context).primaryColor, url);
+    bool res = false; //await this.performAuthentication();
+    // print("final res: " + res.toString());
+    if (res) {
+      final NavigatorState navigator = Navigator.of(context);
+      await Provider.of<FeedProvider>(context, listen: false)
+          .navigateToSubreddit('');
+      if (!PlatformX.isDesktop && navigator.canPop()) {
+        navigator.pop();
       }
-    } catch (e) {
-      // // print(e.toString());
-    } finally {
-      _state = ViewState.Idle;
-      notifyListeners();
     }
   }
 
@@ -401,7 +318,7 @@ class FeedProvider with ChangeNotifier {
       debugPrint('updating currentSubredditStream');
 
       currentSubredditStream.value = strippedSubreddit;
-      await _fetchPostsListing(currentSubreddit: strippedSubreddit);
+      await _fetchPostsListing(subredditName: strippedSubreddit);
 
       String token = await _storageHelper.authToken;
       await fetchSubredditInformationOAuth(token, currentSubreddit);
@@ -533,14 +450,10 @@ class FeedProvider with ChangeNotifier {
       Provider.of<FeedProvider>(context, listen: listen);
 
   Future<void> updateSorting({String sortBy, bool loadingTop}) {
-    return _fetchPostsListing(
-        currentSubreddit: currentSubreddit,
-        currentSort: sortBy,
-        loadingTop: loadingTop);
+    throw UnimplementedError();
   }
 
-  Future<void> refresh() =>
-      _fetchPostsListing(currentSubreddit: currentSubreddit);
+  Future<void> refresh() => _fetchPostsListing(subredditName: currentSubreddit);
   List<SubredditInformationEntity> _popularSubreddits;
 
   Future<List<SubredditInformationEntity>> fetchPopularSubreddits() async {
@@ -554,12 +467,7 @@ class FeedProvider with ChangeNotifier {
     return _popularSubreddits = subs;
   }
 
-  Future<List<Rule>> getSubredditRules(String subreddit) async {
-    final Map json =
-        await _fetch(endpoint: Endpoints.subredditRules(subreddit));
-    final rules = Rule.listFromJson(json);
-    return rules;
-  }
+  Future<List<Rule>> getSubredditRules(String subreddit) async {}
 
   Future<Map> _fetch({String endpoint, String token, int limit}) async {
     final url =
@@ -649,4 +557,35 @@ class Endpoints {
   static const String popular = '/subreddits/popular';
 
   static String subredditRules(String subreddit) => '/r/$subreddit/about/rules';
+}
+
+extension on SubredditRef {
+  Stream<UserContent> sortBy(Sort sortType,
+      {TimeFilter timeFilter = TimeFilter.all,
+      int limit,
+      String after,
+      Map<String, String> params}) {
+    switch (sortType) {
+      case Sort.hot:
+        return hot(
+          limit: limit,
+          after: after,
+          params: params,
+        );
+      case Sort.newest:
+        return newest(
+          limit: limit,
+          after: after,
+          params: params,
+        );
+
+      case Sort.top:
+        return top(
+          timeFilter: timeFilter,
+          limit: limit,
+          after: after,
+          params: params,
+        );
+    }
+  }
 }
