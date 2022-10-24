@@ -111,7 +111,7 @@ class SecureStorageHelper {
     String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
     final response = await http
         .post(
-      "https://www.reddit.com/api/v1/access_token",
+      Uri.dataFromString("https://www.reddit.com/api/v1/access_token"),
       headers: {
         "Authorization": basicAuth,
         'Content-Type': 'application/x-www-form-urlencoded',

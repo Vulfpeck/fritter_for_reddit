@@ -186,7 +186,7 @@ class AboutCommunity extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       data: sanitizedData,
       shrinkWrap: true,
-      onTapLink: (link) => FeedProvider.of(context).navigateToSubreddit(link),
+      onTapLink: (link, _, __) => FeedProvider.of(context).navigateToSubreddit(link),
     );
   }
 }

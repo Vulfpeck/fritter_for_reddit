@@ -174,10 +174,7 @@ class CommentBody extends StatelessWidget {
             ),
             Html(
               data: _htmlContent,
-              useRichText: true,
-              showImages: false,
-              padding: const EdgeInsets.all(0),
-              onLinkTap: (url) {
+              onLinkTap: (url,_, __, ___) {
                 if (url.startsWith("/r/") || url.startsWith("r/")) {
                   Navigator.push(
                     context,

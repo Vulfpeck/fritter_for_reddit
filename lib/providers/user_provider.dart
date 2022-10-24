@@ -91,7 +91,7 @@ class UserInformationProvider with ChangeNotifier {
 
     String basicAuth = "Basic " + base64Encode(utf8.encode('$user:$password'));
     final response = await http.post(
-      "https://www.reddit.com/api/v1/access_token",
+      Uri.dataFromString("https://www.reddit.com/api/v1/access_token"),
       headers: {
         "Authorization": basicAuth,
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -157,7 +157,7 @@ class UserInformationProvider with ChangeNotifier {
       return;
     }
     final response = await http.get(
-      "https://oauth.reddit.com/api/v1/me",
+      Uri.dataFromString("https://oauth.reddit.com/api/v1/me"),
       headers: {
         'Authorization': 'bearer ' + token,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus'
@@ -172,7 +172,7 @@ class UserInformationProvider with ChangeNotifier {
           new UserInformationEntity.fromJson(json.decode(response.body));
 
     final subredditResponse = await http.get(
-      "https://oauth.reddit.com/subreddits/mine/?limit=100",
+      Uri.dataFromString("https://oauth.reddit.com/subreddits/mine/?limit=100"),
       headers: {
         'Authorization': 'bearer ' + token,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',

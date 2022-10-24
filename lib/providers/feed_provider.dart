@@ -150,7 +150,10 @@ class FeedProvider with ChangeNotifier {
     http.Response subInfoResponse;
     if (action) {
       subInfoResponse = await http.post(
-        url + '?action=sub&sr=$subId&skip_initial_defaults=true&X-Modhash=null',
+        Uri.dataFromString(
+
+          url + '?action=sub&sr=$subId&skip_initial_defaults=true&X-Modhash=null',
+        ),
         headers: {
           'Authorization': 'bearer ' + authToken,
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
@@ -158,7 +161,10 @@ class FeedProvider with ChangeNotifier {
       );
     } else {
       subInfoResponse = await http.post(
-        url + '?action=unsub&sr=$subId&X-Modhash=null',
+        Uri.dataFromString(
+
+          url + '?action=unsub&sr=$subId&X-Modhash=null',
+        ),
         headers: {
           'Authorization': 'bearer ' + authToken,
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
@@ -231,7 +237,7 @@ class FeedProvider with ChangeNotifier {
         }
 
         // // print(url);
-        response = await http.get(url).catchError((e) {
+        response = await http.get(Uri.dataFromString(url)).catchError((e) {
           // // print("Feed fetch error");
           notifyListeners();
           throw new Exception("Feed fetch error");
@@ -276,7 +282,9 @@ class FeedProvider with ChangeNotifier {
         }
         // // print("Feed fetch url is : " + url);
         response = await http.get(
-          url,
+          Uri.dataFromString(
+            url,
+          ),
           headers: {
             'Authorization': 'bearer ' + token,
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
@@ -309,7 +317,9 @@ class FeedProvider with ChangeNotifier {
     final url = "https://oauth.reddit.com/r/$currentSubreddit/about";
     try {
       final subInfoResponse = await http.get(
-        url,
+        Uri.dataFromString(
+          url,
+        ),
         headers: {
           'Authorization': 'bearer ' + token,
           'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
@@ -356,7 +366,9 @@ class FeedProvider with ChangeNotifier {
         // // print(url);
         String token = await _storageHelper.authToken;
         subredditResponse = await http.get(
-          url,
+          Uri.dataFromString(
+            url,
+          ),
           headers: {
             'Authorization': 'bearer ' + token,
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
@@ -368,7 +380,9 @@ class FeedProvider with ChangeNotifier {
         // // print("new after : " + newData.data.after);
       } else {
         subredditResponse = await http.get(
-          url,
+          Uri.dataFromString(
+            url,
+          ),
           headers: {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
@@ -478,7 +492,10 @@ class FeedProvider with ChangeNotifier {
   void _currentSubredditListener(dynamic value) async {
     final infoUrl = "https://api.reddit.com/r/$currentSubreddit/about";
     final subInfoResponse = await http.get(
-      infoUrl,
+
+      Uri.dataFromString(
+        infoUrl
+      ),
       headers: {
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
       },
@@ -565,7 +582,10 @@ class FeedProvider with ChangeNotifier {
     final url =
         "https://www.reddit.com$endpoint.json${limit != null ? '?limit=$limit' : ''}";
     http.Response response = await http.get(
-      url,
+
+      Uri.dataFromString(
+        url,
+      ),
       headers: {
         if (token != null) 'Authorization': 'bearer ' + token,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',

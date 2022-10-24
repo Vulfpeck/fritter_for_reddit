@@ -49,7 +49,7 @@ class CommentsProvider with ChangeNotifier {
             'https://oauth.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
         try {
           final response = await http.get(
-            url,
+            Uri.dataFromString(url),
             headers: {
               'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
               'Authorization': 'bearer ' + authToken,
@@ -84,7 +84,7 @@ class CommentsProvider with ChangeNotifier {
             'https://api.reddit.com/r/$subredditName/comments/$postId/_/.json?sort=$sortString&showedits=true&threaded=false';
         try {
           final response = await http.get(
-            url,
+            Uri.dataFromString(url),
             headers: {
               'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
             },
@@ -156,7 +156,7 @@ class CommentsProvider with ChangeNotifier {
       // // print(url);
       try {
         final response = await http.get(
-          url,
+          Uri.dataFromString(url),
           headers: {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
             'Authorization': 'bearer ' + authToken,
@@ -207,7 +207,7 @@ class CommentsProvider with ChangeNotifier {
           'https://api.reddit.com/api/morechildren?link_id=$postFullName&api_type=json&children=$childrenString&sort={$changeCommentSortConvertToString[this.sort]}';
       try {
         final response = await http.get(
-          url,
+          Uri.dataFromString(url),
           headers: {
             'User-Agent': 'fritter_for_reddit by /u/SexusMexus',
           },
@@ -319,7 +319,9 @@ class CommentsProvider with ChangeNotifier {
     // // print(authToken);
     http.Response voteResponse;
     voteResponse = await http.post(
-      url + '?dir=$dir&id=${item.data.name}&rank=2',
+      Uri.dataFromString(
+        url + '?dir=$dir&id=${item.data.name}&rank=2',
+      ),
       headers: {
         'Authorization': 'bearer ' + authToken,
         'User-Agent': 'fritter_for_reddit by /u/SexusMexus',

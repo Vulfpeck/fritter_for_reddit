@@ -323,15 +323,8 @@ class FeedCardBodySelfText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      renderNewlines: true,
-      defaultTextStyle: Theme.of(context).textTheme.bodyText2,
-      linkStyle: Theme.of(context).textTheme.bodyText2.copyWith(
-            color: Theme.of(context).accentColor,
-          ),
-      padding: EdgeInsets.all(16),
       data: """${_htmlUnescape.convert(selftextHtml)}""",
-      useRichText: false,
-      onLinkTap: (url) {
+      onLinkTap: (url, _, __, ___) {
         if (url.startsWith("/r/") || url.startsWith("r/")) {
           Navigator.push(
             context,
