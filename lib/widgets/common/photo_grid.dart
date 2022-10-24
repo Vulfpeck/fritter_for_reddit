@@ -126,14 +126,14 @@ class _ImageDialogState extends State<ImageDialog> {
           ),
         ),
         actions: <Widget>[
-          FlatButton.icon(
+          TextButton.icon(
             icon: Icon(
               Icons.file_download,
             ),
             onPressed: () {},
             label: Text('Download'),
           ),
-          FlatButton.icon(
+          TextButton.icon(
             icon: Icon(
               Icons.share,
             ),

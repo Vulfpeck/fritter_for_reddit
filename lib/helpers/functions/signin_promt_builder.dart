@@ -3,8 +3,8 @@ import 'package:fritter_for_reddit/exports.dart';
 import 'package:fritter_for_reddit/utils/extensions.dart';
 
 void buildSnackBar(BuildContext context) {
-  Scaffold.of(context).hideCurrentSnackBar();
-  Scaffold.of(context).showSnackBar(SnackBar(
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text('Please sign-in to vote'),
     action: SnackBarAction(
       onPressed: () {

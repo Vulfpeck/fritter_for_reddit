@@ -484,11 +484,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                                 if (feedProvider.subredditInformationEntity.data
                                         .userIsSubscriber !=
                                     null)
-                                  FlatButton(
-                                    textColor: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .color,
+                                  TextButton(
                                     child: ConditionalBuilder(
                                       condition: feedProvider.partialState ==
                                           ViewState.busy,

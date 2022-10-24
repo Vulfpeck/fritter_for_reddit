@@ -42,7 +42,6 @@ class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       color: Theme.of(context).cardColor.withOpacity(0.8),
       // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
       child: Stack(
-        overflow: Overflow.clip,
         children: <Widget>[
           Positioned(
             bottom: 0,

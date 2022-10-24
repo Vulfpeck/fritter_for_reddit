@@ -235,13 +235,13 @@ class UserInformationProvider with ChangeNotifier {
           return AlertDialog(
             title: Text('Sign '),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: Text('Cancel'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: Text('Retry'),
                 onPressed: () {
                   authenticateUser(context);

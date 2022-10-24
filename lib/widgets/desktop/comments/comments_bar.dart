@@ -33,7 +33,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
         child: Row(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            FlatButton.icon(
+            TextButton.icon(
               icon: Icon(
                 Icons.refresh,
                 color: Theme.of(context)
@@ -42,7 +42,6 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                     .color
                     .withOpacity(0.6),
               ),
-              colorBrightness: MediaQuery.of(context).platformBrightness,
               label: Text(
                 'Refresh',
                 style: TextStyle(

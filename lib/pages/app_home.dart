@@ -48,21 +48,18 @@ class _HomePageState extends State<HomePage> {
                 Icons.library_books,
                 size: 24,
               ),
-              title: Text("Feed"),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.search,
                 size: 24,
               ),
-              title: Text("Search"),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.account_circle,
                 size: 24,
               ),
-              title: Text("Account"),
             ),
           ],
         ),

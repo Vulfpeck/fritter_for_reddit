@@ -315,12 +315,7 @@ class Login extends StatelessWidget {
               Container(
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: 56.0,
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      14,
-                    ),
-                  ),
+                child: ElevatedButton(
                   child: Text("Sign In"),
                   onPressed: () {
                     Provider.of<UserInformationProvider>(context, listen: false)

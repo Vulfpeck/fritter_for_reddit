@@ -46,7 +46,6 @@ class TitleOverlayState extends State<TitleOverlay> {
                     widget.title,
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,
-                    style: Theme.of(context).textTheme.title,
                     textAlign: TextAlign.center,
                   ),
                 ),

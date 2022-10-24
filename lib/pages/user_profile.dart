@@ -56,19 +56,6 @@ class UserProfileScreen extends StatelessWidget {
                                           SizedBox(
                                             height: 150,
                                           ),
-                                          Text(
-                                            "Hello 🥳",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .display1
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .title
-                                                      .color,
-                                                ),
-                                            textAlign: TextAlign.center,
-                                          ),
                                           SizedBox(
                                             height: 12,
                                           ),
@@ -84,9 +71,6 @@ class UserProfileScreen extends StatelessWidget {
                                           ),
                                           Text(
                                             "Sign in to Fritter",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .body2,
                                             textAlign: TextAlign.center,
                                           ),
                                           SizedBox(
@@ -98,13 +82,7 @@ class UserProfileScreen extends StatelessWidget {
                                                     .width *
                                                 0.8,
                                             height: 56.0,
-                                            child: RaisedButton(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  14,
-                                                ),
-                                              ),
+                                            child: ElevatedButton(
                                               child: Text("Sign In"),
                                               onPressed: () {
                                                 model.authenticateUser(context);

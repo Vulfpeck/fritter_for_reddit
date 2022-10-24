@@ -166,7 +166,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      RaisedButton(
+                                      ElevatedButton(
                                         child: Text('Logout'),
                                         onPressed: () {
                                           SharedPreferences.getInstance()
@@ -332,12 +332,7 @@ class _DesktopSubredditFeedState extends State<DesktopSubredditFeed>
                                                           .data
                                                           .userIsSubscriber !=
                                                       null)
-                                                    FlatButton(
-                                                      textColor:
-                                                          Theme.of(context)
-                                                              .textTheme
-                                                              .bodyText2
-                                                              .color,
+                                                    TextButton(
                                                       child: ConditionalBuilder(
                                                         condition: feedProvider
                                                                 .partialState ==

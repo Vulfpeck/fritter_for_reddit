@@ -23,7 +23,8 @@ class _WebViewSignInState extends State<WebViewSignIn> {
         title: Text('Sign in'),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          FlatButton.icon(
+
+          TextButton.icon(
             icon: Icon(Icons.cancel),
             label: Text('Cancel'),
             onPressed: () {

@@ -373,15 +373,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Theme.of(context)
-                              .textTheme
-                              .title
-                              .color
-                              .withOpacity(
-                                0.3,
-                              ),
-                        ),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(Icons.clear),

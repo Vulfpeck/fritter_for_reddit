@@ -214,21 +214,6 @@ class FeedCardTitle extends StatelessWidget {
                         linkFlairText != null
                             ? TextSpan(
                                 text: linkFlairText,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle
-                                    .copyWith(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .subtitle
-                                            .color
-                                            .withOpacity(0.8),
-                                        backgroundColor: Theme.of(context)
-                                            .textTheme
-                                            .subtitle
-                                            .color
-                                            .withOpacity(0.15),
-                                        decorationThickness: 2),
                               )
                             : TextSpan(),
                       ],
