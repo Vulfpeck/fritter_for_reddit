@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fritter_for_reddit/utils/extensions.dart';
+import 'package:fritter_for_reddit/v1/utils/extensions.dart';
 
 main() {
   test('Ensure convertSubredditsToLinks returns markdown formatted links', () {

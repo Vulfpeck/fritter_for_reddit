@@ -6,7 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
-import 'package:fritter_for_reddit/pages/app_home.dart';
+import 'package:fritter_for_reddit/v1/pages/app_home.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
