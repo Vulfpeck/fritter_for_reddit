@@ -8,13 +8,13 @@ part of 'posts_feed_entity.dart';
 
 class PostsFeedEntityAdapter extends TypeAdapter<PostsFeedEntity> {
   @override
-  final typeId = 2;
+  final int typeId = 2;
 
   @override
   PostsFeedEntity read(BinaryReader reader) {
-    var numOfFields = reader.readByte();
-    var fields = <int, dynamic>{
-      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PostsFeedEntity(
       data: fields[0] as PostsFeedData,
@@ -31,17 +31,27 @@ class PostsFeedEntityAdapter extends TypeAdapter<PostsFeedEntity> {
       ..writeByte(1)
       ..write(obj.kind);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PostsFeedEntityAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
 
 class PostsFeedDataAdapter extends TypeAdapter<PostsFeedData> {
   @override
-  final typeId = 3;
+  final int typeId = 3;
 
   @override
   PostsFeedData read(BinaryReader reader) {
-    var numOfFields = reader.readByte();
-    var fields = <int, dynamic>{
-      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PostsFeedData(
       modhash: fields[0] as dynamic,
@@ -67,20 +77,30 @@ class PostsFeedDataAdapter extends TypeAdapter<PostsFeedData> {
       ..writeByte(4)
       ..write(obj.after);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PostsFeedDataAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
 
 class PostsFeedDataChildAdapter extends TypeAdapter<PostsFeedDataChild> {
   @override
-  final typeId = 4;
+  final int typeId = 4;
 
   @override
   PostsFeedDataChild read(BinaryReader reader) {
-    var numOfFields = reader.readByte();
-    var fields = <int, dynamic>{
-      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PostsFeedDataChild(
-      data: PostsFeedDataChildrenData.fromJson(fields[0]),
+      data: fields[0] as PostsFeedDataChildrenData,
       kind: fields[1] as String,
     );
   }
@@ -90,8 +110,18 @@ class PostsFeedDataChildAdapter extends TypeAdapter<PostsFeedDataChild> {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.data.toJson())
+      ..write(obj.data)
       ..writeByte(1)
       ..write(obj.kind);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PostsFeedDataChildAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
