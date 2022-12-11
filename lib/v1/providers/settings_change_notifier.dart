@@ -3,6 +3,8 @@ import 'package:fritter_for_reddit/v1/providers/state_persisting_change_notifier
 import 'package:fritter_for_reddit/v1/widgets/desktop/desktop_subreddit_feed.dart';
 import 'package:provider/provider.dart';
 
+enum ViewMode { card, gallery }
+
 class SettingsNotifier extends StatePersistingChangeNotifier<SettingsState> {
   @override
   SettingsState get initialState => SettingsState.initial();

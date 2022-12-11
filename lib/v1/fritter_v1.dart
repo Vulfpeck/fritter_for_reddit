@@ -74,13 +74,6 @@ class _DesktopHomeState extends State<DesktopHome> {
             title: Text("Fritter for Reddit"),
             elevation: 0,
             actions: <Widget>[
-              ViewSwitcherIconButton(
-                viewMode: Provider.of<SettingsNotifier>(context).state.viewMode,
-                onChanged: (viewMode) {
-                  Provider.of<SettingsNotifier>(context, listen: false)
-                      .changeViewMode(viewMode);
-                },
-              ),
               PopupMenuButton<String>(
                 key: key,
                 icon: Icon(
@@ -150,16 +143,21 @@ class _DesktopHomeState extends State<DesktopHome> {
                 onCanceled: () {},
                 initialValue: sortSelectorValue,
               ),
-              IconButton(icon: Icon(Icons.info_outline), onPressed: () {
-                _scaffoldKey.currentState.openEndDrawer();
-              },)
+              IconButton(
+                icon: Icon(Icons.info_outline),
+                onPressed: () {
+                  _scaffoldKey.currentState.openEndDrawer();
+                },
+              )
             ],
           ),
           body: Row(
             children: <Widget>[
-              Container(child: LeftDrawer(mode: Mode.desktop,), constraints: BoxConstraints.tightForFinite(width: 250),),
-              Expanded(
-                child: Center(child: DesktopSubredditFeed()),
+              Container(
+                child: LeftDrawer(
+                  mode: Mode.desktop,
+                ),
+                constraints: BoxConstraints.tightForFinite(width: 250),
               ),
             ],
           ),

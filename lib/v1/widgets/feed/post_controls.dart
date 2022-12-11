@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:conditional_wrapper/conditional_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -173,39 +172,6 @@ class PostVoteControls extends StatelessWidget {
                           );
                         },
                       ),
-                      ConditionalWrapper(
-                        builder: (BuildContext context, Widget child) {
-                          return AbsorbPointer(
-                            absorbing: true,
-                            child: child,
-                          );
-                        },
-                        condition: PlatformX.isDesktop,
-                        child: ListTile(
-                          title: Text('Download'),
-                          leading: CircleAvatar(
-                            child: Icon(Icons.file_download),
-                          ),
-                          onTap: () async {
-                            if (postData.hasImage) {
-                              await Future.forEach(
-                                postData.images,
-                                (image) async {
-                                  String downloadPath =
-                                      await ImageDownloader.downloadImage(
-                                    image.source.url,
-                                    destination: AndroidDestinationType
-                                        .directoryPictures,
-                                  );
-
-                                  debugPrint('Downloading ${image.source.url}');
-                                },
-                              );
-                              Navigator.pop(context);
-                            }
-                          },
-                        ),
-                      ),
                       if (kDebugMode) ...[
                         ListTile(
                           title: Text('Open in Chrome'),
@@ -255,7 +221,9 @@ class VotesCountWidget extends StatelessWidget {
           size: 14,
           color: postData.likes == null
               ? Theme.of(context).textTheme.subtitle2.color
-              : postData.likes == true ? Colors.orange : Colors.purple,
+              : postData.likes == true
+                  ? Colors.orange
+                  : Colors.purple,
         ),
         SizedBox(
           width: 4.0,

@@ -176,43 +176,7 @@ class FeedCardBodyImage extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {
-                if (postMetaData['media_type'] == MediaType.Video ||
-                    postMetaData['media_type'] == MediaType.Image) {
-                  Navigator.of(
-                    context,
-                    rootNavigator: false,
-                  ).push(
-                    CupertinoPageRoute(
-                      maintainState: true,
-                      builder: (BuildContext context) {
-                        return PhotoViewerScreen(
-                          mediaUrl: postMetaData['media_type'] ==
-                                  MediaType.Image
-                              ? _htmlUnescape.convert(images.first.source.url)
-                              : postMetaData['url'],
-                          isVideo:
-                              postMetaData['media_type'] == MediaType.Video,
-                        );
-                      },
-                      fullscreenDialog: true,
-                    ),
-                  );
-                } else {}
-              },
-              onLongPress: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) => PhotoViewerScreen(
-                    fullScreen: false,
-                    mediaUrl: postMetaData['media_type'] == MediaType.Image
-                        ? _htmlUnescape.convert(images.first.source.url)
-                        : postMetaData['url'],
-                    isVideo: postMetaData['media_type'] == MediaType.Video,
-                  ),
-                );
-              },
+              onTap: () {},
               child:
 //            data.media != null
 //                ? Image(

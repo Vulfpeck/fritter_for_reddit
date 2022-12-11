@@ -118,13 +118,6 @@ class _DesktopSliverAppBarState extends State<DesktopSliverAppBar> {
           onCanceled: () {},
           initialValue: sortSelectorValue,
         ),
-        ViewSwitcherIconButton(
-          viewMode: Provider.of<SettingsNotifier>(context).state.viewMode,
-          onChanged: (viewMode) {
-            Provider.of<SettingsNotifier>(context, listen: false)
-                .changeViewMode(viewMode);
-          },
-        ),
         IconButton(
           icon: Icon(Icons.info_outline),
           color: Theme.of(context).iconTheme.color,

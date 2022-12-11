@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:conditional_builder/conditional_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
@@ -157,14 +156,6 @@ class _SubredditFeedState extends State<SubredditFeed>
                       onCanceled: () {},
                       initialValue: sortSelectorValue,
                     ),
-                    ViewSwitcherIconButton(
-                      viewMode: SettingsNotifier.of(context, listen: true)
-                          .state
-                          .viewMode,
-                      onChanged: (viewMode) {
-                        settingsNotifier.changeViewMode(viewMode);
-                      },
-                    ),
                     IconButton(
                       icon: Icon(Icons.info_outline),
                       color: Theme.of(context).iconTheme.color,
@@ -213,51 +204,6 @@ class _SubredditFeedState extends State<SubredditFeed>
                     ],
                   ),
                 ),
-                if (settingsNotifier.state.viewMode == ViewMode.card)
-                  SliverList(
-                    delegate: (hasError)
-                        ? SliverChildListDelegate([
-                            Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                Icon(Icons.error_outline),
-                                Text("Couldn't Load subreddit")
-                              ],
-                            )
-                          ])
-                        : feedProviderIsIdle && userInfoProviderIsIdle
-                            ? SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                                  var item =
-                                      model.postFeed.data.children[index].data;
-                                  return InkWell(
-                                    onDoubleTap: () {
-                                      if (item.isTextPost == false) {
-                                        launchURL(
-                                            Theme.of(context).primaryColor,
-                                            item.url);
-                                      }
-                                    },
-                                    onTap: () {
-                                      _openComments(item, context, index);
-                                    },
-                                    child: PostCard(item: item),
-                                  );
-                                },
-                                childCount:
-                                    model.postFeed.data.children.length * 2 + 1,
-                              )
-                            : SliverChildListDelegate([
-                                Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: LinearProgressIndicator(),
-                                )
-                              ]),
-                  )
-                else
-                  PhotoGrid(
-                    postsFeed: model.postFeed,
-                  )
               ],
             ),
           );
@@ -336,207 +282,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                   padding: EdgeInsets.all(0),
                   color: headerColor,
                   // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
-                  child: ConditionalBuilder(
-                    condition: feedProvider != null,
-                    builder: (context) => ConditionalBuilder(
-                      condition: feedProvider.state == ViewState.Idle,
-                      builder: (context) => ConditionalBuilder(
-                        condition:
-                            feedProvider.currentPage == CurrentPage.frontPage,
-                        builder: (context) => Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text(
-                                  'Front Page',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5
-                                      .copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.chevron_right),
-                                  onPressed: () {
-                                    return Navigator.of(context,
-                                            rootNavigator: false)
-                                        .push(
-                                      CupertinoPageRoute(
-                                        maintainState: true,
-                                        builder: (context) => LeftDrawer(
-                                          mode: Mode.mobile,
-                                        ),
-                                        fullscreenDialog: false,
-                                      ),
-                                    );
-                                  },
-                                  color: Theme.of(context).accentColor,
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        fallback: (context) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
-                        ),
-                      ),
-                      fallback: (context) => Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: 24,
-                          ),
-                          feedProvider.subredditInformationEntity != null
-                              ? CircleAvatar(
-                                  maxRadius: 24,
-                                  minRadius: 24,
-                                  backgroundImage: feedProvider
-                                              .subredditInformationEntity
-                                              .data
-                                              .communityIcon !=
-                                          ""
-                                      ? CachedNetworkImageProvider(
-                                          feedProvider
-                                              .subredditInformationEntity
-                                              .data
-                                              .communityIcon,
-                                          errorListener: () {
-                                          debugPrint('here\'s an Error!');
-                                        })
-                                      : feedProvider.subredditInformationEntity
-                                                  .data.iconImg !=
-                                              ""
-                                          ? CachedNetworkImageProvider(
-                                              feedProvider
-                                                  .subredditInformationEntity
-                                                  .data
-                                                  .iconImg,
-                                            )
-                                          : AssetImage(
-                                              'assets/default_icon.png'),
-                                  backgroundColor: feedProvider
-                                              .subredditInformationEntity
-                                              .data
-                                              .primaryColor ==
-                                          ""
-                                      ? Theme.of(context).accentColor
-                                      : HexColor(
-                                          feedProvider
-                                              .subredditInformationEntity
-                                              .data
-                                              .primaryColor,
-                                        ),
-                                )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Text(
-                                          widget.pageTitle,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5
-                                              .copyWith(
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                          if (feedProvider.subredditInformationEntity != null)
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  feedProvider.subredditInformationEntity.data
-                                      .displayNamePrefixed,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5
-                                      .copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                  overflow: TextOverflow.fade,
-                                  textAlign: TextAlign.center,
-                                  softWrap: false,
-                                ),
-                                Text(
-                                  getRoundedToThousand(feedProvider
-                                          .subredditInformationEntity
-                                          .data
-                                          .subscribers) +
-                                      " Subscribers",
-                                  style: Theme.of(context).textTheme.subtitle1,
-                                ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                if (feedProvider.subredditInformationEntity.data
-                                        .userIsSubscriber !=
-                                    null)
-                                  TextButton(
-                                    child: ConditionalBuilder(
-                                      condition: feedProvider.partialState ==
-                                          ViewState.busy,
-                                      builder: (context) => Container(
-                                        width: 24.0,
-                                        height: 24.0,
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ),
-                                      fallback: (context) => Text(
-                                        feedProvider.subredditInformationEntity
-                                                .data.userIsSubscriber
-                                            ? 'Subscribed'
-                                            : 'Join',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      feedProvider.changeSubscriptionStatus(
-                                        feedProvider.subredditInformationEntity
-                                            .data.name,
-                                        !feedProvider.subredditInformationEntity
-                                            .data.userIsSubscriber,
-                                      );
-                                    },
-                                  ),
-                              ],
-                            ),
-                          SizedBox(
-                            height: 24.0,
-                          )
-                        ],
-                      ),
-                    ),
-                    fallback: (context) => Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Front Page',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: Container(),
                 );
               },
             ),

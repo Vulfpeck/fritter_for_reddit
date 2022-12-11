@@ -1,4 +1,3 @@
-import 'package:conditional_builder/conditional_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -137,33 +136,7 @@ class AboutCommunity extends StatelessWidget {
                       FeedProvider.of(context).getSubredditRules(subredditName),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Rule>> snapshot) {
-                    return ConditionalBuilder(
-                      condition: snapshot.hasData,
-                      builder: (context) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            for (final rule in snapshot.data)
-                              ExpansionTile(
-                                title: Text(rule.shortName),
-                                children: <Widget>[
-                                  ListTile(
-                                      subtitle: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: SubredditAwareClickableText(
-                                      rule.description,
-                                      onClick: (String subreddit) {
-                                        FeedProvider.of(context)
-                                            .navigateToSubreddit(subreddit);
-                                      },
-                                    ),
-                                  ))
-                                ],
-                              )
-                          ],
-                        );
-                      },
-                    );
+                    return Container();
                   },
                 ),
               ),
