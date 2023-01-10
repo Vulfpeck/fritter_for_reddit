@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 class CustomScrollPhysics extends ScrollPhysics {
   /// Creates scroll physics that bounce back from the edge.
-  const CustomScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+  const CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  CustomScrollPhysics applyTo(ScrollPhysics ancestor) {
+  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return CustomScrollPhysics(parent: buildParent(ancestor));
   }
 
@@ -66,7 +66,7 @@ class CustomScrollPhysics extends ScrollPhysics {
   double applyBoundaryConditions(ScrollMetrics position, double value) => 0.0;
 
   @override
-  Simulation createBallisticSimulation(
+  Simulation? createBallisticSimulation(
       ScrollMetrics position, double velocity) {
     final Tolerance tolerance = this.tolerance;
     if (velocity.abs() >= tolerance.velocity || position.outOfRange) {

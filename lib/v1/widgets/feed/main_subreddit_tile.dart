@@ -8,10 +8,10 @@ class MainSubredditTile extends StatelessWidget {
   final String description;
 
   const MainSubredditTile({
-    Key key,
-    @required this.subreddit,
-    @required this.title,
-    @required this.description,
+    Key? key,
+    required this.subreddit,
+    required this.title,
+    required this.description,
   }) : super(key: key);
 
   @override
@@ -30,7 +30,7 @@ class MainSubredditTile extends StatelessWidget {
       dense: true,
       onTap: () {
         FocusScope.of(context).unfocus();
-        return Navigator.of(
+        Navigator.of(
           context,
           rootNavigator: false,
         ).push(

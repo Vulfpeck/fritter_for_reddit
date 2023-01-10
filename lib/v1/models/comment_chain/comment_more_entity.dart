@@ -1,5 +1,5 @@
 class CommentMoreEntity {
-  CommentMoreJson json;
+  CommentMoreJson? json;
 
   CommentMoreEntity.fromJson(Map json) {
 //    // print(json);
@@ -11,15 +11,15 @@ class CommentMoreEntity {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.json != null) {
-      data['json'] = this.json.toJson();
+      data['json'] = this.json!.toJson();
     }
     return data;
   }
 }
 
 class CommentMoreJson {
-  CommentMoreJsonData data;
-  List<Null> errors;
+  CommentMoreJsonData? data;
+  List<Null>? errors;
 
   CommentMoreJson.fromJson(Map json) {
 //    // print("data" + json["data"]);
@@ -29,14 +29,14 @@ class CommentMoreJson {
       // print('data is null');
     }
     if (json['errors'] != null) {
-      errors = new List<Null>();
+      errors = <Null>[];
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     if (this.errors != null) {
       data['errors'] = [];
@@ -46,15 +46,15 @@ class CommentMoreJson {
 }
 
 class CommentMoreJsonData {
-  List<CommantMoreJsonDataThings> things;
+  List<CommantMoreJsonDataThings>? things;
 
   CommentMoreJsonData({this.things});
 
   CommentMoreJsonData.fromJson(Map json) {
     if (json['things'] != null) {
-      things = new List<CommantMoreJsonDataThings>();
+      things = <CommantMoreJsonDataThings>[];
       (json['things'] as List).forEach((v) {
-        things.add(new CommantMoreJsonDataThings.fromJson(v));
+        things!.add(new CommantMoreJsonDataThings.fromJson(v));
       });
     }
   }
@@ -62,15 +62,15 @@ class CommentMoreJsonData {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.things != null) {
-      data['things'] = this.things.map((v) => v.toJson()).toList();
+      data['things'] = this.things!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class CommantMoreJsonDataThings {
-  CommentMoreJsonDataThingsData data;
-  String kind;
+  CommentMoreJsonDataThingsData? data;
+  String? kind;
 
   CommantMoreJsonDataThings({this.data, this.kind});
 
@@ -84,7 +84,7 @@ class CommantMoreJsonDataThings {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     data['kind'] = this.kind;
     return data;
@@ -92,67 +92,67 @@ class CommantMoreJsonDataThings {
 }
 
 class CommentMoreJsonDataThingsData {
-  String bodyHtml;
-  List<Null> authorFlairRichtext;
-  bool saved;
-  int controversiality;
-  String body;
-  int totalAwardsReceived;
-  String linkId;
-  String subredditId;
-  String subreddit;
-  int score;
+  String? bodyHtml;
+  List<Null>? authorFlairRichtext;
+  bool? saved;
+  int? controversiality;
+  String? body;
+  int? totalAwardsReceived;
+  String? linkId;
+  String? subredditId;
+  String? subreddit;
+  int? score;
   dynamic modReasonTitle;
-  bool isSubmitter;
-  bool canGild;
-  List<Null> stewardReports;
-  String id;
+  bool? isSubmitter;
+  bool? canGild;
+  List<Null>? stewardReports;
+  String? id;
   dynamic createdUtc;
-  bool locked;
+  bool? locked;
   dynamic likes;
   dynamic bannedAtUtc;
-  int downs;
+  int? downs;
   dynamic edited;
-  String author;
+  String? author;
   dynamic created;
   dynamic authorFlairBackgroundColor;
-  CommentMoreJsonDataThingsDataGildings gildings;
+  CommentMoreJsonDataThingsDataGildings? gildings;
   dynamic reportReasons;
   dynamic approvedBy;
-  bool scoreHidden;
-  String replies;
-  String subredditNamePrefixed;
+  bool? scoreHidden;
+  String? replies;
+  String? subredditNamePrefixed;
   dynamic modReasonBy;
-  String parentId;
+  String? parentId;
   dynamic approvedAtUtc;
-  bool noFollow;
-  String name;
-  int ups;
-  String authorFlairType;
-  List<Null> awarders;
-  String permalink;
+  bool? noFollow;
+  String? name;
+  int? ups;
+  String? authorFlairType;
+  List<Null>? awarders;
+  String? permalink;
   dynamic authorFlairCssClass;
   dynamic numReports;
-  List<Null> modReports;
-  int gilded;
-  bool authorPatreonFlair;
+  List<Null>? modReports;
+  int? gilded;
+  bool? authorPatreonFlair;
   dynamic collapsedReason;
-  bool collapsed;
+  bool? collapsed;
   dynamic removalReason;
   dynamic modNote;
-  bool sendReplies;
+  bool? sendReplies;
   dynamic authorFlairText;
-  bool archived;
+  bool? archived;
   dynamic authorFlairTextColor;
-  bool canModPost;
-  String authorFullname;
-  String subredditType;
-  List<Null> userReports;
+  bool? canModPost;
+  String? authorFullname;
+  String? subredditType;
+  List<Null>? userReports;
   dynamic distinguished;
   dynamic authorFlairTemplateId;
-  int depth;
-  bool stickied;
-  List<Null> allAwardings;
+  int? depth;
+  bool? stickied;
+  List<Null>? allAwardings;
   dynamic bannedBy;
 
   CommentMoreJsonDataThingsData(
@@ -222,7 +222,7 @@ class CommentMoreJsonDataThingsData {
   CommentMoreJsonDataThingsData.fromJson(Map json) {
     bodyHtml = json['body_html'];
     if (json['author_flair_richtext'] != null) {
-      authorFlairRichtext = new List<Null>();
+      authorFlairRichtext = <Null>[];
     }
     saved = json['saved'];
     controversiality = json['controversiality'];
@@ -236,7 +236,7 @@ class CommentMoreJsonDataThingsData {
     isSubmitter = json['is_submitter'];
     canGild = json['can_gild'];
     if (json['steward_reports'] != null) {
-      stewardReports = new List<Null>();
+      stewardReports = <Null>[];
     }
     id = json['id'];
     createdUtc = json['created_utc'];
@@ -264,13 +264,13 @@ class CommentMoreJsonDataThingsData {
     ups = json['ups'];
     authorFlairType = json['author_flair_type'];
     if (json['awarders'] != null) {
-      awarders = new List<Null>();
+      awarders = <Null>[];
     }
     permalink = json['permalink'];
     authorFlairCssClass = json['author_flair_css_class'];
     numReports = json['num_reports'];
     if (json['mod_reports'] != null) {
-      modReports = new List<Null>();
+      modReports = <Null>[];
     }
     gilded = json['gilded'];
     authorPatreonFlair = json['author_patreon_flair'];
@@ -286,14 +286,14 @@ class CommentMoreJsonDataThingsData {
     authorFullname = json['author_fullname'];
     subredditType = json['subreddit_type'];
     if (json['user_reports'] != null) {
-      userReports = new List<Null>();
+      userReports = <Null>[];
     }
     distinguished = json['distinguished'];
     authorFlairTemplateId = json['author_flair_template_id'];
     depth = json['depth'];
     stickied = json['stickied'];
     if (json['all_awardings'] != null) {
-      allAwardings = new List<Null>();
+      allAwardings = <Null>[];
     }
     bannedBy = json['banned_by'];
   }
@@ -329,7 +329,7 @@ class CommentMoreJsonDataThingsData {
     data['created'] = this.created;
     data['author_flair_background_color'] = this.authorFlairBackgroundColor;
     if (this.gildings != null) {
-      data['gildings'] = this.gildings.toJson();
+      data['gildings'] = this.gildings!.toJson();
     }
     data['report_reasons'] = this.reportReasons;
     data['approved_by'] = this.approvedBy;
@@ -383,7 +383,7 @@ class CommentMoreJsonDataThingsData {
 class CommentMoreJsonDataThingsDataGildings {
   CommentMoreJsonDataThingsDataGildings();
 
-  CommentMoreJsonDataThingsDataGildings.fromJson(Map json);
+  CommentMoreJsonDataThingsDataGildings.fromJson(Map? json);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();

@@ -14,8 +14,8 @@ import '../../exports.dart';
 
 class CommentItem extends StatelessWidget {
   final CommentPojo.Child _comment;
-  final String name;
-  final String postId;
+  final String? name;
+  final String? postId;
   final int commentIndex;
 
   CommentItem(this._comment, this.name, this.postId, this.commentIndex);
@@ -24,10 +24,10 @@ class CommentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
       SizedBox(
-        width: 16.0 * _comment.data.depth,
+        width: 16.0 * _comment.data!.depth!,
       ),
       Expanded(
-        child: _comment.data.collapseParent == true
+        child: _comment.data!.collapseParent == true
             ? Column(
                 children: <Widget>[
                   CollapsedCommentParent(
@@ -38,7 +38,7 @@ class CommentItem extends StatelessWidget {
                   Divider(),
                 ],
               )
-            : _comment.data.collapse == true
+            : _comment.data!.collapse == true
                 ? Container()
                 : _comment.kind == CommentPojo.Kind.MORE
                     ? Column(
@@ -76,12 +76,12 @@ class CommentItem extends StatelessWidget {
 
 class CollapsedCommentParent extends StatelessWidget {
   final CommentPojo.Child comment;
-  final String postId;
+  final String? postId;
   final int commentIndex;
   CollapsedCommentParent({
-    @required this.comment,
-    @required this.postId,
-    @required this.commentIndex,
+    required this.comment,
+    required this.postId,
+    required this.commentIndex,
   });
   @override
   Widget build(BuildContext context) {
@@ -93,9 +93,9 @@ class CollapsedCommentParent extends StatelessWidget {
             collapse(commentIndex, context);
           },
           title: Text(
-            comment.data.author +
-                " [+${model.collapsedChildrenCount[comment.data.id].toString()}]",
-            style: Theme.of(context).textTheme.subtitle2.copyWith(
+            comment.data!.author! +
+                " [+${model.collapsedChildrenCount[comment.data!.id].toString()}]",
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
                   fontStyle: FontStyle.italic,
                 ),
           ),
@@ -117,7 +117,7 @@ class CollapsedCommentParent extends StatelessWidget {
 
 class CommentBody extends StatelessWidget {
   final CommentPojo.Child comment;
-  final String postId;
+  final String? postId;
   final int commentIndex;
   final BuildContext context;
   static final HtmlUnescape _unescape = new HtmlUnescape();
@@ -125,15 +125,15 @@ class CommentBody extends StatelessWidget {
   String _htmlContent = "";
 
   CommentBody({
-    @required this.comment,
-    @required this.postId,
-    @required this.commentIndex,
-    @required this.context,
+    required this.comment,
+    required this.postId,
+    required this.commentIndex,
+    required this.context,
   }) {
-    _htmlContent = _unescape.convert(comment.data.bodyHtml);
+    _htmlContent = _unescape.convert(comment.data!.bodyHtml!);
   }
 
-  Brightness _platformBrightness;
+  Brightness? _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
@@ -144,10 +144,10 @@ class CommentBody extends StatelessWidget {
         color: Theme.of(context).cardColor,
         border: Border(
           left: BorderSide(
-            color: comment.data.depth != 0
-                ? colorsRainbow.elementAt(comment.data.depth % 5)
+            color: comment.data!.depth != 0
+                ? colorsRainbow.elementAt(comment.data!.depth! % 5)
                 : Colors.transparent,
-            width: comment.data.depth != 0 ? 2 : 0,
+            width: comment.data!.depth != 0 ? 2 : 0,
           ),
         ),
       ),
@@ -160,7 +160,7 @@ class CommentBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            comment.data.stickied
+            comment.data!.stickied!
                 ? PinnedCommentTag(platformBrightness: _platformBrightness)
                 : Container(),
             Flexible(
@@ -172,7 +172,7 @@ class CommentBody extends StatelessWidget {
             Html(
               data: _htmlContent,
               onLinkTap: (url, _, __, ___) {
-                if (url.startsWith("/r/") || url.startsWith("r/")) {
+                if (url!.startsWith("/r/") || url.startsWith("r/")) {
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -211,21 +211,21 @@ class CommentBody extends StatelessWidget {
 
 class AuthorTag extends StatelessWidget {
   const AuthorTag({
-    @required this.comment,
-    @required Brightness platformBrightness,
+    required this.comment,
+    required Brightness? platformBrightness,
   }) : _platformBrightness = platformBrightness;
   final CommentPojo.Child comment;
-  final Brightness _platformBrightness;
+  final Brightness? _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
-        comment.data.isSubmitter
+        comment.data!.isSubmitter!
             ? Padding(
                 padding: const EdgeInsets.only(right: 4.0),
-                child: comment.data.isSubmitter
+                child: comment.data!.isSubmitter!
                     ? Icon(
                         Icons.person,
                         size: 16,
@@ -238,17 +238,17 @@ class AuthorTag extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: comment.data.author + "  ",
-                style: comment.data.isSubmitter
-                    ? Theme.of(context).textTheme.caption.copyWith(
+                text: comment.data!.author! + "  ",
+                style: comment.data!.isSubmitter!
+                    ? Theme.of(context).textTheme.caption!.copyWith(
                           color: Theme.of(context).accentColor,
                         )
                     : Theme.of(context).textTheme.caption,
               ),
-              comment.data.distinguished.toString().compareTo("moderator") == 0
+              comment.data!.distinguished.toString().compareTo("moderator") == 0
                   ? TextSpan(
                       text: "MOD",
-                      style: Theme.of(context).textTheme.subtitle2.copyWith(
+                      style: Theme.of(context).textTheme.subtitle2!.copyWith(
                             color: Theme.of(context).accentColor,
                             letterSpacing: 1,
                           ),
@@ -261,25 +261,25 @@ class AuthorTag extends StatelessWidget {
           children: <Widget>[
             Icon(
               Icons.arrow_upward,
-              color: comment.data.likes != null
-                  ? comment.data.likes == true
+              color: comment.data!.likes != null
+                  ? comment.data!.likes == true
                       ? getColor(_platformBrightness, ColorObjects.UpvoteColor)
                       : getColor(
                           _platformBrightness, ColorObjects.DownvoteColor)
-                  : Theme.of(context).textTheme.subtitle2.color,
+                  : Theme.of(context).textTheme.subtitle2!.color,
               size: 14,
             ),
             Text(
-              (comment.data.scoreHidden
+              (comment.data!.scoreHidden!
                   ? " [?]"
-                  : " " + getRoundedToThousand(comment.data.score)),
-              style: comment.data.likes != null
-                  ? comment.data.likes == true
-                      ? Theme.of(context).textTheme.subtitle2.copyWith(
+                  : " " + getRoundedToThousand(comment.data!.score!)),
+              style: comment.data!.likes != null
+                  ? comment.data!.likes == true
+                      ? Theme.of(context).textTheme.subtitle2!.copyWith(
                             color: getColor(
                                 _platformBrightness, ColorObjects.UpvoteColor),
                           )
-                      : Theme.of(context).textTheme.subtitle2.copyWith(
+                      : Theme.of(context).textTheme.subtitle2!.copyWith(
                             color: getColor(_platformBrightness,
                                 ColorObjects.DownvoteColor),
                           )
@@ -292,7 +292,7 @@ class AuthorTag extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            " • " + getTimePosted(comment.data.createdUtc),
+            " • " + getTimePosted(comment.data!.createdUtc),
             style: Theme.of(context).textTheme.subtitle2,
             overflow: TextOverflow.fade,
             maxLines: 100,
@@ -305,9 +305,9 @@ class AuthorTag extends StatelessWidget {
 
 class PinnedCommentTag extends StatelessWidget {
   const PinnedCommentTag({
-    @required Brightness platformBrightness,
+    required Brightness? platformBrightness,
   }) : _platformBrightness = platformBrightness;
-  final Brightness _platformBrightness;
+  final Brightness? _platformBrightness;
 
   @override
   Widget build(BuildContext context) {
@@ -329,8 +329,8 @@ class PinnedCommentTag extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.label_outline,
-            color: Theme.of(context).textTheme.subtitle2.color,
-            size: Theme.of(context).textTheme.subtitle2.fontSize,
+            color: Theme.of(context).textTheme.subtitle2!.color,
+            size: Theme.of(context).textTheme.subtitle2!.fontSize,
           ),
           SizedBox(
             width: 4.0,
@@ -346,9 +346,9 @@ class PinnedCommentTag extends StatelessWidget {
 }
 
 class MoreCommentKind extends StatelessWidget {
-  final CommentPojo.Child comment;
-  final String postFullName;
-  final String id;
+  final CommentPojo.Child? comment;
+  final String? postFullName;
+  final String? id;
 
   MoreCommentKind({this.comment, this.postFullName, this.id});
   @override
@@ -364,10 +364,10 @@ class MoreCommentKind extends StatelessWidget {
                 splashColor: Theme.of(context).accentColor.withOpacity(0.2),
                 onTap: () {
                   model.fetchChildren(
-                    children: comment.data.children,
+                    children: comment!.data!.children,
                     postId: id,
                     postFullName: postFullName,
-                    moreParentId: comment.data.id,
+                    moreParentId: comment!.data!.id,
                   );
                 },
                 child: Row(
@@ -387,7 +387,7 @@ class MoreCommentKind extends StatelessWidget {
                     ),
                     model.commentsMoreLoadingState == ViewState.busy &&
                             model.moreParentLoadingId != "" &&
-                            model.moreParentLoadingId == comment.data.id
+                            model.moreParentLoadingId == comment!.data!.id
                         ? Container(
                             width: 24,
                             height: 24,

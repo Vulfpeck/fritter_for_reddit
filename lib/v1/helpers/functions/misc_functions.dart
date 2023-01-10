@@ -29,7 +29,7 @@ Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
     case false:
       {
         if (data.media == null) {
-          final Uri uri = Uri.parse(data.url);
+          final Uri uri = Uri.parse(data.url!);
           if (uri.authority == 'imgur.com' ||
               uri.authority == 'i.imgur.com' ||
               uri.authority == 'm.imgur.com') {
@@ -39,7 +39,7 @@ Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
               return result;
             } else if (uri.path.contains('mp4') || uri.path.contains('gifv')) {
               result['media_type'] = MediaType.Video;
-              result['url'] = data.url.replaceAll('gifv', 'mp4');
+              result['url'] = data.url!.replaceAll('gifv', 'mp4');
               return result;
             } else {
               result['media_type'] = MediaType.Image;
@@ -48,7 +48,7 @@ Map<String, dynamic> getMediaType(PostsFeedDataChildrenData data) {
             }
           }
         } else {
-          final Uri uri = Uri.parse(data.url);
+          final Uri uri = Uri.parse(data.url!);
           if (uri.authority == 'gfycat.com') {
             result['url'] = data.media['oembed']['thumbnail_url']
                 .toString()

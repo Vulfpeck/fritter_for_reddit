@@ -9,11 +9,11 @@ import 'package:fritter_for_reddit/v1/models/search_results/posts/search_posts_r
 import 'package:fritter_for_reddit/v1/models/search_results/subreddits/search_subreddits_repo_entity.dart';
 
 class JsonConvert<T> {
-  T fromJson(Map<String, dynamic> json) {
+  T? fromJson(Map<String, dynamic>? json) {
     return _getFromJson<T>(runtimeType, this, json);
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic>? toJson() {
     return _getToJson<T>(runtimeType, this);
   }
 
@@ -122,46 +122,46 @@ class JsonConvert<T> {
     return data as T;
   }
 
-  static T fromJsonAsT<T>(json) {
+  static T? fromJsonAsT<T>(json) {
     switch (T.toString()) {
       case 'SearchPostsRepoEntity':
-        return SearchPostsRepoEntity().fromJson(json) as T;
+        return SearchPostsRepoEntity().fromJson(json) as T?;
       case 'SearchPostsRepoEntityData':
-        return SearchPostsRepoEntityData().fromJson(json) as T;
+        return SearchPostsRepoEntityData().fromJson(json) as T?;
       case 'SearchPostsRepoEntityDataFacets':
-        return SearchPostsRepoEntityDataFacets().fromJson(json) as T;
+        return SearchPostsRepoEntityDataFacets().fromJson(json) as T?;
       case 'SearchPostsRepoEntityDatachild':
-        return SearchPostsRepoEntityDatachild().fromJson(json) as T;
+        return SearchPostsRepoEntityDatachild().fromJson(json) as T?;
       case 'SearchPostsRepoEntityDataChildrenData':
-        return SearchPostsRepoEntityDataChildrenData().fromJson(json) as T;
+        return SearchPostsRepoEntityDataChildrenData().fromJson(json) as T?;
       case 'SearchPostsRepoEntityDataChildrenDataMediaEmbed':
         return SearchPostsRepoEntityDataChildrenDataMediaEmbed().fromJson(json)
-            as T;
+            as T?;
       case 'SearchPostsRepoEntityDataChildrenDataSecureMediaEmbed':
         return SearchPostsRepoEntityDataChildrenDataSecureMediaEmbed()
-            .fromJson(json) as T;
+            .fromJson(json) as T?;
       case 'SearchPostsRepoEntityDataChildrenDataGildings':
         return SearchPostsRepoEntityDataChildrenDataGildings().fromJson(json)
-            as T;
+            as T?;
       case 'SearchPostsRepoEntityDataChildrenDataPreview':
         return SearchPostsRepoEntityDataChildrenDataPreview().fromJson(json)
-            as T;
+            as T?;
       case 'SearchPostsRepoEntityDatachildDataPreviewImages':
         return SearchPostsRepoEntityDatachildDataPreviewImages().fromJson(json)
-            as T;
+            as T?;
       case 'SearchPostsRepoEntityDataChildrenDataPreviewImagesSource':
         return SearchPostsRepoEntityDataChildrenDataPreviewImagesSource()
-            .fromJson(json) as T;
+            .fromJson(json) as T?;
       case 'SearchPostsRepoEntityDatachildDataPreviewImagesResolutions':
         return SearchPostsRepoEntityDatachildDataPreviewImagesResolutions()
-            .fromJson(json) as T;
+            .fromJson(json) as T?;
       case 'SearchPostsRepoEntityDataChildrenDataPreviewImagesVariants':
         return SearchPostsRepoEntityDataChildrenDataPreviewImagesVariants()
-            .fromJson(json) as T;
+            .fromJson(json) as T?;
       case 'SearchSubredditsRepoEntity':
-        return SearchSubredditsRepoEntity().fromJson(json) as T;
+        return SearchSubredditsRepoEntity().fromJson(json) as T?;
       case 'SearchSubredditsRepoSubreddit':
-        return SubredditSearchResultEntry().fromJson(json) as T;
+        return SubredditSearchResultEntry().fromJson(json) as T?;
     }
     return null;
   }

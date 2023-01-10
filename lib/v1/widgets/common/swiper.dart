@@ -9,31 +9,31 @@ import '../../exports.dart';
 
 class Swiper extends StatefulWidget {
   final Widget child;
-  final String postId;
+  final String? postId;
   final CommentPojo.Child comment;
   final int commentIndex;
 
   Swiper(
-      {@required this.child,
-      @required this.comment,
-      @required this.postId,
-      @required this.commentIndex});
+      {required this.child,
+      required this.comment,
+      required this.postId,
+      required this.commentIndex});
 
   @override
   _SwiperState createState() => _SwiperState();
 }
 
 class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  late AnimationController _controller;
   bool isUpvoting = false;
   bool thresholdCrossed = false;
-  DismissDirection direction;
+  DismissDirection? direction;
   Offset commentOffset = Offset.zero;
-  MediaQueryData _mediaQuery;
+  late MediaQueryData _mediaQuery;
   bool isDragging = false;
   double initialPosition = 0;
   double finalPosition = 0;
-  Animation<Alignment> _animation;
+  late Animation<Alignment> _animation;
 
   /// Calculates and runs a [SpringSimulation].
   void _runAnimation(Offset pixelsPerSecond, Size size) {
@@ -129,7 +129,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
         _runAnimation(details.velocity.pixelsPerSecond, size);
         if (isUpvoting && thresholdCrossed) {
           if (Provider.of<UserInformationProvider>(context).signedIn) {
-            if (widget.comment.data.likes == true) {
+            if (widget.comment.data!.likes == true) {
               Provider.of<CommentsProvider>(context).voteComment(
                 index: widget.commentIndex,
                 dir: 0,
@@ -148,7 +148,7 @@ class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin {
         } else if (!isUpvoting && thresholdCrossed) {
           // print("Downvote");
           if (Provider.of<UserInformationProvider>(context).signedIn) {
-            if (widget.comment.data.likes == false) {
+            if (widget.comment.data!.likes == false) {
               Provider.of<CommentsProvider>(context).voteComment(
                   index: widget.commentIndex, dir: 0, postId: widget.postId);
             } else {

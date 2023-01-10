@@ -8,8 +8,8 @@ class PhotoGrid extends StatefulWidget {
   final PostsFeedEntity postsFeed;
 
   const PhotoGrid({
-    Key key,
-    @required this.postsFeed,
+    Key? key,
+    required this.postsFeed,
   }) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class _PhotoGridState extends State<PhotoGrid> {
   GlobalKey gridKey = GlobalKey();
 
   List<PostsFeedDataChild> get postsWithImages =>
-      widget.postsFeed.children.where((post) => post.data.hasPreview).toList();
+      widget.postsFeed.children!.where((post) => post.data!.hasPreview).toList();
 
   @override
   void didUpdateWidget(PhotoGrid oldWidget) {
@@ -82,8 +82,8 @@ class _PhotoGridState extends State<PhotoGrid> {
 
 class ImageDialog extends StatefulWidget {
   const ImageDialog({
-    Key key,
-    @required this.postFeedItem,
+    Key? key,
+    required this.postFeedItem,
   }) : super(key: key);
 
   final PostsFeedDataChild postFeedItem;
@@ -113,7 +113,7 @@ class _ImageDialogState extends State<ImageDialog> {
       child: AlertDialog(
         title: Flexible(
           child: Text(
-            widget.postFeedItem.title,
+            widget.postFeedItem.title!,
             softWrap: true,
           ),
         ),

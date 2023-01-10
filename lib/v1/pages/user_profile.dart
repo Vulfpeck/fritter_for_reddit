@@ -11,7 +11,7 @@ class UserProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder:
-          (BuildContext context, UserInformationProvider model, Widget child) {
+          (BuildContext context, UserInformationProvider model, Widget? child) {
         return Scaffold(
           body: Padding(
             padding: MediaQuery.of(context)
@@ -109,7 +109,7 @@ class UserProfileScreen extends StatelessWidget {
 class SignedInProfileContent extends StatelessWidget {
   final UserInformationProvider model;
 
-  SignedInProfileContent({@required this.model});
+  SignedInProfileContent({required this.model});
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +125,7 @@ class SignedInProfileContent extends StatelessWidget {
               ),
               CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(
-                  model.userInformation.iconImg.asSanitizedImageUrl,
+                  model.userInformation!.iconImg!.asSanitizedImageUrl,
                 ),
                 minRadius: 56,
                 maxRadius: 56,
@@ -134,10 +134,10 @@ class SignedInProfileContent extends StatelessWidget {
                 height: 24,
               ),
               Text(
-                model.userInformation.name,
+                model.userInformation!.name!,
                 style: Theme.of(context)
                     .textTheme
-                    .headline5
+                    .headline5!
                     .copyWith(fontWeight: FontWeight.w500),
               ),
               SizedBox(
@@ -159,13 +159,13 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.link,
-                            color: Theme.of(context).textTheme.subtitle2.color,
+                            color: Theme.of(context).textTheme.subtitle2!.color,
                           ),
                           SizedBox(
                             width: 8.0,
                           ),
                           Text(
-                            model.userInformation.linkKarma.toString(),
+                            model.userInformation!.linkKarma.toString(),
                             style: Theme.of(context).textTheme.headline6,
                           ),
                         ],
@@ -185,13 +185,13 @@ class SignedInProfileContent extends StatelessWidget {
                         children: <Widget>[
                           Icon(
                             Icons.chat_bubble_outline,
-                            color: Theme.of(context).textTheme.subtitle2.color,
+                            color: Theme.of(context).textTheme.subtitle2!.color,
                           ),
                           SizedBox(
                             width: 8.0,
                           ),
                           Text(
-                            model.userInformation.commentKarma.toString(),
+                            model.userInformation!.commentKarma.toString(),
                             style: Theme.of(context).textTheme.headline6,
                           ),
                         ],

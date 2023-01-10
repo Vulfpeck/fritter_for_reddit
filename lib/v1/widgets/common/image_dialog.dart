@@ -4,8 +4,8 @@ import 'package:fritter_for_reddit/v1/widgets/common/gallery_card.dart';
 
 class ImageDialog extends StatefulWidget {
   const ImageDialog({
-    Key key,
-    @required this.postFeedItem,
+    Key? key,
+    required this.postFeedItem,
   }) : super(key: key);
 
   final PostsFeedDataChild postFeedItem;
@@ -34,7 +34,7 @@ class _ImageDialogState extends State<ImageDialog> {
       height: height,
       child: AlertDialog(
         title: Text(
-          widget.postFeedItem.title,
+          widget.postFeedItem.title!,
           softWrap: true,
         ),
         content: Card(

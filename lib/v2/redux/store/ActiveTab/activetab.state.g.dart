@@ -10,10 +10,10 @@ class _$ActiveTabState extends ActiveTabState {
   @override
   final int activeTab;
 
-  factory _$ActiveTabState([void Function(ActiveTabStateBuilder) updates]) =>
+  factory _$ActiveTabState([void Function(ActiveTabStateBuilder)? updates]) =>
       (new ActiveTabStateBuilder()..update(updates))._build();
 
-  _$ActiveTabState._({this.activeTab}) : super._() {
+  _$ActiveTabState._({required this.activeTab}) : super._() {
     BuiltValueNullFieldError.checkNotNull(
         activeTab, r'ActiveTabState', 'activeTab');
   }
@@ -47,11 +47,11 @@ class _$ActiveTabState extends ActiveTabState {
 
 class ActiveTabStateBuilder
     implements Builder<ActiveTabState, ActiveTabStateBuilder> {
-  _$ActiveTabState _$v;
+  _$ActiveTabState? _$v;
 
-  int _activeTab;
-  int get activeTab => _$this._activeTab;
-  set activeTab(int activeTab) => _$this._activeTab = activeTab;
+  int? _activeTab;
+  int? get activeTab => _$this._activeTab;
+  set activeTab(int? activeTab) => _$this._activeTab = activeTab;
 
   ActiveTabStateBuilder();
 
@@ -71,7 +71,7 @@ class ActiveTabStateBuilder
   }
 
   @override
-  void update(void Function(ActiveTabStateBuilder) updates) {
+  void update(void Function(ActiveTabStateBuilder)? updates) {
     if (updates != null) updates(this);
   }
 

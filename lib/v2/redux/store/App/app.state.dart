@@ -15,8 +15,8 @@ class AppState {
         new AuthenticationState(
           (value) => value
             ..isLoading = false
-            ..isSignedIn = userRepository.tokenData.authToken != null
-            ..token = userRepository.tokenData.authToken,
+            ..isSignedIn = userRepository.tokenData?.authToken != Null
+            ..token = userRepository.tokenData?.authToken,
         ),
         ActiveTabState(
           (value) => value..activeTab = 0,

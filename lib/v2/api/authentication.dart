@@ -13,7 +13,7 @@ final authenticationStartUrl = Uri.parse(
 );
 
 class GetAuthTokenResponse {
-  final String authToken, refreshToken;
+  final String? authToken, refreshToken;
 
   GetAuthTokenResponse(this.authToken, this.refreshToken);
 }
@@ -38,8 +38,8 @@ Future<GetAuthTokenResponse> getTokensFromAccessCode(String accessCode) async {
   }
 
   Map<String, dynamic> map = json.decode(response.body);
-  final String accessToken = map['access_token'];
-  final String refreshToken = map['refresh_token'];
+  final String? accessToken = map['access_token'];
+  final String? refreshToken = map['refresh_token'];
 
   return new GetAuthTokenResponse(accessToken, refreshToken);
 }

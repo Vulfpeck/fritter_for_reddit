@@ -51,7 +51,7 @@ class _SearchPageState extends State<SearchPage> {
 
                   // subreddit headings
                   SliverList(
-                    delegate: model.subQueryResult.subreddits != null
+                    delegate: model.subQueryResult!.subreddits != null
                         ? SliverChildListDelegate(
                             [
                               Padding(
@@ -70,49 +70,48 @@ class _SearchPageState extends State<SearchPage> {
 
                   // list of relevant subreddits
                   SliverList(
-                    delegate: model.subQueryResult.subreddits != null
+                    delegate: model.subQueryResult!.subreddits != null
                         ? SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return ListTile(
                                 title: Text(
-                                  model.subQueryResult.subreddits
-                                      .elementAt(index)
-                                      .name,
+                                  model.subQueryResult!.subreddits!
+                                      .elementAt(index)!
+                                      .name!,
                                 ),
                                 leading: CircleAvatar(
-                                  backgroundImage: model
-                                                  .subQueryResult.subreddits
-                                                  .elementAt(index)
+                                  backgroundImage: (model
+                                                  .subQueryResult!.subreddits!
+                                                  .elementAt(index)!
                                                   .iconImg !=
                                               "" &&
-                                          model.subQueryResult.subreddits
-                                                  .elementAt(index)
+                                          model.subQueryResult!.subreddits!
+                                                  .elementAt(index)!
                                                   .iconImg !=
                                               null
                                       ? CachedNetworkImageProvider(model
-                                          .subQueryResult.subreddits
-                                          .elementAt(index)
-                                          .iconImg)
+                                          .subQueryResult!.subreddits!
+                                          .elementAt(index)!
+                                          .iconImg!)
                                       : AssetImage(
                                           'assets/default_icon.png',
-                                        ),
+                                        )) as ImageProvider<Object>?,
                                   backgroundColor: model
-                                              .subQueryResult.subreddits
-                                              .elementAt(index)
+                                              .subQueryResult!.subreddits!
+                                              .elementAt(index)!
                                               .keyColor !=
                                           ""
                                       ? HexColor(
                                           "#" +
-                                              model.subQueryResult.subreddits
-                                                  .elementAt(index)
-                                                  .keyColor,
+                                              model.subQueryResult!.subreddits!
+                                                  .elementAt(index)!
+                                                  .keyColor!,
                                         )
                                       : Theme.of(context).accentColor,
                                 ),
                                 onTap: () {
                                   focusNode.unfocus();
-                                  return Navigator.of(context,
-                                          rootNavigator: false)
+                                  Navigator.of(context, rootNavigator: false)
                                       .push(
                                     CupertinoPageRoute(
                                       maintainState: true,
@@ -120,8 +119,8 @@ class _SearchPageState extends State<SearchPage> {
                                       builder: (BuildContext context) =>
                                           SubredditFeedPage(
                                         subreddit: model
-                                            .subQueryResult.subreddits
-                                            .elementAt(index)
+                                            .subQueryResult!.subreddits!
+                                            .elementAt(index)!
                                             .name,
                                       ),
                                     ),
@@ -129,7 +128,8 @@ class _SearchPageState extends State<SearchPage> {
                                 },
                               );
                             },
-                            childCount: model.subQueryResult.subreddits.length,
+                            childCount:
+                                model.subQueryResult!.subreddits!.length,
                           )
                         : SliverChildListDelegate([]),
                   ),
@@ -162,7 +162,7 @@ class _SearchPageState extends State<SearchPage> {
                                 return Divider();
                               } else {
                                 final item = model
-                                    .postsQueryResult.data.children
+                                    .postsQueryResult.data!.children!
                                     .elementAt(index ~/ 2)
                                     .data;
                                 return Padding(
@@ -176,7 +176,7 @@ class _SearchPageState extends State<SearchPage> {
                                         Provider.of<CommentsProvider>(context)
                                             .fetchComments(
                                           requestingRefresh: false,
-                                          subredditName: item.subreddit,
+                                          subredditName: item!.subreddit,
                                           postId: item.id,
                                           sort: item.suggestedSort != null
                                               ? changeCommentSortConvertToEnum[
@@ -232,12 +232,13 @@ class _SearchPageState extends State<SearchPage> {
                               }
                             },
                             childCount:
-                                model.postsQueryResult.data.children.length * 2,
+                                model.postsQueryResult.data!.children!.length *
+                                    2,
                           )
                         : SliverChildListDelegate([]),
                   ),
                   SliverList(
-                    delegate: model.subQueryResult.subreddits == null &&
+                    delegate: model.subQueryResult!.subreddits == null &&
                             model.postsQueryResult.data == null
                         ? SliverChildListDelegate(
                             [
@@ -249,12 +250,12 @@ class _SearchPageState extends State<SearchPage> {
                                 Icons.search,
                                 color: Theme.of(context)
                                     .textTheme
-                                    .caption
+                                    .caption!
                                     .copyWith(
                                       color: Theme.of(context)
                                           .textTheme
-                                          .caption
-                                          .color
+                                          .caption!
+                                          .color!
                                           .withOpacity(
                                             0.3,
                                           ),
@@ -270,12 +271,12 @@ class _SearchPageState extends State<SearchPage> {
                                   "To get the results, search you must.",
                                   style: Theme.of(context)
                                       .textTheme
-                                      .caption
+                                      .caption!
                                       .copyWith(
                                         color: Theme.of(context)
                                             .textTheme
-                                            .caption
-                                            .color
+                                            .caption!
+                                            .color!
                                             .withOpacity(
                                               0.7,
                                             ),
@@ -318,7 +319,7 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class SearchBarWidget extends StatefulWidget {
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
   SearchBarWidget({this.focusNode});
   @override
@@ -351,8 +352,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               left: 16,
               right: 16,
               child: Consumer(
-                builder:
-                    (BuildContext context, SearchProvider model, Widget child) {
+                builder: (BuildContext context, SearchProvider model,
+                    Widget? child) {
                   return TextField(
                     controller: controller,
                     focusNode: widget.focusNode,

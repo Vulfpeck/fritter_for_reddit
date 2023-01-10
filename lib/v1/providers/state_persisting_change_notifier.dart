@@ -16,8 +16,8 @@ abstract class StatePersistingChangeNotifier<T extends SerializableClass>
 
   Future<bool> get initializationFuture => isInitializedCompleter.future;
 
-  Box _storage;
-  T _state;
+  late Box _storage;
+  late T _state;
 
   T get state => _state;
 
@@ -27,7 +27,7 @@ abstract class StatePersistingChangeNotifier<T extends SerializableClass>
     notifyListeners();
   }
 
-  StatePersistingChangeNotifier({String boxName}) {
+  StatePersistingChangeNotifier({String? boxName}) {
     _state = initialState;
     Hive.openBox(boxName ?? runtimeType.toString()).then((box) {
       _storage = box;
@@ -37,7 +37,7 @@ abstract class StatePersistingChangeNotifier<T extends SerializableClass>
     });
   }
 
-  T fromJson(Map json);
+  T fromJson(Map? json);
 
   @mustCallSuper
   void writeState(T state) async {

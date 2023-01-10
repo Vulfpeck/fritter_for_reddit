@@ -6,32 +6,32 @@ const _EXPIRES_AT = 'refresh_token';
 final storage = new FlutterSecureStorage();
 
 class SignedInUserTokenData {
-  final String authToken;
-  final String refreshToken;
+  final String? authToken;
+  final String? refreshToken;
   final DateTime expiresAt;
 
   SignedInUserTokenData(this.authToken, this.refreshToken, this.expiresAt);
 }
 
 class UserRepository {
-  SignedInUserTokenData _signedInUserTokenData;
+  SignedInUserTokenData? _signedInUserTokenData;
 
-  SignedInUserTokenData get tokenData => _signedInUserTokenData;
+  SignedInUserTokenData? get tokenData => _signedInUserTokenData;
 
-  UserRepository._init(SignedInUserTokenData tokenData)
+  UserRepository._init(SignedInUserTokenData? tokenData)
       : _signedInUserTokenData = tokenData;
 
   static Future<UserRepository> create() async {
-    String currentAuthToken = await storage.read(key: _AUTH_TOKEN_KEY);
-    String currentRefreshToken = await storage.read(key: _REFRESH_TOKEN_KEY);
-    String expiresAtString = await storage.read(key: _REFRESH_TOKEN_KEY);
+    String? currentAuthToken = await storage.read(key: _AUTH_TOKEN_KEY);
+    String? currentRefreshToken = await storage.read(key: _REFRESH_TOKEN_KEY);
+    String? expiresAtString = await storage.read(key: _REFRESH_TOKEN_KEY);
 
-    SignedInUserTokenData tokenData = null;
+    SignedInUserTokenData? tokenData = null;
     if (currentRefreshToken != null) {
       tokenData = SignedInUserTokenData(
         currentAuthToken,
         currentRefreshToken,
-        DateTime.parse(expiresAtString),
+        DateTime.parse(expiresAtString!),
       );
     }
 

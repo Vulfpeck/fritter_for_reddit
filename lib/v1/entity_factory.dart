@@ -4,7 +4,7 @@ import 'package:fritter_for_reddit/v1/models/subreddit_info/subreddit_informatio
 import 'package:fritter_for_reddit/v1/models/user_profile/user_information_entity.dart';
 
 class EntityFactory {
-  static T generateOBJ<T>(json) {
+  static T? generateOBJ<T>(json) {
     if (1 == 0) {
       return null;
     } else if (T.toString() == "PostsFeedEntity") {

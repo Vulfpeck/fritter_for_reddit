@@ -21,7 +21,7 @@ import 'package:fritter_for_reddit/v1/widgets/feed/feed_list_item.dart';
 import 'post_controls.dart';
 
 class SubredditFeed extends StatefulWidget {
-  final String pageTitle;
+  final String? pageTitle;
 
   SubredditFeed({this.pageTitle = ""});
 
@@ -32,7 +32,7 @@ class SubredditFeed extends StatefulWidget {
 // TODO : implement posting to subreddits
 class _SubredditFeedState extends State<SubredditFeed>
     with TickerProviderStateMixin {
-  ScrollController _controller;
+  ScrollController? _controller;
   String sortSelectorValue = "Best";
   GlobalKey key = new GlobalKey();
 
@@ -47,7 +47,7 @@ class _SubredditFeedState extends State<SubredditFeed>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -91,7 +91,7 @@ class _SubredditFeedState extends State<SubredditFeed>
                       ),
                       onSelected: (value) {
                         final RenderBox box =
-                            key.currentContext.findRenderObject();
+                            key.currentContext!.findRenderObject() as RenderBox;
                         final positionDropDown = box.localToGlobal(Offset.zero);
                         // print(
                         if (value == "Top") {
@@ -268,12 +268,12 @@ class _SubredditFeedState extends State<SubredditFeed>
                         : TransparentHexColor("#FFFFFF", "aa");
 
                 if (feedProvider.subredditInformationEntity != null &&
-                    feedProvider.subredditInformationEntity.data
+                    feedProvider.subredditInformationEntity!.data!
                             .bannerBackgroundColor !=
                         "") {
                   headerColor = TransparentHexColor(
                     feedProvider
-                        .subredditInformationEntity.data.bannerBackgroundColor,
+                        .subredditInformationEntity!.data!.bannerBackgroundColor!,
                     "50",
                   );
                 }
@@ -339,8 +339,8 @@ class _SubredditFeedState extends State<SubredditFeed>
 
 class PostCard extends StatelessWidget {
   const PostCard({
-    Key key,
-    @required this.item,
+    Key? key,
+    required this.item,
   }) : super(key: key);
 
   final PostsFeedDataChildrenData item;

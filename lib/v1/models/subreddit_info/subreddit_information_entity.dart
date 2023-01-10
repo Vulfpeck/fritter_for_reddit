@@ -1,12 +1,12 @@
 class SubredditInformationEntity {
-  SubredditInformationData data;
-  String kind;
+  SubredditInformationData? data;
+  String? kind;
 
   SubredditInformationEntity({this.data, this.kind});
 
-  factory SubredditInformationEntity.fromJson(Map json) {
+  factory SubredditInformationEntity.fromJson(Map? json) {
     if (json == null) {
-      return null;
+      return SubredditInformationEntity();
     }
     final data = json['data'] != null
         ? SubredditInformationData.fromJson(json['data'])
@@ -18,7 +18,7 @@ class SubredditInformationEntity {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     data['kind'] = this.kind;
     return data;
@@ -26,94 +26,94 @@ class SubredditInformationEntity {
 }
 
 class SubredditInformationData {
-  String userFlairPosition;
-  String publicDescription;
-  String keyColor;
-  int activeUserCount;
-  int accountsActive;
-  bool userIsBanned;
+  String? userFlairPosition;
+  String? publicDescription;
+  String? keyColor;
+  int? activeUserCount;
+  int? accountsActive;
+  bool? userIsBanned;
   dynamic submitTextLabel;
-  String userFlairTextColor;
-  bool emojisEnabled;
-  bool userIsMuted;
-  bool disableContributorRequests;
-  String publicDescriptionHtml;
+  String? userFlairTextColor;
+  bool? emojisEnabled;
+  bool? userIsMuted;
+  bool? disableContributorRequests;
+  String? publicDescriptionHtml;
   dynamic isCrosspostableSubreddit;
-  bool userIsSubscriber;
-  String whitelistStatus;
-  List<int> iconSize;
-  bool userFlairEnabledInSr;
-  String id;
-  bool showMedia;
-  double createdUtc;
-  int commentScoreHideMins;
+  bool? userIsSubscriber;
+  String? whitelistStatus;
+  List<int>? iconSize;
+  bool? userFlairEnabledInSr;
+  String? id;
+  bool? showMedia;
+  double? createdUtc;
+  int? commentScoreHideMins;
   dynamic isEnrolledInNewModmail;
-  List<SubredditInformationDataUserFlairRichtext> userFlairRichtext;
+  List<SubredditInformationDataUserFlairRichtext>? userFlairRichtext;
   dynamic headerTitle;
-  bool restrictCommenting;
-  int subscribers;
-  double created;
-  bool restrictPosting;
-  String communityIcon;
-  String displayName;
-  String primaryColor;
-  String linkFlairPosition;
-  bool linkFlairEnabled;
-  bool userIsContributor;
-  bool canAssignUserFlair;
-  String submitLinkLabel;
-  String bannerImg;
-  String userFlairCssClass;
-  String name;
-  bool allowVideogifs;
-  String userFlairType;
-  String notificationLevel;
-  String descriptionHtml;
-  bool userSrFlairEnabled;
-  int wls;
+  bool? restrictCommenting;
+  int? subscribers;
+  double? created;
+  bool? restrictPosting;
+  String? communityIcon;
+  String? displayName;
+  String? primaryColor;
+  String? linkFlairPosition;
+  bool? linkFlairEnabled;
+  bool? userIsContributor;
+  bool? canAssignUserFlair;
+  String? submitLinkLabel;
+  String? bannerImg;
+  String? userFlairCssClass;
+  String? name;
+  bool? allowVideogifs;
+  String? userFlairType;
+  String? notificationLevel;
+  String? descriptionHtml;
+  bool? userSrFlairEnabled;
+  int? wls;
   dynamic suggestedCommentSort;
-  String submitText;
-  bool userHasFavorited;
-  bool accountsActiveIsFuzzed;
-  bool allowImages;
-  bool publicTraffic;
-  String description;
-  String title;
-  String userFlairText;
-  String bannerBackgroundColor;
-  String userFlairTemplateId;
-  String displayNamePrefixed;
-  String submissionType;
-  bool spoilersEnabled;
-  bool showMediaPreview;
-  bool userSrThemeEnabled;
-  bool freeFormReports;
-  String lang;
-  bool userIsModerator;
+  String? submitText;
+  bool? userHasFavorited;
+  bool? accountsActiveIsFuzzed;
+  bool? allowImages;
+  bool? publicTraffic;
+  String? description;
+  String? title;
+  String? userFlairText;
+  String? bannerBackgroundColor;
+  String? userFlairTemplateId;
+  String? displayNamePrefixed;
+  String? submissionType;
+  bool? spoilersEnabled;
+  bool? showMediaPreview;
+  bool? userSrThemeEnabled;
+  bool? freeFormReports;
+  String? lang;
+  bool? userIsModerator;
   dynamic userFlairBackgroundColor;
-  bool allowDiscovery;
-  String bannerBackgroundImage;
-  String subredditType;
-  bool over18;
+  bool? allowDiscovery;
+  String? bannerBackgroundImage;
+  String? subredditType;
+  bool? over18;
   dynamic bannerSize;
   dynamic headerSize;
-  bool collapseDeletedComments;
-  String advertiserCategory;
-  bool hasMenuWidget;
-  bool originalContentTagEnabled;
-  bool allOriginalContent;
-  String url;
-  String mobileBannerImage;
-  bool userCanFlairInSr;
-  bool allowVideos;
+  bool? collapseDeletedComments;
+  String? advertiserCategory;
+  bool? hasMenuWidget;
+  bool? originalContentTagEnabled;
+  bool? allOriginalContent;
+  String? url;
+  String? mobileBannerImage;
+  bool? userCanFlairInSr;
+  bool? allowVideos;
   dynamic headerImg;
-  String iconImg;
-  String submitTextHtml;
-  bool wikiEnabled;
-  bool quarantine;
-  bool hideAds;
+  String? iconImg;
+  String? submitTextHtml;
+  bool? wikiEnabled;
+  bool? quarantine;
+  bool? hideAds;
   dynamic emojisCustomSize;
-  bool canAssignLinkFlair;
+  bool? canAssignLinkFlair;
 
   SubredditInformationData(
       {this.userFlairPosition,
@@ -229,9 +229,9 @@ class SubredditInformationData {
     commentScoreHideMins = json['comment_score_hide_mins'];
     isEnrolledInNewModmail = json['is_enrolled_in_new_modmail'];
     if (json['user_flair_richtext'] != null) {
-      userFlairRichtext = new List<SubredditInformationDataUserFlairRichtext>();
+      userFlairRichtext = <SubredditInformationDataUserFlairRichtext>[];
       (json['user_flair_richtext'] as List).forEach((v) {
-        userFlairRichtext
+        userFlairRichtext!
             .add(new SubredditInformationDataUserFlairRichtext.fromJson(v));
       });
     }
@@ -328,7 +328,7 @@ class SubredditInformationData {
     data['is_enrolled_in_new_modmail'] = this.isEnrolledInNewModmail;
     if (this.userFlairRichtext != null) {
       data['user_flair_richtext'] =
-          this.userFlairRichtext.map((v) => v.toJson()).toList();
+          this.userFlairRichtext!.map((v) => v.toJson()).toList();
     }
     data['header_title'] = this.headerTitle;
     data['restrict_commenting'] = this.restrictCommenting;
@@ -400,8 +400,8 @@ class SubredditInformationData {
 }
 
 class SubredditInformationDataUserFlairRichtext {
-  String t;
-  String e;
+  String? t;
+  String? e;
 
   SubredditInformationDataUserFlairRichtext({this.t, this.e});
 

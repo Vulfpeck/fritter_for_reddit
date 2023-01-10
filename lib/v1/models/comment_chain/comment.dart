@@ -11,8 +11,8 @@ String commentToJson(List<Comment> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toMap())));
 
 class Comment {
-  String kind;
-  CommentData data;
+  String? kind;
+  CommentData? data;
 
   Comment({
     this.kind,
@@ -26,14 +26,14 @@ class Comment {
 
   Map<String, dynamic> toMap() => {
         "kind": kind,
-        "data": data.toMap(),
+        "data": data!.toMap(),
       };
 }
 
 class CommentData {
-  String modhash;
-  int dist;
-  List<Child> children;
+  String? modhash;
+  int? dist;
+  List<Child>? children;
   dynamic after;
   dynamic before;
 
@@ -57,15 +57,15 @@ class CommentData {
   Map<String, dynamic> toMap() => {
         "modhash": modhash,
         "dist": dist == null ? null : dist,
-        "children": List<dynamic>.from(children.map((x) => x.toMap())),
+        "children": List<dynamic>.from(children!.map((x) => x.toMap())),
         "after": after,
         "before": before,
       };
 }
 
 class Child {
-  Kind kind;
-  ChildData data;
+  Kind? kind;
+  ChildData? data;
 
   Child({
     this.kind,
@@ -78,130 +78,130 @@ class Child {
       );
 
   Map<String, dynamic> toMap() => {
-        "kind": kindValues.reverse[kind],
-        "data": data.toMap(),
+        "kind": kindValues.reverse![kind],
+        "data": data!.toMap(),
       };
 }
 
 class ChildData {
   dynamic approvedAtUtc;
-  String subreddit;
-  String selftext;
-  List<dynamic> userReports;
-  bool saved;
+  String? subreddit;
+  String? selftext;
+  List<dynamic>? userReports;
+  bool? saved;
   dynamic modReasonTitle;
-  int gilded;
-  bool clicked;
-  String title;
+  int? gilded;
+  bool? clicked;
+  String? title;
   bool collapse = false;
   bool collapseParent = false;
-  List<dynamic> linkFlairRichtext;
-  String subredditNamePrefixed;
-  bool hidden;
-  int pwls;
+  List<dynamic>? linkFlairRichtext;
+  String? subredditNamePrefixed;
+  bool? hidden;
+  int? pwls;
   dynamic linkFlairCssClass;
-  int downs;
-  int thumbnailHeight;
-  String parentWhitelistStatus;
-  bool hideScore;
-  String name;
-  bool quarantine;
-  String linkFlairTextColor;
+  int? downs;
+  int? thumbnailHeight;
+  String? parentWhitelistStatus;
+  bool? hideScore;
+  String? name;
+  bool? quarantine;
+  String? linkFlairTextColor;
   dynamic upvoteRatio;
-  String authorFlairBackgroundColor;
-  String subredditType;
-  int ups;
-  int totalAwardsReceived;
+  String? authorFlairBackgroundColor;
+  String? subredditType;
+  int? ups;
+  int? totalAwardsReceived;
   dynamic mediaEmbed;
-  int thumbnailWidth;
-  String authorFlairTemplateId;
-  bool isOriginalContent;
-  String authorFullname;
+  int? thumbnailWidth;
+  String? authorFlairTemplateId;
+  bool? isOriginalContent;
+  String? authorFullname;
   dynamic secureMedia;
-  bool isRedditMediaDomain;
-  bool isMeta;
+  bool? isRedditMediaDomain;
+  bool? isMeta;
   dynamic category;
-  Gildings secureMediaEmbed;
+  Gildings? secureMediaEmbed;
   dynamic linkFlairText;
-  bool canModPost;
-  int numDuplicates;
+  bool? canModPost;
+  int? numDuplicates;
   dynamic approvedBy;
-  String thumbnail;
+  String? thumbnail;
   dynamic edited;
-  String authorFlairCssClass;
-  List<dynamic> stewardReports;
-  List<dynamic> authorFlairRichtext;
-  Gildings gildings;
-  String postHint;
+  String? authorFlairCssClass;
+  List<dynamic>? stewardReports;
+  List<dynamic>? authorFlairRichtext;
+  Gildings? gildings;
+  String? postHint;
   dynamic contentCategories;
-  bool isSelf;
+  bool? isSelf;
   dynamic modNote;
   dynamic created;
-  String linkFlairType;
-  int wls;
+  String? linkFlairType;
+  int? wls;
   dynamic bannedBy;
-  String authorFlairType;
-  String domain;
-  bool allowLiveComments;
+  String? authorFlairType;
+  String? domain;
+  bool? allowLiveComments;
   dynamic selftextHtml;
   dynamic likes;
   dynamic suggestedSort;
   dynamic bannedAtUtc;
   dynamic viewCount;
-  bool archived;
-  int score;
-  bool noFollow;
-  bool isCrosspostable;
-  bool pinned;
-  bool over18;
-  Preview preview;
-  List<dynamic> allAwardings;
-  List<dynamic> awarders;
-  bool mediaOnly;
-  bool canGild;
-  bool spoiler;
-  bool locked;
-  String authorFlairText;
-  bool visited;
+  bool? archived;
+  int? score;
+  bool? noFollow;
+  bool? isCrosspostable;
+  bool? pinned;
+  bool? over18;
+  Preview? preview;
+  List<dynamic>? allAwardings;
+  List<dynamic>? awarders;
+  bool? mediaOnly;
+  bool? canGild;
+  bool? spoiler;
+  bool? locked;
+  String? authorFlairText;
+  bool? visited;
   dynamic numReports;
   dynamic distinguished;
-  String subredditId;
+  String? subredditId;
   dynamic modReasonBy;
   dynamic removalReason;
-  String linkFlairBackgroundColor;
-  String id;
-  bool isRobotIndexable;
+  String? linkFlairBackgroundColor;
+  String? id;
+  bool? isRobotIndexable;
   dynamic reportReasons;
-  String author;
+  String? author;
   dynamic discussionType;
-  int numComments;
-  bool sendReplies;
+  int? numComments;
+  bool? sendReplies;
   dynamic media;
-  bool contestMode;
-  bool authorPatreonFlair;
-  String authorFlairTextColor;
-  String permalink;
-  String whitelistStatus;
-  bool stickied;
-  String url;
-  int subredditSubscribers;
+  bool? contestMode;
+  bool? authorPatreonFlair;
+  String? authorFlairTextColor;
+  String? permalink;
+  String? whitelistStatus;
+  bool? stickied;
+  String? url;
+  int? subredditSubscribers;
   dynamic createdUtc;
-  int numCrossposts;
-  List<dynamic> modReports;
-  bool isVideo;
-  String linkId;
-  String replies;
-  String parentId;
-  String body;
-  bool isSubmitter;
-  String bodyHtml;
+  int? numCrossposts;
+  List<dynamic>? modReports;
+  bool? isVideo;
+  String? linkId;
+  String? replies;
+  String? parentId;
+  String? body;
+  bool? isSubmitter;
+  String? bodyHtml;
   dynamic collapsedReason;
-  bool scoreHidden;
-  bool collapsed;
-  int controversiality;
-  int depth;
-  int count;
-  List<String> children;
+  bool? scoreHidden;
+  bool? collapsed;
+  int? controversiality;
+  int? depth;
+  int? count;
+  List<String>? children;
 
   ChildData({
     this.approvedAtUtc,
@@ -515,7 +515,7 @@ class ChildData {
         "selftext": selftext == null ? null : selftext,
         "user_reports": userReports == null
             ? null
-            : List<dynamic>.from(userReports.map((x) => x)),
+            : List<dynamic>.from(userReports!.map((x) => x)),
         "saved": saved == null ? null : saved,
         "mod_reason_title": modReasonTitle,
         "gilded": gilded == null ? null : gilded,
@@ -523,7 +523,7 @@ class ChildData {
         "title": title == null ? null : title,
         "link_flair_richtext": linkFlairRichtext == null
             ? null
-            : List<dynamic>.from(linkFlairRichtext.map((x) => x)),
+            : List<dynamic>.from(linkFlairRichtext!.map((x) => x)),
         "subreddit_name_prefixed":
             subredditNamePrefixed == null ? null : subredditNamePrefixed,
         "hidden": hidden == null ? null : hidden,
@@ -559,7 +559,7 @@ class ChildData {
         "is_meta": isMeta == null ? null : isMeta,
         "category": category,
         "secure_media_embed":
-            secureMediaEmbed == null ? null : secureMediaEmbed.toMap(),
+            secureMediaEmbed == null ? null : secureMediaEmbed!.toMap(),
         "link_flair_text": linkFlairText,
         "can_mod_post": canModPost == null ? null : canModPost,
         "num_duplicates": numDuplicates == null ? null : numDuplicates,
@@ -570,11 +570,11 @@ class ChildData {
             authorFlairCssClass == null ? null : authorFlairCssClass,
         "steward_reports": stewardReports == null
             ? null
-            : List<dynamic>.from(stewardReports.map((x) => x)),
+            : List<dynamic>.from(stewardReports!.map((x) => x)),
         "author_flair_richtext": authorFlairRichtext == null
             ? null
-            : List<dynamic>.from(authorFlairRichtext.map((x) => x)),
-        "gildings": gildings == null ? null : gildings.toMap(),
+            : List<dynamic>.from(authorFlairRichtext!.map((x) => x)),
+        "gildings": gildings == null ? null : gildings!.toMap(),
         "post_hint": postHint == null ? null : postHint,
         "content_categories": contentCategories,
         "is_self": isSelf == null ? null : isSelf,
@@ -598,13 +598,13 @@ class ChildData {
         "is_crosspostable": isCrosspostable == null ? null : isCrosspostable,
         "pinned": pinned == null ? null : pinned,
         "over_18": over18 == null ? null : over18,
-        "preview": preview == null ? null : preview.toMap(),
+        "preview": preview == null ? null : preview!.toMap(),
         "all_awardings": allAwardings == null
             ? null
-            : List<dynamic>.from(allAwardings.map((x) => x)),
+            : List<dynamic>.from(allAwardings!.map((x) => x)),
         "awarders": awarders == null
             ? null
-            : List<dynamic>.from(awarders.map((x) => x)),
+            : List<dynamic>.from(awarders!.map((x) => x)),
         "media_only": mediaOnly == null ? null : mediaOnly,
         "can_gild": canGild == null ? null : canGild,
         "spoiler": spoiler == null ? null : spoiler,
@@ -642,7 +642,7 @@ class ChildData {
         "num_crossposts": numCrossposts == null ? null : numCrossposts,
         "mod_reports": modReports == null
             ? null
-            : List<dynamic>.from(modReports.map((x) => x)),
+            : List<dynamic>.from(modReports!.map((x) => x)),
         "is_video": isVideo == null ? null : isVideo,
         "link_id": linkId == null ? null : linkId,
         "replies": replies == null ? null : replies,
@@ -658,21 +658,21 @@ class ChildData {
         "count": count == null ? null : count,
         "children": children == null
             ? null
-            : List<dynamic>.from(children.map((x) => x)),
+            : List<dynamic>.from(children!.map((x) => x)),
       };
 }
 
 class Gildings {
   Gildings();
 
-  factory Gildings.fromMap(Map json) => Gildings();
+  factory Gildings.fromMap(Map? json) => Gildings();
 
   Map<String, dynamic> toMap() => {};
 }
 
 class Preview {
-  List<Image> images;
-  bool enabled;
+  List<Image>? images;
+  bool? enabled;
 
   Preview({
     this.images,
@@ -685,16 +685,16 @@ class Preview {
       );
 
   Map<String, dynamic> toMap() => {
-        "images": List<dynamic>.from(images.map((x) => x.toMap())),
+        "images": List<dynamic>.from(images!.map((x) => x.toMap())),
         "enabled": enabled,
       };
 }
 
 class Image {
-  Source source;
-  List<Source> resolutions;
-  Gildings variants;
-  String id;
+  Source? source;
+  List<Source>? resolutions;
+  Gildings? variants;
+  String? id;
 
   Image({
     this.source,
@@ -712,17 +712,17 @@ class Image {
       );
 
   Map<String, dynamic> toMap() => {
-        "source": source.toMap(),
-        "resolutions": List<dynamic>.from(resolutions.map((x) => x.toMap())),
-        "variants": variants.toMap(),
+        "source": source!.toMap(),
+        "resolutions": List<dynamic>.from(resolutions!.map((x) => x.toMap())),
+        "variants": variants!.toMap(),
         "id": id,
       };
 }
 
 class Source {
-  String url;
-  int width;
-  int height;
+  String? url;
+  int? width;
+  int? height;
 
   Source({
     this.url,
@@ -750,11 +750,11 @@ final kindValues =
 
 class EnumValues<T> {
   Map<String, T> map;
-  Map<T, String> reverseMap;
+  Map<T, String>? reverseMap;
 
   EnumValues(this.map);
 
-  Map<T, String> get reverse {
+  Map<T, String>? get reverse {
     if (reverseMap == null) {
       reverseMap = map.map((k, v) => new MapEntry(v, k));
     }

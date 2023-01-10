@@ -17,8 +17,8 @@ class PostsFeedEntityAdapter extends TypeAdapter<PostsFeedEntity> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PostsFeedEntity(
-      data: fields[0] as PostsFeedData,
-      kind: fields[1] as String,
+      data: fields[0] as PostsFeedData?,
+      kind: fields[1] as String?,
     );
   }
 
@@ -55,10 +55,10 @@ class PostsFeedDataAdapter extends TypeAdapter<PostsFeedData> {
     };
     return PostsFeedData(
       modhash: fields[0] as dynamic,
-      children: (fields[1] as List)?.cast<PostsFeedDataChild>(),
-      before: fields[2] as String,
-      dist: fields[3] as int,
-      after: fields[4] as String,
+      children: (fields[1] as List?)?.cast<PostsFeedDataChild>(),
+      before: fields[2] as String?,
+      dist: fields[3] as int?,
+      after: fields[4] as String?,
     );
   }
 
@@ -100,8 +100,8 @@ class PostsFeedDataChildAdapter extends TypeAdapter<PostsFeedDataChild> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PostsFeedDataChild(
-      data: fields[0] as PostsFeedDataChildrenData,
-      kind: fields[1] as String,
+      data: fields[0] as PostsFeedDataChildrenData?,
+      kind: fields[1] as String?,
     );
   }
 

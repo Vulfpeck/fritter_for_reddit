@@ -8,11 +8,11 @@ class DesktopMainSubredditTile extends StatelessWidget {
   final Function(String subreddit) onTap;
 
   const DesktopMainSubredditTile({
-    Key key,
-    @required this.subreddit,
-    @required this.title,
-    @required this.description,
-    @required this.onTap,
+    Key? key,
+    required this.subreddit,
+    required this.title,
+    required this.description,
+    required this.onTap,
   }) : super(key: key);
 
   @override

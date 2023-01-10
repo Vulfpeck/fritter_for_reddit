@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fritter_for_reddit/v1/widgets/feed/subreddit_feed.dart';
 
 class SubredditFeedPage extends StatefulWidget {
-  final String subreddit;
+  final String? subreddit;
   final bool frontPageLoad;
   SubredditFeedPage({this.subreddit = "", this.frontPageLoad = false});
 

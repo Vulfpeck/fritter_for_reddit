@@ -10,11 +10,11 @@ import 'package:fritter_for_reddit/v1/widgets/subreddit_aware_text.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class SubredditSidePanel extends StatelessWidget {
-  final SubredditInformationEntity subredditInformation;
+  final SubredditInformationEntity? subredditInformation;
 
   const SubredditSidePanel({
-    Key key,
-    @required this.subredditInformation,
+    Key? key,
+    required this.subredditInformation,
   }) : super(key: key);
 
   @override
@@ -27,12 +27,12 @@ class SubredditSidePanel extends StatelessWidget {
 //        shrinkWrap: true,
           children: <Widget>[
             AboutCommunity(
-              subredditName: subredditInformation.data.displayName,
-              activeUserAccounts: subredditInformation.data.activeUserCount,
-              description: subredditInformation.data.description,
-              isNsfw: subredditInformation.data.over18,
+              subredditName: subredditInformation!.data!.displayName,
+              activeUserAccounts: subredditInformation!.data!.activeUserCount,
+              description: subredditInformation!.data!.description,
+              isNsfw: subredditInformation!.data!.over18,
               createdDate: DateTime.fromMillisecondsSinceEpoch(
-                  subredditInformation.data.createdUtc.toInt() * 1000,
+                  subredditInformation!.data!.createdUtc!.toInt() * 1000,
                   isUtc: true),
             ),
             Divider()
@@ -45,7 +45,7 @@ class SubredditSidePanel extends StatelessWidget {
 
 class PopularSubsSidePanelList extends StatelessWidget {
   const PopularSubsSidePanelList({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -53,7 +53,7 @@ class PopularSubsSidePanelList extends StatelessWidget {
     return FutureBuilder(
       future: FeedProvider.of(context).fetchPopularSubreddits(),
       builder: (BuildContext context,
-          AsyncSnapshot<List<SubredditInformationEntity>> snapshot) {
+          AsyncSnapshot<List<SubredditInformationEntity>?> snapshot) {
         if (!snapshot.hasData) {
           return Text('Loading');
         } else {
@@ -65,14 +65,14 @@ class PopularSubsSidePanelList extends StatelessWidget {
                   middle: Text(
                     'Popular Subreddits',
                     style:
-                        Theme.of(context).primaryTextTheme.bodyText1.copyWith(),
+                        Theme.of(context).primaryTextTheme.bodyText1!.copyWith(),
                   ),
                   automaticallyImplyLeading: false,
                   backgroundColor: Theme.of(context).secondaryHeaderColor,
                 ),
                 content: Column(
                   children: <Widget>[
-                    for (final subreddit in snapshot.data)
+                    for (final subreddit in snapshot.data!)
                       DesktopSubredditDrawerTile.fromSubredditInformationEntity(
                         subreddit: subreddit,
                       )
@@ -88,19 +88,19 @@ class PopularSubsSidePanelList extends StatelessWidget {
 }
 
 class AboutCommunity extends StatelessWidget {
-  final String subredditName;
-  final int activeUserAccounts;
-  final String description;
-  final bool isNsfw;
+  final String? subredditName;
+  final int? activeUserAccounts;
+  final String? description;
+  final bool? isNsfw;
   final DateTime createdDate;
 
   const AboutCommunity({
-    Key key,
-    @required this.activeUserAccounts,
-    @required this.description,
-    @required this.isNsfw,
-    @required this.createdDate,
-    @required this.subredditName,
+    Key? key,
+    required this.activeUserAccounts,
+    required this.description,
+    required this.isNsfw,
+    required this.createdDate,
+    required this.subredditName,
   }) : super(key: key);
 
   @override
@@ -110,7 +110,7 @@ class AboutCommunity extends StatelessWidget {
         CupertinoNavigationBar(
           middle: Text(
             'About Community',
-            style: Theme.of(context).primaryTextTheme.bodyText1.copyWith(),
+            style: Theme.of(context).primaryTextTheme.bodyText1!.copyWith(),
           ),
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).secondaryHeaderColor,
@@ -152,7 +152,7 @@ class AboutCommunity extends StatelessWidget {
     ErrorWidget.builder = (error) => PopularSubsSidePanelList();
     Future.delayed(Duration(milliseconds: 100))
         .then((value) => ErrorWidget.builder = oldErrorWidgetBuilder);
-    String sanitizedData = description
+    String sanitizedData = description!
         .htmlUnescaped.withSubredditLinksAsMarkdownLinks
         .cleanupMarkdown();
     return Markdown(

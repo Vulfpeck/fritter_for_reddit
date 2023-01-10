@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BlurredSliverAppBar extends StatelessWidget {
-  final String title;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +21,13 @@ class BlurredSliverAppBar extends StatelessWidget {
 class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   /// This is required to calculate the height of the bar
   ///
-  final EdgeInsets safeAreaPadding;
+  final EdgeInsets? safeAreaPadding;
 
-  final String title;
+  final String? title;
   _BlurredSliverAppBarDelegate({this.safeAreaPadding, this.title});
 
   @override
-  double get minExtent => safeAreaPadding.top;
+  double get minExtent => safeAreaPadding!.top;
 
   @override
   double get maxExtent => minExtent + kToolbarHeight;
@@ -37,7 +37,7 @@ class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       // Don't wrap this in any SafeArea widgets, use padding instead
-      padding: EdgeInsets.only(top: safeAreaPadding.top),
+      padding: EdgeInsets.only(top: safeAreaPadding!.top),
       height: maxExtent,
       color: Theme.of(context).cardColor.withOpacity(0.8),
       // Use Stack and Positioned to create the toolbar slide up effect when scrolled up
@@ -55,7 +55,7 @@ class _BlurredSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               iconTheme: Theme.of(context).iconTheme,
               backgroundColor: Colors.transparent,
               title: Text(
-                title,
+                title!,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),

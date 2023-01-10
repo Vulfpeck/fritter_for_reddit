@@ -1,7 +1,7 @@
 import 'package:fritter_for_reddit/v1/models/subreddits/children.dart';
 
 class SubredditsSubscribed {
-  final String kind;
+  final String? kind;
   final Children data;
 
   SubredditsSubscribed.fromJsonMap(Map<String, dynamic> map)

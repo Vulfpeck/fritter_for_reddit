@@ -9,9 +9,9 @@ import 'package:html_unescape/html_unescape.dart';
 import 'comment_list_item.dart';
 
 class DesktopCommentsScreen extends StatelessWidget {
-  final PostsFeedDataChildrenData postData;
+  final PostsFeedDataChildrenData? postData;
   static final _unescape = HtmlUnescape();
-  DesktopCommentsScreen({@required this.postData});
+  DesktopCommentsScreen({required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +44,17 @@ class DesktopCommentsScreen extends StatelessWidget {
                             color: Theme.of(context).cardColor,
                             child: InkWell(
                               onTap: () {
-                                if (postData.isTextPost == false) {
+                                if (postData!.isTextPost == false) {
                                   launchURL(Theme.of(context).primaryColor,
-                                      postData.url);
+                                      postData!.url);
                                 }
                               },
                               child: FeedCard(postData),
                             ),
                           ),
-                          postData.isTextPost && postData.selftextHtml != null
+                          postData!.isTextPost! && postData!.selftextHtml != null
                               ? FeedCardBodySelfText(
-                                  selftextHtml: postData.selftextHtml,
+                                  selftextHtml: postData!.selftextHtml,
                                 )
                               : Container(),
                           PostControls(
@@ -82,8 +82,8 @@ class DesktopCommentsScreen extends StatelessWidget {
                               ),
                             ],
                           )
-                        : model.commentsMap[postData.id] == null ||
-                                model.commentsMap[postData.id].length == 0
+                        : model.commentsMap[postData!.id] == null ||
+                                model.commentsMap[postData!.id]!.length == 0
                             ? SliverChildListDelegate(
                                 <Widget>[
                                   SizedBox(
@@ -103,7 +103,7 @@ class DesktopCommentsScreen extends StatelessWidget {
                             : SliverChildBuilderDelegate(
                                 (BuildContext context, int index) {
                                   var commentItem =
-                                      model.commentsMap[postData.id].elementAt(
+                                      model.commentsMap[postData!.id]!.elementAt(
                                     (index),
                                   );
 //                                String _htmlContent = _unescape
@@ -123,8 +123,8 @@ class DesktopCommentsScreen extends StatelessWidget {
 //                                );
                                   return CommentItem(
                                     commentItem,
-                                    postData.name,
-                                    postData.id,
+                                    postData!.name,
+                                    postData!.id,
                                     index,
                                   );
 //                                return ListTile(
@@ -171,7 +171,7 @@ class DesktopCommentsScreen extends StatelessWidget {
 //                                );
                                 },
                                 childCount:
-                                    model.commentsMap[postData.id].length,
+                                    model.commentsMap[postData!.id]!.length,
                               ),
 //
                   ),

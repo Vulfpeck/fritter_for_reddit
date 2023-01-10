@@ -20,7 +20,7 @@ class LeftDrawer extends StatefulWidget {
   final bool firstLaunch;
   final Mode mode;
 
-  LeftDrawer({this.firstLaunch = false, @required this.mode});
+  LeftDrawer({this.firstLaunch = false, required this.mode});
 
   @override
   _LeftDrawerState createState() => _LeftDrawerState();
@@ -111,8 +111,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 ),
                 if (model.userInformation != null)
                   ProfileListTile(
-                    name: model.userInformation.name,
-                    imageUrl: model.userInformation.iconImg,
+                    name: model.userInformation!.name,
+                    imageUrl: model.userInformation!.iconImg,
                   ),
               ],
             ),
@@ -125,7 +125,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
 class SubredditSearch extends StatefulWidget {
   const SubredditSearch({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -133,8 +133,8 @@ class SubredditSearch extends StatefulWidget {
 }
 
 class _SubredditSearchState extends State<SubredditSearch> {
-  BehaviorSubject<SearchSubredditsRepoEntity> subredditResultsStream =
-      BehaviorSubject<SearchSubredditsRepoEntity>();
+  BehaviorSubject<SearchSubredditsRepoEntity?> subredditResultsStream =
+      BehaviorSubject<SearchSubredditsRepoEntity?>();
 
   @override
   void dispose() {
@@ -144,7 +144,7 @@ class _SubredditSearchState extends State<SubredditSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return FilteredDropdownSearch<SubredditSearchResultEntry>(
+    return FilteredDropdownSearch<SubredditSearchResultEntry?>(
       onChanged: (value) async {
         final queryResult =
             await SearchProvider.of(context).searchSubreddits(query: value);
@@ -154,15 +154,15 @@ class _SubredditSearchState extends State<SubredditSearch> {
       asSliver: true,
       options: subredditResultsStream.value?.subreddits ?? [],
       itemBuilder:
-          (BuildContext context, SubredditSearchResultEntry subreddit) {
+          (BuildContext context, SubredditSearchResultEntry? subreddit) {
         return ListTile(
           dense: true,
-          leading: subreddit.iconImg?.isNotEmpty ?? false
+          leading: subreddit!.iconImg?.isNotEmpty ?? false
               ? CircleAvatarImage(imageUrl: subreddit.iconImg)
               : CircleAvatar(
-                  child: Text(subreddit.name[0]),
+                  child: Text(subreddit.name![0]),
                 ),
-          title: Text(subreddit.name),
+          title: Text(subreddit.name!),
         );
       },
       verticalOffset: 20,
@@ -174,9 +174,9 @@ class SubredditDrawerTile extends StatelessWidget {
   final SubredditListChild child;
 
   const SubredditDrawerTile({
-    Key key,
-    @required this.focusNode,
-    @required this.child,
+    Key? key,
+    required this.focusNode,
+    required this.child,
   }) : super(key: key);
 
   final FocusNode focusNode;
@@ -186,14 +186,14 @@ class SubredditDrawerTile extends StatelessWidget {
     return ListTile(
       dense: true,
       title: Text(
-        child.display_name,
+        child.display_name!,
         style: Theme.of(context).textTheme.subtitle1,
       ),
       leading: UserAvatar(user: child),
       onTap: () {
-        FeedProvider.of(context).navigateToSubreddit(child.display_name);
+        FeedProvider.of(context).navigateToSubreddit(child.display_name!);
         focusNode.unfocus();
-        return Navigator.of(
+        Navigator.of(
           context,
           rootNavigator: false,
         ).push(
@@ -211,8 +211,8 @@ class SubredditDrawerTile extends StatelessWidget {
 
 class UserAvatar extends StatelessWidget {
   const UserAvatar({
-    Key key,
-    @required this.user,
+    Key? key,
+    required this.user,
   }) : super(key: key);
 
   final SubredditListChild user;
@@ -222,20 +222,21 @@ class UserAvatar extends StatelessWidget {
     return CircleAvatar(
       maxRadius: 16,
       backgroundImage: user.community_icon != ""
-          ? CachedNetworkImageProvider(user.community_icon.asSanitizedImageUrl,
+          ? CachedNetworkImageProvider(user.community_icon!.asSanitizedImageUrl,
               errorListener: () {
               debugger();
             })
-          : user.icon_img != ""
-              ? CachedNetworkImageProvider(user.icon_img.asSanitizedImageUrl,
-                  errorListener: () {
-                  debugger();
-                })
-              : AssetImage('assets/default_icon.png'),
+          : (user.icon_img != ""
+                  ? CachedNetworkImageProvider(
+                      user.icon_img!.asSanitizedImageUrl, errorListener: () {
+                      debugger();
+                    })
+                  : AssetImage('assets/default_icon.png'))
+              as ImageProvider<Object>?,
       backgroundColor: user.primary_color == ""
           ? Theme.of(context).accentColor
           : HexColor(
-              user.primary_color,
+              user.primary_color!,
             ),
     );
   }
@@ -286,8 +287,8 @@ class Login extends StatelessWidget {
               ),
               Text(
                 "Hello 🥳",
-                style: Theme.of(context).textTheme.headline4.copyWith(
-                      color: Theme.of(context).textTheme.headline6.color,
+                style: Theme.of(context).textTheme.headline4!.copyWith(
+                      color: Theme.of(context).textTheme.headline6!.color,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -333,13 +334,13 @@ class Login extends StatelessWidget {
 }
 
 class ProfileListTile extends StatelessWidget {
-  final String imageUrl;
-  final String name;
+  final String? imageUrl;
+  final String? name;
 
   const ProfileListTile({
-    Key key,
-    @required this.imageUrl,
-    @required this.name,
+    Key? key,
+    required this.imageUrl,
+    required this.name,
   }) : super(key: key);
 
   @override
@@ -351,11 +352,11 @@ class ProfileListTile extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: 50),
           child: CircleAvatar(
             backgroundImage: CachedNetworkImageProvider(
-              imageUrl.asSanitizedImageUrl,
+              imageUrl!.asSanitizedImageUrl,
             ),
           ),
         ),
-        title: Text(name),
+        title: Text(name!),
         children: <Widget>[
           ListTile(
             title: Text('Logout'),

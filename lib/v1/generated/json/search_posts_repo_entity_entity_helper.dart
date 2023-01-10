@@ -27,9 +27,9 @@ searchPostsRepoEntityDataFromJson(
       : null;
   data.modhash = json['modhash']?.toString();
   if (json['children'] != null) {
-    data.children = new List<SearchPostsRepoEntityDatachild>();
+    data.children = <SearchPostsRepoEntityDatachild?>[];
     (json['children'] as List).forEach((v) {
-      data.children.add(new SearchPostsRepoEntityDatachild().fromJson(v));
+      data.children!.add(new SearchPostsRepoEntityDatachild().fromJson(v));
     });
   }
   data.before = json['before'];
@@ -46,14 +46,14 @@ Map<String, dynamic> searchPostsRepoEntityDataToJson(
   }
   data['modhash'] = entity.modhash;
   if (entity.children != null) {
-    data['children'] = entity.children.map((v) => v.toJson()).toList();
+    data['children'] = entity.children!.map((v) => v!.toJson()).toList();
   }
   data['before'] = entity.before;
   return data;
 }
 
 searchPostsRepoEntityDataFacetsFromJson(
-    SearchPostsRepoEntityDataFacets data, Map<String, dynamic> json) {
+    SearchPostsRepoEntityDataFacets data, Map<String, dynamic>? json) {
   return data;
 }
 
@@ -94,8 +94,8 @@ searchPostsRepoEntityDataChildrenDataFromJson(
   data.clicked = json['clicked'];
   data.title = json['title']?.toString();
   if (json['link_flair_richtext'] != null) {
-    data.linkFlairRichtext = new List<dynamic>();
-    data.linkFlairRichtext.addAll(json['link_flair_richtext']);
+    data.linkFlairRichtext = <dynamic>[];
+    data.linkFlairRichtext!.addAll(json['link_flair_richtext']);
   }
   data.subredditNamePrefixed = json['subreddit_name_prefixed']?.toString();
   data.hidden = json['hidden'];
@@ -119,8 +119,8 @@ searchPostsRepoEntityDataChildrenDataFromJson(
   data.authorFlairTemplateId = json['author_flair_template_id'];
   data.isOriginalContent = json['is_original_content'];
   if (json['user_reports'] != null) {
-    data.userReports = new List<dynamic>();
-    data.userReports.addAll(json['user_reports']);
+    data.userReports = <dynamic>[];
+    data.userReports!.addAll(json['user_reports']);
   }
   data.secureMedia = json['secure_media'];
   data.isRedditMediaDomain = json['is_reddit_media_domain'];
@@ -139,12 +139,12 @@ searchPostsRepoEntityDataChildrenDataFromJson(
   data.edited = json['edited'];
   data.authorFlairCssClass = json['author_flair_css_class'];
   if (json['steward_reports'] != null) {
-    data.stewardReports = new List<dynamic>();
-    data.stewardReports.addAll(json['steward_reports']);
+    data.stewardReports = <dynamic>[];
+    data.stewardReports!.addAll(json['steward_reports']);
   }
   if (json['author_flair_richtext'] != null) {
-    data.authorFlairRichtext = new List<dynamic>();
-    data.authorFlairRichtext.addAll(json['author_flair_richtext']);
+    data.authorFlairRichtext = <dynamic>[];
+    data.authorFlairRichtext!.addAll(json['author_flair_richtext']);
   }
   data.gildings = json['gildings'] != null
       ? new SearchPostsRepoEntityDataChildrenDataGildings()
@@ -177,12 +177,12 @@ searchPostsRepoEntityDataChildrenDataFromJson(
           .fromJson(json['preview'])
       : null;
   if (json['all_awardings'] != null) {
-    data.allAwardings = new List<dynamic>();
-    data.allAwardings.addAll(json['all_awardings']);
+    data.allAwardings = <dynamic>[];
+    data.allAwardings!.addAll(json['all_awardings']);
   }
   if (json['awarders'] != null) {
-    data.awarders = new List<dynamic>();
-    data.awarders.addAll(json['awarders']);
+    data.awarders = <dynamic>[];
+    data.awarders!.addAll(json['awarders']);
   }
   data.mediaOnly = json['media_only'];
   data.canGild = json['can_gild'];
@@ -208,8 +208,8 @@ searchPostsRepoEntityDataChildrenDataFromJson(
   data.whitelistStatus = json['whitelist_status'];
   data.contestMode = json['contest_mode'];
   if (json['mod_reports'] != null) {
-    data.modReports = new List<dynamic>();
-    data.modReports.addAll(json['mod_reports']);
+    data.modReports = <dynamic>[];
+    data.modReports!.addAll(json['mod_reports']);
   }
   data.authorPatreonFlair = json['author_patreon_flair'];
   data.authorFlairTextColor = json['author_flair_text_color'];
@@ -361,7 +361,7 @@ Map<String, dynamic> searchPostsRepoEntityDataChildrenDataToJson(
 
 searchPostsRepoEntityDataChildrenDataMediaEmbedFromJson(
     SearchPostsRepoEntityDataChildrenDataMediaEmbed data,
-    Map<String, dynamic> json) {
+    Map<String, dynamic>? json) {
   return data;
 }
 
@@ -373,7 +373,7 @@ Map<String, dynamic> searchPostsRepoEntityDataChildrenDataMediaEmbedToJson(
 
 searchPostsRepoEntityDataChildrenDataSecureMediaEmbedFromJson(
     SearchPostsRepoEntityDataChildrenDataSecureMediaEmbed data,
-    Map<String, dynamic> json) {
+    Map<String, dynamic>? json) {
   return data;
 }
 
@@ -386,7 +386,7 @@ Map<String, dynamic>
 
 searchPostsRepoEntityDataChildrenDataGildingsFromJson(
     SearchPostsRepoEntityDataChildrenDataGildings data,
-    Map<String, dynamic> json) {
+    Map<String, dynamic>? json) {
   return data;
 }
 
@@ -400,9 +400,9 @@ searchPostsRepoEntityDataChildrenDataPreviewFromJson(
     SearchPostsRepoEntityDataChildrenDataPreview data,
     Map<String, dynamic> json) {
   if (json['images'] != null) {
-    data.images = new List<SearchPostsRepoEntityDatachildDataPreviewImages>();
+    data.images = <SearchPostsRepoEntityDatachildDataPreviewImages?>[];
     (json['images'] as List).forEach((v) {
-      data.images.add(
+      data.images!.add(
           new SearchPostsRepoEntityDatachildDataPreviewImages().fromJson(v));
     });
   }
@@ -414,7 +414,7 @@ Map<String, dynamic> searchPostsRepoEntityDataChildrenDataPreviewToJson(
     SearchPostsRepoEntityDataChildrenDataPreview entity) {
   final Map<String, dynamic> data = new Map<String, dynamic>();
   if (entity.images != null) {
-    data['images'] = entity.images.map((v) => v.toJson()).toList();
+    data['images'] = entity.images!.map((v) => v!.toJson()).toList();
   }
   data['enabled'] = entity.enabled;
   return data;
@@ -429,9 +429,9 @@ searchPostsRepoEntityDatachildDataPreviewImagesFromJson(
       : null;
   if (json['resolutions'] != null) {
     data.resolutions =
-        new List<SearchPostsRepoEntityDatachildDataPreviewImagesResolutions>();
+        <SearchPostsRepoEntityDatachildDataPreviewImagesResolutions?>[];
     (json['resolutions'] as List).forEach((v) {
-      data.resolutions.add(
+      data.resolutions!.add(
           new SearchPostsRepoEntityDatachildDataPreviewImagesResolutions()
               .fromJson(v));
     });
@@ -452,7 +452,7 @@ Map<String, dynamic> searchPostsRepoEntityDatachildDataPreviewImagesToJson(
         SearchPostsRepoEntityDataChildrenDataPreviewImagesSource().toJson();
   }
   if (entity.resolutions != null) {
-    data['resolutions'] = entity.resolutions.map((v) => v.toJson()).toList();
+    data['resolutions'] = entity.resolutions!.map((v) => v!.toJson()).toList();
   }
   if (entity.variants != null) {
     data['variants'] =
@@ -502,7 +502,7 @@ Map<String, dynamic>
 
 searchPostsRepoEntityDataChildrenDataPreviewImagesVariantsFromJson(
     SearchPostsRepoEntityDataChildrenDataPreviewImagesVariants data,
-    Map<String, dynamic> json) {
+    Map<String, dynamic>? json) {
   return data;
 }
 

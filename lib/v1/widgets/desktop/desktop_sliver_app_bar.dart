@@ -8,9 +8,9 @@ class DesktopSliverAppBar extends StatefulWidget {
   final VoidCallback onInfoButtonPressed;
 
   const DesktopSliverAppBar({
-    Key key,
-    @required this.subredditInfo,
-    @required this.onInfoButtonPressed,
+    Key? key,
+    required this.subredditInfo,
+    required this.onInfoButtonPressed,
   }) : super(key: key);
 
   @override
@@ -35,15 +35,15 @@ class _DesktopSliverAppBarState extends State<DesktopSliverAppBar> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            subredditInfo.name.isNotEmpty ? subredditInfo.name : 'FrontPage',
+            subredditInfo.name!.isNotEmpty ? subredditInfo.name! : 'FrontPage',
             textAlign: TextAlign.center,
           ),
           Text(
-            '/r/${subredditInfo.name.isNotEmpty ? subredditInfo.name : 'FrontPage'}',
+            '/r/${subredditInfo.name!.isNotEmpty ? subredditInfo.name : 'FrontPage'}',
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .subtitle2
+                .subtitle2!
                 .copyWith(fontSize: 12, color: Colors.grey),
           ),
         ],
@@ -55,7 +55,7 @@ class _DesktopSliverAppBarState extends State<DesktopSliverAppBar> {
             Icons.sort,
           ),
           onSelected: (value) {
-            final RenderBox box = key.currentContext.findRenderObject();
+            final RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
             final positionDropDown = box.localToGlobal(Offset.zero);
             // print(
             if (value == "Top") {

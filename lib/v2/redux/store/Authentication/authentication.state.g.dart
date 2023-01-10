@@ -12,16 +12,19 @@ class _$AuthenticationState extends AuthenticationState {
   @override
   final bool isSignedIn;
   @override
-  final String token;
+  final String? token;
   @override
-  final String username;
+  final String? username;
 
   factory _$AuthenticationState(
-          [void Function(AuthenticationStateBuilder) updates]) =>
+          [void Function(AuthenticationStateBuilder)? updates]) =>
       (new AuthenticationStateBuilder()..update(updates))._build();
 
   _$AuthenticationState._(
-      {this.isLoading, this.isSignedIn, this.token, this.username})
+      {required this.isLoading,
+      required this.isSignedIn,
+      this.token,
+      this.username})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         isLoading, r'AuthenticationState', 'isLoading');
@@ -69,23 +72,23 @@ class _$AuthenticationState extends AuthenticationState {
 
 class AuthenticationStateBuilder
     implements Builder<AuthenticationState, AuthenticationStateBuilder> {
-  _$AuthenticationState _$v;
+  _$AuthenticationState? _$v;
 
-  bool _isLoading;
-  bool get isLoading => _$this._isLoading;
-  set isLoading(bool isLoading) => _$this._isLoading = isLoading;
+  bool? _isLoading;
+  bool? get isLoading => _$this._isLoading;
+  set isLoading(bool? isLoading) => _$this._isLoading = isLoading;
 
-  bool _isSignedIn;
-  bool get isSignedIn => _$this._isSignedIn;
-  set isSignedIn(bool isSignedIn) => _$this._isSignedIn = isSignedIn;
+  bool? _isSignedIn;
+  bool? get isSignedIn => _$this._isSignedIn;
+  set isSignedIn(bool? isSignedIn) => _$this._isSignedIn = isSignedIn;
 
-  String _token;
-  String get token => _$this._token;
-  set token(String token) => _$this._token = token;
+  String? _token;
+  String? get token => _$this._token;
+  set token(String? token) => _$this._token = token;
 
-  String _username;
-  String get username => _$this._username;
-  set username(String username) => _$this._username = username;
+  String? _username;
+  String? get username => _$this._username;
+  set username(String? username) => _$this._username = username;
 
   AuthenticationStateBuilder();
 
@@ -108,7 +111,7 @@ class AuthenticationStateBuilder
   }
 
   @override
-  void update(void Function(AuthenticationStateBuilder) updates) {
+  void update(void Function(AuthenticationStateBuilder)? updates) {
     if (updates != null) updates(this);
   }
 

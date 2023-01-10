@@ -39,7 +39,7 @@ class _FritterState extends State<Fritter> {
 
 class DesktopHome extends StatefulWidget {
   const DesktopHome({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -62,8 +62,8 @@ class _DesktopHomeState extends State<DesktopHome> {
     return StreamBuilder<SubredditInfo>(
       stream: FeedProvider.of(context).subStream,
       builder: (context, snapshot) {
-        final SubredditInfo subredditInfo = snapshot.data;
-        final SubredditInformationEntity subredditInformationData =
+        final SubredditInfo? subredditInfo = snapshot.data;
+        final SubredditInformationEntity? subredditInformationData =
             subredditInfo?.subredditInformation;
         if (!snapshot.hasData) {
           return Center(child: CupertinoActivityIndicator());
@@ -80,7 +80,7 @@ class _DesktopHomeState extends State<DesktopHome> {
                   Icons.sort,
                 ),
                 onSelected: (value) {
-                  final RenderBox box = key.currentContext.findRenderObject();
+                  final RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
                   final positionDropDown = box.localToGlobal(Offset.zero);
                   // print(
                   if (value == "Top") {
@@ -146,7 +146,7 @@ class _DesktopHomeState extends State<DesktopHome> {
               IconButton(
                 icon: Icon(Icons.info_outline),
                 onPressed: () {
-                  _scaffoldKey.currentState.openEndDrawer();
+                  _scaffoldKey.currentState!.openEndDrawer();
                 },
               )
             ],

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorageHelper {
-  SecureStorage _storage;
+  late SecureStorage _storage;
   Map<String, dynamic> map = Map();
 
   SecureStorageHelper() {
@@ -26,16 +26,16 @@ class SecureStorageHelper {
     await fetchData();
   }
 
-  Future<String> get authToken => _storage.read('authToken');
+  Future<String?> get authToken => _storage.read('authToken');
 
   String get debugPrint => map.toString();
 
-  Future<String> get refreshToken async {
+  Future<String?> get refreshToken async {
     await fetchData();
     return map['refreshToken'];
   }
 
-  Future<String> get lastTokenRefresh async {
+  Future<String?> get lastTokenRefresh async {
     await fetchData();
     return map['lastTokenRefresh'];
   }
@@ -52,7 +52,7 @@ class SecureStorageHelper {
 
   Future<bool> needsTokenRefresh() async {
     Duration time =
-        (DateTime.now()).difference(DateTime.parse(await lastTokenRefresh));
+        (DateTime.now()).difference(DateTime.parse((await lastTokenRefresh)!));
     // print("Time since last token refresh: " + time.inMinutes.toString());
     // print(await authToken);
     if (time.inMinutes > 30) {
@@ -63,8 +63,8 @@ class SecureStorageHelper {
   }
 
   Future<void> updateCredentials(
-    String authToken,
-    String refreshToken,
+    String? authToken,
+    String? refreshToken,
     String lastTokenRefresh,
     bool signedIn,
   ) async {
@@ -80,7 +80,7 @@ class SecureStorageHelper {
     // print("Storage helper: Update Credentials : " + map.toString());
   }
 
-  Future<void> updateAuthToken(String accessToken) async {
+  Future<void> updateAuthToken(String? accessToken) async {
     map['authToken'] = accessToken;
     await _storage.write(key: 'authToken', value: accessToken);
     await _storage.write(
@@ -135,15 +135,15 @@ class SecureStorageHelper {
 
 abstract class SecureStorage {
   Future<void> write({
-    @required String key,
-    @required String value,
+    required String key,
+    required String? value,
   });
 
-  Future<Map<String, String>> readAll();
+  Future<Map<String, String?>> readAll();
 
   Future<void> deleteAll();
 
-  Future<String> read(String s);
+  Future<String?> read(String s);
 }
 
 class MobileSecureStorage extends SecureStorage {
@@ -153,14 +153,14 @@ class MobileSecureStorage extends SecureStorage {
   Future<void> deleteAll() => _storage.deleteAll();
 
   @override
-  Future<Map<String, String>> readAll() => _storage.readAll();
+  Future<Map<String, String?>> readAll() => _storage.readAll();
 
   @override
-  Future<void> write({String key, String value}) =>
+  Future<void> write({required String key, String? value}) =>
       _storage.write(key: key, value: value);
 
   @override
-  Future<String> read(String key) {
+  Future<String?> read(String key) {
     return _storage.read(key: key);
   }
 }
@@ -171,11 +171,11 @@ class MacOSSecureStorage extends SecureStorage {
   @override
   Future<void> deleteAll() async {
     final prefs = await sharedPreferences;
-    return prefs.clear();
+    await prefs.clear();
   }
 
   @override
-  Future<Map<String, String>> readAll() async {
+  Future<Map<String, String?>> readAll() async {
     final prefs = await sharedPreferences;
     return {
       "authToken": prefs.getString("authToken"),
@@ -186,16 +186,16 @@ class MacOSSecureStorage extends SecureStorage {
   }
 
   @override
-  Future<void> write({String key, String value}) async {
+  Future<void> write({required String key, String? value}) async {
     final prefs = await sharedPreferences;
-    prefs.setString(key, value);
+    prefs.setString(key, value!);
   }
 
   Future<SharedPreferences> get sharedPreferences async =>
       await SharedPreferences.getInstance();
 
   @override
-  Future<String> read(String key) async {
+  Future<String?> read(String key) async {
     final prefs = await sharedPreferences;
     return prefs.getString(key);
   }

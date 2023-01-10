@@ -12,25 +12,25 @@ class UserInformationProvider with ChangeNotifier {
           {bool listen = false}) =>
       Provider.of<UserInformationProvider>(context, listen: listen);
 
-  HttpServer server;
+  HttpServer? server;
   final _storageHelper = new SecureStorageHelper();
 
   bool get signedIn => _storageHelper.signInStatus;
 
-  UserInformationEntity userInformation;
-  SubredditsSubscribed userSubreddits;
+  UserInformationEntity? userInformation;
+  late SubredditsSubscribed userSubreddits;
 
-  ViewState _state;
-  ViewState _authenticationStatus;
+  ViewState? _state;
+  ViewState? _authenticationStatus;
 
-  ViewState get authenticationStatus => _authenticationStatus;
+  ViewState? get authenticationStatus => _authenticationStatus;
 
   UserInformationProvider() {
 //    // print("*** Initializing user information provider ****");
     validateAuthentication();
   }
 
-  ViewState get state => _state;
+  ViewState? get state => _state;
 
   Future<void> performTokenRefresh() async {
     await _storageHelper.performTokenRefresh();
@@ -59,16 +59,16 @@ class UserInformationProvider with ChangeNotifier {
     notifyListeners();
     bool authResult = true;
     if (server != null) {
-      await server.close(force: true);
+      await server!.close(force: true);
     }
     await _storageHelper.clearStorage();
 //    // print("*** Performing authentication ****");
     // start a new instance of the server that listens to localhost requests
-    Stream<String> onCode = await accessCodeServer();
+    Stream<String?> onCode = await accessCodeServer();
 
     // server returns the first access_code it receives
 
-    final String accessCode = await onCode.first;
+    final String? accessCode = await onCode.first;
 //    // print("local host response");
 
     notifyListeners();
@@ -113,12 +113,12 @@ class UserInformationProvider with ChangeNotifier {
     return authResult;
   }
 
-  Future<Stream<String>> accessCodeServer() async {
-    final StreamController<String> onCode = new StreamController();
+  Future<Stream<String?>> accessCodeServer() async {
+    final StreamController<String?> onCode = new StreamController();
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
-    server.listen((HttpRequest request) async {
+    server!.listen((HttpRequest request) async {
 //      // print("Server started");
-      final String code = request.uri.queryParameters["code"];
+      final String? code = request.uri.queryParameters["code"];
 //      // print(request.uri.pathSegments);
       request.response
         ..statusCode = 200
@@ -126,7 +126,7 @@ class UserInformationProvider with ChangeNotifier {
         ..write(
             '<html><meta name="viewport" content="width=device-width, initial-scale=1.0"><body> <h2 style="text-align: center; position: absolute; top: 50%; left: 0: right: 0">Welcome to Fritter</h2><h3>You can close this window<script type="javascript">window.close()</script> </h3></body></html>');
       await request.response.close();
-      await server.close(force: true);
+      await server!.close(force: true);
       onCode.add(code);
       await onCode.close();
     });
@@ -145,7 +145,7 @@ class UserInformationProvider with ChangeNotifier {
   Future<void> loadUserInformation() async {
 //    // print("*** Loading user information ****");
 
-    String token = await _storageHelper.authToken;
+    String? token = await _storageHelper.authToken;
 
     if (token == null) {
       return;
@@ -182,9 +182,9 @@ class UserInformationProvider with ChangeNotifier {
 
       userSubreddits.data.children
           .sort((SubredditListChild a, SubredditListChild b) {
-        return a.display_name
+        return a.display_name!
             .toLowerCase()
-            .compareTo(b.display_name.toLowerCase());
+            .compareTo(b.display_name!.toLowerCase());
       });
     }
   }

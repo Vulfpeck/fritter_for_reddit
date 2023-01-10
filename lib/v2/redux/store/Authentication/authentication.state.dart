@@ -8,11 +8,9 @@ abstract class AuthenticationState
   bool get isLoading;
   bool get isSignedIn;
 
-  @nullable
-  String get token;
+  String? get token;
 
-  @nullable
-  String get username;
+  String? get username;
 
   AuthenticationState._();
 

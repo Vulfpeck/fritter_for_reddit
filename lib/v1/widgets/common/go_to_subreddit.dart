@@ -8,10 +8,10 @@ import '../../exports.dart';
 enum Mode { desktop, mobile }
 
 class GoToSubredditWidget extends StatefulWidget {
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
   final Mode mode;
 
-  GoToSubredditWidget({this.focusNode, @required this.mode});
+  GoToSubredditWidget({this.focusNode, required this.mode});
 
   @override
   _GoToSubredditWidgetState createState() => _GoToSubredditWidgetState();
@@ -42,7 +42,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
                     Icons.arrow_forward,
                   ),
                   onPressed: () {
-                    widget.focusNode.unfocus();
+                    widget.focusNode!.unfocus();
                     loadNewSubreddit(context, _subredditGoTextController.text);
                   },
                 ),
@@ -58,7 +58,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
               controller: _subredditGoTextController,
               textInputAction: TextInputAction.go,
               onSubmitted: (value) {
-                widget.focusNode.unfocus();
+                widget.focusNode!.unfocus();
                 loadNewSubreddit(context, value);
               },
             ),
@@ -120,7 +120,7 @@ class _GoToSubredditWidgetState extends State<GoToSubredditWidget> {
     if (_subredditGoTextController.text == "") {
       return;
     }
-    widget.focusNode.unfocus();
+    widget.focusNode!.unfocus();
     final text = _subredditGoTextController.text.replaceAll(" ", "");
     return Navigator.of(
       context,

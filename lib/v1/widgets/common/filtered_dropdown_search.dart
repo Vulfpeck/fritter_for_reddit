@@ -7,7 +7,7 @@ class FilteredDropdownSearch<T> extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final bool asSliver;
   final List<T> options;
-  final InputDecoration inputDecoration;
+  final InputDecoration? inputDecoration;
 
   /// The placement of the results List below the TextField.
   final double verticalOffset;
@@ -16,12 +16,12 @@ class FilteredDropdownSearch<T> extends StatelessWidget {
   final Widget Function(BuildContext, T) itemBuilder;
 
   FilteredDropdownSearch({
-    Key key,
-    @required this.onChanged,
+    Key? key,
+    required this.onChanged,
     this.asSliver = false,
-    @required this.options,
+    required this.options,
     this.inputDecoration,
-    @required this.itemBuilder,
+    required this.itemBuilder,
     this.verticalOffset = 0.0,
   })  : assert(verticalOffset != null),
         assert(options != null),

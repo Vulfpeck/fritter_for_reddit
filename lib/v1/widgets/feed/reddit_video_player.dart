@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class RedditVideoPlayer extends StatelessWidget {
-  final String uri;
+  final String? uri;
 
   RedditVideoPlayer({
-    @required this.uri,
+    required this.uri,
   });
 
   @override

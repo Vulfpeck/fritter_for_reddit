@@ -14,7 +14,7 @@ import 'package:html_unescape/html_unescape.dart';
 import 'post_url_preview.dart';
 
 class FeedCard extends StatelessWidget {
-  final PostsFeedDataChildrenData data;
+  final PostsFeedDataChildrenData? data;
 
   FeedCard(this.data);
 
@@ -26,11 +26,11 @@ class FeedCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         FeedCardTitle(
-          title: data.title,
-          stickied: data.stickied,
-          linkFlairText: data.linkFlairText,
-          nsfw: data.over18,
-          locked: data.locked,
+          title: data!.title!,
+          stickied: data!.stickied,
+          linkFlairText: data!.linkFlairText,
+          nsfw: data!.over18,
+          locked: data!.locked,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -39,24 +39,24 @@ class FeedCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'in r/' + data.subreddit + ' by ' + data.author,
+                'in r/' + data!.subreddit! + ' by ' + data!.author!,
                 style: Theme.of(context).textTheme.subtitle2,
               ),
             ],
           ),
         ),
-        if (data.postType == MediaType.Url)
+        if (data!.postType == MediaType.Url)
           PostUrlPreview(
             data: data,
             htmlUnescape: _htmlUnescape,
           ),
-        if (data.hasPreview)
+        if (data!.hasPreview)
           Padding(
             padding: const EdgeInsets.only(bottom: 0.0, top: 16.0),
             child: FeedCardBodyImage(
-              images: data.preview.images,
+              images: data!.preview!.images!,
               data: data,
-              postMetaData: {'media_type': data.postType, 'url': data.url},
+              postMetaData: {'media_type': data!.postType, 'url': data!.url},
               deviceWidth: MediaQuery.of(context).size.width,
             ),
           ),
@@ -67,19 +67,19 @@ class FeedCard extends StatelessWidget {
 
 class FeedCardTitle extends StatelessWidget {
   final String title;
-  final bool stickied;
-  final String linkFlairText;
-  final bool nsfw;
-  final bool locked;
+  final bool? stickied;
+  final String? linkFlairText;
+  final bool? nsfw;
+  final bool? locked;
 
   final String escapedTitle;
 
   FeedCardTitle({
-    @required this.title,
-    @required this.stickied,
-    @required this.linkFlairText,
-    @required this.nsfw,
-    @required this.locked,
+    required this.title,
+    required this.stickied,
+    required this.linkFlairText,
+    required this.nsfw,
+    required this.locked,
   }) : escapedTitle = HtmlUnescape().convert(title);
 
   @override
@@ -151,21 +151,21 @@ class FeedCardTitle extends StatelessWidget {
 class FeedCardBodyImage extends StatelessWidget {
   final Map<String, dynamic> postMetaData;
   final List<PostsFeedDataChildDataPreviewImages> images;
-  final PostsFeedDataChildrenData data;
+  final PostsFeedDataChildrenData? data;
   final double deviceWidth;
   static final HtmlUnescape _htmlUnescape = new HtmlUnescape();
-  final String url;
+  final String? url;
   final double ratio;
 
   FeedCardBodyImage({
-    @required this.images,
-    @required this.data,
-    @required this.postMetaData,
-    @required this.deviceWidth,
+    required this.images,
+    required this.data,
+    required this.postMetaData,
+    required this.deviceWidth,
   })  : url = images.isNotEmpty
-            ? _htmlUnescape.convert(images.first.source.url)
+            ? _htmlUnescape.convert(images.first.source!.url!)
             : null,
-        ratio = (deviceWidth) / images.first.source.width,
+        ratio = (deviceWidth) / images.first.source!.width!,
         assert(postMetaData != null);
 
   @override
@@ -218,7 +218,7 @@ class FeedCardBodyImage extends StatelessWidget {
 }
 
 class FeedCardBodySelfText extends StatelessWidget {
-  final String selftextHtml;
+  final String? selftextHtml;
 
   FeedCardBodySelfText({this.selftextHtml});
 
@@ -227,9 +227,9 @@ class FeedCardBodySelfText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      data: """${_htmlUnescape.convert(selftextHtml)}""",
+      data: """${_htmlUnescape.convert(selftextHtml!)}""",
       onLinkTap: (url, _, __, ___) {
-        if (url.startsWith("/r/") || url.startsWith("r/")) {
+        if (url!.startsWith("/r/") || url.startsWith("r/")) {
           Navigator.push(
             context,
             CupertinoPageRoute(
@@ -253,13 +253,13 @@ class FeedCardBodySelfText extends StatelessWidget {
 }
 
 class StickyTag extends StatelessWidget {
-  final bool _isStickied;
+  final bool? _isStickied;
 
   StickyTag(this._isStickied);
 
   @override
   Widget build(BuildContext context) {
-    return _isStickied
+    return _isStickied!
         ? Padding(
             padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
             child: Container(

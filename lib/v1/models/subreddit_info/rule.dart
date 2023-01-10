@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 class Rule {
-  final String kind;
-  final String description;
-  final String shortName;
-  final String violationReason;
-  final int createdUtc;
-  final int priority;
-  final String descriptionHtml;
+  final String? kind;
+  final String? description;
+  final String? shortName;
+  final String? violationReason;
+  final int? createdUtc;
+  final int? priority;
+  final String? descriptionHtml;
 
   Rule({
     this.kind,

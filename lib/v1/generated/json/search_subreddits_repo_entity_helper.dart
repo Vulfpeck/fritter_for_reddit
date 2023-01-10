@@ -3,9 +3,9 @@ import 'package:fritter_for_reddit/v1/models/search_results/subreddits/search_su
 searchSubredditsRepoEntityFromJson(
     SearchSubredditsRepoEntity data, Map<String, dynamic> json) {
   if (json['subreddits'] != null) {
-    data.subreddits = new List<SubredditSearchResultEntry>();
+    data.subreddits = <SubredditSearchResultEntry?>[];
     (json['subreddits'] as List).forEach((v) {
-      data.subreddits.add(new SubredditSearchResultEntry().fromJson(v));
+      data.subreddits!.add(new SubredditSearchResultEntry().fromJson(v));
     });
   }
   return data;
@@ -15,7 +15,7 @@ Map<String, dynamic> searchSubredditsRepoEntityToJson(
     SearchSubredditsRepoEntity entity) {
   final Map<String, dynamic> data = new Map<String, dynamic>();
   if (entity.subreddits != null) {
-    data['subreddits'] = entity.subreddits.map((v) => v.toJson()).toList();
+    data['subreddits'] = entity.subreddits!.map((v) => v!.toJson()).toList();
   }
   return data;
 }

@@ -11,14 +11,14 @@ class LoginButtonState {
   final bool isLoading;
   final bool isSignedIn;
   final Function signIn, signOut;
-  final String token;
+  final String? token;
 
   LoginButtonState({
-    @required this.isLoading,
-    @required this.isSignedIn,
-    @required this.signIn,
-    @required this.signOut,
-    @required this.token,
+    required this.isLoading,
+    required this.isSignedIn,
+    required this.signIn,
+    required this.signOut,
+    required this.token,
   });
 }
 
@@ -36,7 +36,7 @@ class LoginButton extends StatelessWidget {
           if (!state.isSignedIn) Text(state.isLoading ? 'Logging In' : 'Login'),
           if (state.isSignedIn)
             Text(state.isLoading ? 'Logging Out' : 'Log Out'),
-          Text(state.token != null ? state.token : 'token empty'),
+          Text(state.token != null ? state.token! : 'token empty'),
         ]),
       ),
       converter: (store) => new LoginButtonState(
@@ -51,7 +51,7 @@ class LoginButton extends StatelessWidget {
 }
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key key}) : super(key: key);
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

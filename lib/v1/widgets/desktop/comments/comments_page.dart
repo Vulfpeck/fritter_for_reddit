@@ -11,7 +11,7 @@ import 'comment_list_item.dart';
 class CommentsScreen extends StatelessWidget {
   final PostsFeedDataChildrenData postData;
   static final _unescape = HtmlUnescape();
-  CommentsScreen({@required this.postData});
+  CommentsScreen({required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class CommentsScreen extends StatelessWidget {
                           child: FeedCard(postData),
                         ),
                       ),
-                      postData.isTextPost && postData.selftextHtml != null
+                      postData.isTextPost! && postData.selftextHtml != null
                           ? FeedCardBodySelfText(
                               selftextHtml: postData.selftextHtml,
                             )
@@ -83,7 +83,7 @@ class CommentsScreen extends StatelessWidget {
                         ],
                       )
                     : model.commentsMap[postData.id] == null ||
-                            model.commentsMap[postData.id].length == 0
+                            model.commentsMap[postData.id]!.length == 0
                         ? SliverChildListDelegate(
                             <Widget>[
                               SizedBox(
@@ -103,7 +103,7 @@ class CommentsScreen extends StatelessWidget {
                         : SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               var commentItem =
-                                  model.commentsMap[postData.id].elementAt(
+                                  model.commentsMap[postData.id]!.elementAt(
                                 (index),
                               );
 //                                String _htmlContent = _unescape
@@ -170,7 +170,7 @@ class CommentsScreen extends StatelessWidget {
 //                                  ),
 //                                );
                             },
-                            childCount: model.commentsMap[postData.id].length,
+                            childCount: model.commentsMap[postData.id]!.length,
                           ),
 //
               ),

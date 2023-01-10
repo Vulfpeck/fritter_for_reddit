@@ -8,9 +8,9 @@ part 'posts_feed_entity.g.dart';
 @HiveType(typeId: 2)
 class PostsFeedEntity {
   @HiveField(0)
-  PostsFeedData data;
+  PostsFeedData? data;
   @HiveField(1)
-  String kind;
+  String? kind;
 
   PostsFeedEntity({this.data, this.kind});
 
@@ -23,17 +23,17 @@ class PostsFeedEntity {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     data['kind'] = this.kind;
     return data;
   }
 
-  List<PostsFeedDataChild> get children => data.children;
+  List<PostsFeedDataChild>? get children => data!.children;
 
   PostsFeedEntity copyWith({
-    PostsFeedData data,
-    String kind,
+    PostsFeedData? data,
+    String? kind,
   }) {
     return new PostsFeedEntity(
       data: data ?? this.data,
@@ -47,13 +47,13 @@ class PostsFeedData {
   @HiveField(0)
   dynamic modhash;
   @HiveField(1)
-  List<PostsFeedDataChild> children;
+  List<PostsFeedDataChild>? children;
   @HiveField(2)
-  String before;
+  String? before;
   @HiveField(3)
-  int dist;
+  int? dist;
   @HiveField(4)
-  String after;
+  String? after;
 
   PostsFeedData({
     this.modhash,
@@ -66,9 +66,9 @@ class PostsFeedData {
   PostsFeedData.fromJson(Map json) {
     modhash = json['modhash'];
     if (json['children'] != null) {
-      children = new List<PostsFeedDataChild>();
+      children = <PostsFeedDataChild>[];
       (json['children'] as List).forEach((v) {
-        children.add(new PostsFeedDataChild.fromJson(v));
+        children!.add(new PostsFeedDataChild.fromJson(v));
       });
     }
     before = json['before'];
@@ -80,7 +80,7 @@ class PostsFeedData {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['modhash'] = this.modhash;
     if (this.children != null) {
-      data['children'] = this.children.map((v) => v.toJson()).toList();
+      data['children'] = this.children!.map((v) => v.toJson()).toList();
     }
     data['before'] = this.before;
     data['dist'] = this.dist;
@@ -90,10 +90,10 @@ class PostsFeedData {
 
   PostsFeedData copyWith({
     dynamic modhash,
-    List<PostsFeedDataChild> children,
+    List<PostsFeedDataChild>? children,
     dynamic before,
-    int dist,
-    String after,
+    int? dist,
+    String? after,
   }) {
     return new PostsFeedData(
       modhash: modhash ?? this.modhash,
@@ -108,9 +108,9 @@ class PostsFeedData {
 @HiveType(typeId: 4)
 class PostsFeedDataChild {
   @HiveField(0)
-  PostsFeedDataChildrenData data;
+  PostsFeedDataChildrenData? data;
   @HiveField(1)
-  String kind;
+  String? kind;
 
   PostsFeedDataChild({this.data, this.kind});
 
@@ -124,131 +124,132 @@ class PostsFeedDataChild {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     data['kind'] = this.kind;
     return data;
   }
 
-  String get title => data.title;
+  String? get title => data!.title;
 }
 
 class PostsFeedDataChildrenData {
   dynamic secureMedia;
-  bool saved;
-  bool hideScore;
-  int totalAwardsReceived;
-  String subredditId;
-  int score;
-  int numComments;
+  bool? saved;
+  bool? hideScore;
+  int? totalAwardsReceived;
+  String? subredditId;
+  int? score;
+  int? numComments;
   dynamic modReasonTitle;
-  String whitelistStatus;
-  List<Null> stewardReports;
-  bool spoiler;
-  String id;
-  double createdUtc;
+  String? whitelistStatus;
+  List<Null>? stewardReports;
+  bool? spoiler;
+  String? id;
+  double? createdUtc;
   dynamic bannedAtUtc;
   dynamic discussionType;
   dynamic edited;
-  bool allowLiveComments;
+  bool? allowLiveComments;
   dynamic authorFlairBackgroundColor;
   dynamic approvedBy;
-  PostsFeedDataChildrenDataMediaEmbed mediaEmbed;
-  String domain;
+  PostsFeedDataChildrenDataMediaEmbed? mediaEmbed;
+  String? domain;
   dynamic approvedAtUtc;
-  bool noFollow;
-  int ups;
-  String authorFlairType;
-  String permalink;
-  List<String> contentCategories;
-  int wls;
+  bool? noFollow;
+  int? ups;
+  String? authorFlairType;
+  String? permalink;
+  List<String>? contentCategories;
+  int? wls;
   dynamic authorFlairCssClass;
-  List<Null> modReports;
-  int gilded;
+  List<Null>? modReports;
+  int? gilded;
   dynamic removalReason;
-  bool sendReplies;
-  bool archived;
+  bool? sendReplies;
+  bool? archived;
   dynamic authorFlairTextColor;
-  bool canModPost;
-  bool isTextPost;
-  String authorFullname;
+  bool? canModPost;
+  bool? isTextPost;
+  String? authorFullname;
   dynamic linkFlairCssClass;
-  String selftext;
+  String? selftext;
   dynamic selftextHtml;
-  List<Null> userReports;
-  bool isCrosspostable;
-  bool clicked;
+  List<Null>? userReports;
+  bool? isCrosspostable;
+  bool? clicked;
   dynamic authorFlairTemplateId;
-  String url;
-  String parentWhitelistStatus;
-  bool stickied;
-  bool quarantine;
+  String? url;
+  String? parentWhitelistStatus;
+  bool? stickied;
+  bool? quarantine;
   dynamic viewCount;
-  List<Null> linkFlairRichtext;
-  String linkFlairBackgroundColor;
-  List<Null> authorFlairRichtext;
-  bool over18;
-  String subreddit;
+  List<Null>? linkFlairRichtext;
+  String? linkFlairBackgroundColor;
+  List<Null>? authorFlairRichtext;
+  bool? over18;
+  String? subreddit;
   dynamic suggestedSort;
-  bool canGild;
-  bool isRobotIndexable;
-  String postHint;
-  bool locked;
+  bool? canGild;
+  bool? isRobotIndexable;
+  String? postHint;
+  bool? locked;
   dynamic likes;
-  String thumbnail;
-  int downs;
-  double created;
-  String author;
-  String linkFlairTextColor;
-  PostsFeedDataChildrenDataGildings gildings;
+  String? thumbnail;
+  int? downs;
+  double? created;
+  String? author;
+  String? linkFlairTextColor;
+  PostsFeedDataChildrenDataGildings? gildings;
   dynamic reportReasons;
-  bool isVideo;
-  bool isOriginalContent;
-  String subredditNamePrefixed;
+  bool? isVideo;
+  bool? isOriginalContent;
+  String? subredditNamePrefixed;
   dynamic modReasonBy;
-  String name;
-  List<Null> awarders;
-  bool mediaOnly;
-  PostsFeedDataChildrenDataPreview preview;
+  String? name;
+  List<Null>? awarders;
+  bool? mediaOnly;
+  PostsFeedDataChildrenDataPreview? preview;
   dynamic numReports;
-  bool pinned;
-  bool hidden;
-  bool authorPatreonFlair;
+  bool? pinned;
+  bool? hidden;
+  bool? authorPatreonFlair;
   dynamic modNote;
   dynamic media;
-  String _title;
+  String? _title;
 
-  String get title => _title;
+  String? get title => _title;
 
-  set title(String title) {
+  set title(String? title) {
     _title = title;
   }
 
   dynamic authorFlairText;
-  int numCrossposts;
-  int thumbnailWidth;
-  PostsFeedDataChildrenDataSecureMediaEmbed secureMediaEmbed;
-  String linkFlairText;
-  String subredditType;
-  bool isMeta;
-  int subredditSubscribers;
+  int? numCrossposts;
+  int? thumbnailWidth;
+  PostsFeedDataChildrenDataSecureMediaEmbed? secureMediaEmbed;
+  String? linkFlairText;
+  String? subredditType;
+  bool? isMeta;
+  int? subredditSubscribers;
   dynamic distinguished;
-  int thumbnailHeight;
-  String linkFlairType;
-  List<PostsFeedDataChildDataAllAwardings> allAwardings;
-  bool visited;
-  int pwls;
+  int? thumbnailHeight;
+  String? linkFlairType;
+  List<PostsFeedDataChildDataAllAwardings>? allAwardings;
+  bool? visited;
+  int? pwls;
   dynamic category;
   dynamic bannedBy;
-  bool contestMode;
-  bool isRedditMediaDomain;
-  MediaType postType;
+  bool? contestMode;
+  bool? isRedditMediaDomain;
+  MediaType? postType;
 
   bool get hasLinkFlairText => linkFlairText != null;
 
   bool get hasPreview => preview?.images?.isNotEmpty ?? false;
 
-  String get previewUrl => preview.images.first.source.url.asSanitizedImageUrl;
+  String get previewUrl =>
+      preview!.images!.first.source!.url!.asSanitizedImageUrl;
 
   PostsFeedDataChildrenData({
     this.secureMedia,
@@ -365,7 +366,7 @@ class PostsFeedDataChildrenData {
     modReasonTitle = json['mod_reason_title'];
     whitelistStatus = json['whitelist_status'];
     if (json['steward_reports'] != null) {
-      stewardReports = new List<Null>();
+      stewardReports = <Null>[];
     }
     spoiler = json['spoiler'];
     id = json['id'];
@@ -389,7 +390,7 @@ class PostsFeedDataChildrenData {
     wls = json['wls'];
     authorFlairCssClass = json['author_flair_css_class'];
     if (json['mod_reports'] != null) {
-      modReports = new List<Null>();
+      modReports = <Null>[];
     }
     gilded = json['gilded'];
     removalReason = json['removal_reason'];
@@ -403,7 +404,7 @@ class PostsFeedDataChildrenData {
     selftext = json['selftext'];
     selftextHtml = json['selftext_html'];
     if (json['user_reports'] != null) {
-      userReports = new List<Null>();
+      userReports = <Null>[];
     }
     isCrosspostable = json['is_crosspostable'];
     clicked = json['clicked'];
@@ -414,11 +415,11 @@ class PostsFeedDataChildrenData {
     quarantine = json['quarantine'];
     viewCount = json['view_count'];
     if (json['link_flair_richtext'] != null) {
-      linkFlairRichtext = new List<Null>();
+      linkFlairRichtext = <Null>[];
     }
     linkFlairBackgroundColor = json['link_flair_background_color'];
     if (json['author_flair_richtext'] != null) {
-      authorFlairRichtext = new List<Null>();
+      authorFlairRichtext = <Null>[];
     }
     over18 = json['over_18'];
     subreddit = json['subreddit'];
@@ -443,7 +444,7 @@ class PostsFeedDataChildrenData {
     modReasonBy = json['mod_reason_by'];
     name = json['name'];
     if (json['awarders'] != null) {
-      awarders = new List<Null>();
+      awarders = <Null>[];
     }
     mediaOnly = json['media_only'];
     preview = json['preview'] != null
@@ -471,9 +472,9 @@ class PostsFeedDataChildrenData {
     thumbnailHeight = json['thumbnail_height'];
     linkFlairType = json['link_flair_type'];
     if (json['all_awardings'] != null) {
-      allAwardings = new List<PostsFeedDataChildDataAllAwardings>();
+      allAwardings = <PostsFeedDataChildDataAllAwardings>[];
       (json['all_awardings'] as List).forEach((v) {
-        allAwardings.add(new PostsFeedDataChildDataAllAwardings.fromJson(v));
+        allAwardings!.add(new PostsFeedDataChildDataAllAwardings.fromJson(v));
       });
     }
     visited = json['visited'];
@@ -509,7 +510,7 @@ class PostsFeedDataChildrenData {
     data['author_flair_background_color'] = this.authorFlairBackgroundColor;
     data['approved_by'] = this.approvedBy;
     if (this.mediaEmbed != null) {
-      data['media_embed'] = this.mediaEmbed.toJson();
+      data['media_embed'] = this.mediaEmbed!.toJson();
     }
     data['domain'] = this.domain;
     data['approved_at_utc'] = this.approvedAtUtc;
@@ -566,7 +567,7 @@ class PostsFeedDataChildrenData {
     data['author'] = this.author;
     data['link_flair_text_color'] = this.linkFlairTextColor;
     if (this.gildings != null) {
-      data['gildings'] = this.gildings.toJson();
+      data['gildings'] = this.gildings!.toJson();
     }
     data['report_reasons'] = this.reportReasons;
     data['is_video'] = this.isVideo;
@@ -579,7 +580,7 @@ class PostsFeedDataChildrenData {
     }
     data['media_only'] = this.mediaOnly;
     if (this.preview != null) {
-      data['preview'] = this.preview.toJson();
+      data['preview'] = this.preview!.toJson();
     }
     data['num_reports'] = this.numReports;
     data['pinned'] = this.pinned;
@@ -592,7 +593,7 @@ class PostsFeedDataChildrenData {
     data['num_crossposts'] = this.numCrossposts;
     data['thumbnail_width'] = this.thumbnailWidth;
     if (this.secureMediaEmbed != null) {
-      data['secure_media_embed'] = this.secureMediaEmbed.toJson();
+      data['secure_media_embed'] = this.secureMediaEmbed!.toJson();
     }
     data['link_flair_text'] = this.linkFlairText;
     data['subreddit_type'] = this.subredditType;
@@ -602,7 +603,8 @@ class PostsFeedDataChildrenData {
     data['thumbnail_height'] = this.thumbnailHeight;
     data['link_flair_type'] = this.linkFlairType;
     if (this.allAwardings != null) {
-      data['all_awardings'] = this.allAwardings.map((v) => v.toJson()).toList();
+      data['all_awardings'] =
+          this.allAwardings!.map((v) => v.toJson()).toList();
     }
     data['visited'] = this.visited;
     data['pwls'] = this.pwls;
@@ -616,18 +618,18 @@ class PostsFeedDataChildrenData {
   bool get hasImage =>
       postType == MediaType.Image || postType == MediaType.Video;
 
-  List<PostsFeedDataChildDataPreviewImages> get images {
+  List<PostsFeedDataChildDataPreviewImages>? get images {
     if (!hasImage) {
       return [];
     }
-    return preview.images;
+    return preview!.images;
   }
 }
 
 class PostsFeedDataChildrenDataMediaEmbed {
   PostsFeedDataChildrenDataMediaEmbed();
 
-  PostsFeedDataChildrenDataMediaEmbed.fromJson(Map json) {}
+  PostsFeedDataChildrenDataMediaEmbed.fromJson(Map? json) {}
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -636,8 +638,8 @@ class PostsFeedDataChildrenDataMediaEmbed {
 }
 
 class PostsFeedDataChildrenDataGildings {
-  int gid1;
-  int gid2;
+  int? gid1;
+  int? gid2;
 
   PostsFeedDataChildrenDataGildings({this.gid1, this.gid2});
 
@@ -655,16 +657,16 @@ class PostsFeedDataChildrenDataGildings {
 }
 
 class PostsFeedDataChildrenDataPreview {
-  List<PostsFeedDataChildDataPreviewImages> images;
-  bool enabled;
+  List<PostsFeedDataChildDataPreviewImages>? images;
+  bool? enabled;
 
   PostsFeedDataChildrenDataPreview({this.images, this.enabled});
 
   PostsFeedDataChildrenDataPreview.fromJson(Map json) {
     if (json['images'] != null) {
-      images = new List<PostsFeedDataChildDataPreviewImages>();
+      images = <PostsFeedDataChildDataPreviewImages>[];
       (json['images'] as List).forEach((v) {
-        images.add(new PostsFeedDataChildDataPreviewImages.fromJson(v));
+        images!.add(new PostsFeedDataChildDataPreviewImages.fromJson(v));
       });
     }
     enabled = json['enabled'];
@@ -673,7 +675,7 @@ class PostsFeedDataChildrenDataPreview {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.images != null) {
-      data['images'] = this.images.map((v) => v.toJson()).toList();
+      data['images'] = this.images!.map((v) => v.toJson()).toList();
     }
     data['enabled'] = this.enabled;
     return data;
@@ -681,19 +683,19 @@ class PostsFeedDataChildrenDataPreview {
 }
 
 class PostsFeedDataChildDataPreviewImages {
-  List<PostsFeedDataChildDataPreviewImagesResolutions> resolutions;
-  PostsFeedDataChildrenDataPreviewImagesSource source;
-  PostsFeedDataChildrenDataPreviewImagesVariants variants;
-  String id;
+  List<PostsFeedDataChildDataPreviewImagesResolutions>? resolutions;
+  PostsFeedDataChildrenDataPreviewImagesSource? source;
+  PostsFeedDataChildrenDataPreviewImagesVariants? variants;
+  String? id;
 
   PostsFeedDataChildDataPreviewImages(
       {this.resolutions, this.source, this.variants, this.id});
 
   PostsFeedDataChildDataPreviewImages.fromJson(Map<String, dynamic> json) {
     if (json['resolutions'] != null) {
-      resolutions = new List<PostsFeedDataChildDataPreviewImagesResolutions>();
+      resolutions = <PostsFeedDataChildDataPreviewImagesResolutions>[];
       (json['resolutions'] as List).forEach((v) {
-        resolutions.add(
+        resolutions!.add(
             new PostsFeedDataChildDataPreviewImagesResolutions.fromJson(v));
       });
     }
@@ -711,13 +713,13 @@ class PostsFeedDataChildDataPreviewImages {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.resolutions != null) {
-      data['resolutions'] = this.resolutions.map((v) => v.toJson()).toList();
+      data['resolutions'] = this.resolutions!.map((v) => v.toJson()).toList();
     }
     if (this.source != null) {
-      data['source'] = this.source.toJson();
+      data['source'] = this.source!.toJson();
     }
     if (this.variants != null) {
-      data['variants'] = this.variants.toJson();
+      data['variants'] = this.variants!.toJson();
     }
     data['id'] = this.id;
     return data;
@@ -725,9 +727,9 @@ class PostsFeedDataChildDataPreviewImages {
 }
 
 class PostsFeedDataChildDataPreviewImagesResolutions {
-  int width;
-  String url;
-  int height;
+  int? width;
+  String? url;
+  int? height;
 
   PostsFeedDataChildDataPreviewImagesResolutions(
       {this.width, this.url, this.height});
@@ -749,9 +751,9 @@ class PostsFeedDataChildDataPreviewImagesResolutions {
 }
 
 class PostsFeedDataChildrenDataPreviewImagesSource {
-  int width;
-  String url;
-  int height;
+  int? width;
+  String? url;
+  int? height;
 
   PostsFeedDataChildrenDataPreviewImagesSource(
       {this.width, this.url, this.height});
@@ -774,7 +776,7 @@ class PostsFeedDataChildrenDataPreviewImagesSource {
 class PostsFeedDataChildrenDataPreviewImagesVariants {
   PostsFeedDataChildrenDataPreviewImagesVariants();
 
-  PostsFeedDataChildrenDataPreviewImagesVariants.fromJson(Map json) {}
+  PostsFeedDataChildrenDataPreviewImagesVariants.fromJson(Map? json) {}
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -785,7 +787,7 @@ class PostsFeedDataChildrenDataPreviewImagesVariants {
 class PostsFeedDataChildrenDataSecureMediaEmbed {
   PostsFeedDataChildrenDataSecureMediaEmbed();
 
-  PostsFeedDataChildrenDataSecureMediaEmbed.fromJson(Map json) {}
+  PostsFeedDataChildrenDataSecureMediaEmbed.fromJson(Map? json) {}
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -795,22 +797,22 @@ class PostsFeedDataChildrenDataSecureMediaEmbed {
 
 class PostsFeedDataChildDataAllAwardings {
   dynamic endDate;
-  String iconUrl;
-  int iconWidth;
-  int coinReward;
-  int daysOfDripExtension;
-  int iconHeight;
-  int count;
-  String description;
-  List<PostsFeedDatachildDataAllAwardingsResizedIcons> resizedIcons;
-  int coinPrice;
-  int subredditCoinReward;
-  String awardType;
+  String? iconUrl;
+  int? iconWidth;
+  int? coinReward;
+  int? daysOfDripExtension;
+  int? iconHeight;
+  int? count;
+  String? description;
+  List<PostsFeedDatachildDataAllAwardingsResizedIcons>? resizedIcons;
+  int? coinPrice;
+  int? subredditCoinReward;
+  String? awardType;
   dynamic subredditId;
-  bool isEnabled;
-  String name;
-  String id;
-  int daysOfPremium;
+  bool? isEnabled;
+  String? name;
+  String? id;
+  int? daysOfPremium;
   dynamic startDate;
 
   PostsFeedDataChildDataAllAwardings(
@@ -843,9 +845,9 @@ class PostsFeedDataChildDataAllAwardings {
     count = json['count'];
     description = json['description'];
     if (json['resized_icons'] != null) {
-      resizedIcons = new List<PostsFeedDatachildDataAllAwardingsResizedIcons>();
+      resizedIcons = <PostsFeedDatachildDataAllAwardingsResizedIcons>[];
       (json['resized_icons'] as List).forEach((v) {
-        resizedIcons.add(
+        resizedIcons!.add(
             new PostsFeedDatachildDataAllAwardingsResizedIcons.fromJson(v));
       });
     }
@@ -871,7 +873,8 @@ class PostsFeedDataChildDataAllAwardings {
     data['count'] = this.count;
     data['description'] = this.description;
     if (this.resizedIcons != null) {
-      data['resized_icons'] = this.resizedIcons.map((v) => v.toJson()).toList();
+      data['resized_icons'] =
+          this.resizedIcons!.map((v) => v.toJson()).toList();
     }
     data['coin_price'] = this.coinPrice;
     data['subreddit_coin_reward'] = this.subredditCoinReward;
@@ -887,9 +890,9 @@ class PostsFeedDataChildDataAllAwardings {
 }
 
 class PostsFeedDatachildDataAllAwardingsResizedIcons {
-  int width;
-  String url;
-  int height;
+  int? width;
+  String? url;
+  int? height;
 
   PostsFeedDatachildDataAllAwardingsResizedIcons(
       {this.width, this.url, this.height});

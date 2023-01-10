@@ -6,7 +6,7 @@ class SubredditAwareClickableText extends StatelessWidget {
   final String text;
   final Function(String link) onClick;
 
-  const SubredditAwareClickableText(this.text, {@required this.onClick})
+  const SubredditAwareClickableText(this.text, {required this.onClick})
       : assert(onClick != null);
 
   @override

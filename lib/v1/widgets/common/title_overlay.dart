@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TitleOverlay extends StatefulWidget {
-  final String title;
+  final String? title;
   final Widget child;
 
   const TitleOverlay({
-    Key key,
-    @required this.title,
-    @required this.child,
+    Key? key,
+    required this.title,
+    required this.child,
   }) : super(key: key);
 
   @override
@@ -43,7 +43,7 @@ class TitleOverlayState extends State<TitleOverlay> {
                       .scaffoldBackgroundColor
                       .withOpacity(0.87),
                   child: Text(
-                    widget.title,
+                    widget.title!,
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,
                     textAlign: TextAlign.center,

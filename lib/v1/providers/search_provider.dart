@@ -13,14 +13,14 @@ class SearchProvider with ChangeNotifier {
   ViewState _subredditQueryLoadingState = ViewState.Idle;
   ViewState _postsQueryLoadingState = ViewState.Idle;
 
-  SearchSubredditsRepoEntity _subQueryResult = SearchSubredditsRepoEntity();
+  SearchSubredditsRepoEntity? _subQueryResult = SearchSubredditsRepoEntity();
   PostsFeedEntity _postsQueryResult = PostsFeedEntity();
 
   ViewState get subredditQueryLoadingState => _subredditQueryLoadingState;
 
   ViewState get postsQueryLoadingState => _postsQueryLoadingState;
 
-  SearchSubredditsRepoEntity get subQueryResult => _subQueryResult;
+  SearchSubredditsRepoEntity? get subQueryResult => _subQueryResult;
 
   PostsFeedEntity get postsQueryResult => _postsQueryResult;
 
@@ -35,13 +35,13 @@ class SearchProvider with ChangeNotifier {
     await _secureStorageHelper.init();
   }
 
-  Future<SearchSubredditsRepoEntity> searchSubreddits(
-      {@required String query}) async {
+  Future<SearchSubredditsRepoEntity?> searchSubreddits(
+      {required String query}) async {
     _subredditQueryLoadingState = ViewState.busy;
     notifyListeners();
     await _secureStorageHelper.init();
     if (_secureStorageHelper.signInStatus) {
-      String authToken = await _secureStorageHelper.authToken;
+      String? authToken = await _secureStorageHelper.authToken;
       Uri uri = Uri.https(
         'oauth.reddit.com',
         'api/search_subreddits.json',
@@ -60,7 +60,7 @@ class SearchProvider with ChangeNotifier {
       // print("Subreddit search query status: " + response.statusCode.toString());
 
       if (response.statusCode == 200) {
-        _subQueryResult = _subQueryResult.fromJson(json.decode(response.body));
+        _subQueryResult = _subQueryResult!.fromJson(json.decode(response.body));
       }
     } else {
       Uri uri = Uri.https(
@@ -80,7 +80,7 @@ class SearchProvider with ChangeNotifier {
       // print("Subreddit search query status: " + response.statusCode.toString());
 
       if (response.statusCode == 200) {
-        _subQueryResult = _subQueryResult.fromJson(json.decode(response.body));
+        _subQueryResult = _subQueryResult!.fromJson(json.decode(response.body));
       }
     }
 
@@ -90,7 +90,7 @@ class SearchProvider with ChangeNotifier {
   }
 
   Future<void> searchPosts({
-    @required String query,
+    required String query,
     String subreddit = "",
   }) async {
     await _secureStorageHelper.init();
@@ -98,7 +98,7 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
 
     if (_secureStorageHelper.signInStatus) {
-      String authToken = await _secureStorageHelper.authToken;
+      String? authToken = await _secureStorageHelper.authToken;
       Uri uri = Uri.https(
         'oauth.reddit.com',
         'search.json',
@@ -146,7 +146,7 @@ class SearchProvider with ChangeNotifier {
       }
 
       // print(_postsQueryResult.data.children.length);
-      for (var x in _postsQueryResult.data.children) {
+      for (var x in _postsQueryResult.data!.children!) {
         // print(x.data.title);
       }
     }

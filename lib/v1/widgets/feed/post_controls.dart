@@ -11,9 +11,9 @@ import 'package:fritter_for_reddit/v1/utils/extensions.dart';
 import 'package:image_downloader/image_downloader.dart';
 
 class PostControls extends StatelessWidget {
-  final PostsFeedDataChildrenData postData;
+  final PostsFeedDataChildrenData? postData;
 
-  PostControls({@required this.postData});
+  PostControls({required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +28,22 @@ class PostControls extends StatelessWidget {
           Icon(
             Icons.chat_bubble_outline,
             size: 14,
-            color: Theme.of(context).textTheme.subtitle2.color,
+            color: Theme.of(context).textTheme.subtitle2!.color,
           ),
           SizedBox(width: 4.0),
           Text(
-            getRoundedToThousand(postData.numComments),
+            getRoundedToThousand(postData!.numComments!),
             style: Theme.of(context).textTheme.subtitle2,
           ),
           SizedBox(width: 8.0),
           Icon(
             Icons.access_time,
             size: 14,
-            color: Theme.of(context).textTheme.subtitle2.color,
+            color: Theme.of(context).textTheme.subtitle2!.color,
           ),
           SizedBox(width: 4.0),
           Text(
-            getTimePosted(postData.createdUtc),
+            getTimePosted(postData!.createdUtc!),
             style: Theme.of(context).textTheme.subtitle2,
           ),
           Expanded(
@@ -58,11 +58,11 @@ class PostControls extends StatelessWidget {
 
 class PostVoteControls extends StatelessWidget {
   const PostVoteControls({
-    Key key,
-    @required this.postData,
+    Key? key,
+    required this.postData,
   }) : super(key: key);
 
-  final PostsFeedDataChildrenData postData;
+  final PostsFeedDataChildrenData? postData;
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +80,11 @@ class PostVoteControls extends StatelessWidget {
           onPressed: () async {
             if (Provider.of<UserInformationProvider>(context, listen: false)
                 .signedIn) {
-              if (postData.likes == true) {
-                feedProvider(context).votePost(postItem: postData, dir: 0);
+              if (postData!.likes == true) {
+                feedProvider(context).votePost(postItem: postData!, dir: 0);
               } else {
                 feedProvider(context).votePost(
-                  postItem: postData,
+                  postItem: postData!,
                   dir: 1,
                 );
               }
@@ -92,25 +92,25 @@ class PostVoteControls extends StatelessWidget {
               buildSnackBar(context);
             }
           },
-          color: postData.likes == null || postData.likes == false
+          color: postData!.likes == null || postData!.likes == false
               ? Theme.of(context).dividerColor.withOpacity(0.5)
               : Colors.orange,
           splashColor: Colors.orange,
         ),
         IconButton(
           icon: Icon(Icons.arrow_downward),
-          color: postData.likes == null || postData.likes == true
+          color: postData!.likes == null || postData!.likes == true
               ? Theme.of(context).dividerColor.withOpacity(0.5)
               : Colors.purple,
           onPressed: () async {
             if (Provider.of<UserInformationProvider>(context).signedIn) {
-              if (postData.likes == false) {
+              if (postData!.likes == false) {
                 feedProvider(context).votePost(
-                  postItem: postData,
+                  postItem: postData!,
                   dir: 0,
                 );
               } else {
-                feedProvider(context).votePost(postItem: postData, dir: -1);
+                feedProvider(context).votePost(postItem: postData!, dir: -1);
               }
             } else {
               buildSnackBar(context);
@@ -158,14 +158,14 @@ class PostVoteControls extends StatelessWidget {
                         ),
                         onTap: () {
                           Navigator.of(context).pop();
-                          return Navigator.of(
+                          Navigator.of(
                             context,
                             rootNavigator: false,
                           ).push(
                             CupertinoPageRoute(
                               maintainState: true,
                               builder: (context) => SubredditFeedPage(
-                                subreddit: postData.subreddit,
+                                subreddit: postData!.subreddit,
                               ),
                               fullscreenDialog: false,
                             ),
@@ -179,7 +179,7 @@ class PostVoteControls extends StatelessWidget {
                             child: Icon(Icons.open_in_browser),
                           ),
                           onTap: () {
-                            launchURL(Colors.blue, postData.url);
+                            launchURL(Colors.blue, postData!.url);
                           },
                         ),
                         ListTile(
@@ -206,9 +206,9 @@ class PostVoteControls extends StatelessWidget {
 }
 
 class VotesCountWidget extends StatelessWidget {
-  final PostsFeedDataChildrenData postData;
+  final PostsFeedDataChildrenData? postData;
 
-  VotesCountWidget({@required this.postData});
+  VotesCountWidget({required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -219,9 +219,9 @@ class VotesCountWidget extends StatelessWidget {
         Icon(
           Icons.arrow_upward,
           size: 14,
-          color: postData.likes == null
-              ? Theme.of(context).textTheme.subtitle2.color
-              : postData.likes == true
+          color: postData!.likes == null
+              ? Theme.of(context).textTheme.subtitle2!.color
+              : postData!.likes == true
                   ? Colors.orange
                   : Colors.purple,
         ),
@@ -229,14 +229,14 @@ class VotesCountWidget extends StatelessWidget {
           width: 4.0,
         ),
         Text(
-          getRoundedToThousand(postData.score),
+          getRoundedToThousand(postData!.score!),
           textAlign: TextAlign.center,
-          style: postData.likes == null
+          style: postData!.likes == null
               ? Theme.of(context).textTheme.subtitle2
-              : Theme.of(context).textTheme.subtitle2.copyWith(
-                    color: postData.likes == null
+              : Theme.of(context).textTheme.subtitle2!.copyWith(
+                    color: postData!.likes == null
                         ? Colors.grey
-                        : postData.likes == true
+                        : postData!.likes == true
                             ? Colors.orange
                             : Colors.purple,
                   ),

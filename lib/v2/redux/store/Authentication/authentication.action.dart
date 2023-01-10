@@ -7,7 +7,7 @@ class SetAuthenticationLoadingAction implements AuthenticationAction {
 }
 
 class SetSignedInUserAction implements AuthenticationAction {
-  final String token, username;
+  final String? token, username;
   final bool isSignedIn;
 
   SetSignedInUserAction(this.token, this.username, this.isSignedIn);

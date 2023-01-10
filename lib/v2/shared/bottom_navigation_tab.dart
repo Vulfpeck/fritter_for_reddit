@@ -14,7 +14,7 @@ class _AppBottonNavigationState {
 }
 
 class AppBottomNavigationBar extends StatelessWidget {
-  const AppBottomNavigationBar({Key key}) : super(key: key);
+  const AppBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -6,8 +6,8 @@ import 'package:fritter_for_reddit/v1/utils/extensions.dart';
 class GalleryImage extends StatelessWidget {
   final BoxFit fit;
   const GalleryImage({
-    Key key,
-    @required this.postFeedItem,
+    Key? key,
+    required this.postFeedItem,
     this.fit = BoxFit.cover,
   }) : super(key: key);
 
@@ -18,11 +18,11 @@ class GalleryImage extends StatelessWidget {
     return CachedNetworkImage(
       fit: fit,
       imageUrl:
-          postFeedItem.data.preview.images.first.source.url.asSanitizedImageUrl,
+          postFeedItem.data!.preview!.images!.first.source!.url!.asSanitizedImageUrl,
       errorWidget: (context, url, error) {
         return CachedNetworkImage(
           fit: fit,
-          imageUrl: postFeedItem.data.thumbnail.asSanitizedImageUrl,
+          imageUrl: postFeedItem.data!.thumbnail!.asSanitizedImageUrl,
           errorWidget: (context, url, error) {
             return Icon(Icons.broken_image);
           },

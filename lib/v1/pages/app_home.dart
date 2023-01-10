@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
 //            'https://media2.giphy.com/media/8z2mlSy0xxwkw/giphy.gif');
     return WillPopScope(
       onWillPop: () async {
-        return !await currentNavigatorKey().currentState.maybePop();
+        return !await currentNavigatorKey()!.currentState!.maybePop();
       },
       child: CupertinoTabScaffold(
         controller: _tabController,
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
 //    );
   }
 
-  GlobalKey<NavigatorState> currentNavigatorKey() {
+  GlobalKey<NavigatorState>? currentNavigatorKey() {
     switch (_tabController.index) {
       case 0:
         return firstTabNavKey;

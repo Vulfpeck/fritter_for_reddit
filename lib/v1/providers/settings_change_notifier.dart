@@ -16,7 +16,7 @@ class SettingsNotifier extends StatePersistingChangeNotifier<SettingsState> {
       state = state.copyWith(viewMode: viewMode);
 
   @override
-  SettingsState fromJson(Map<dynamic, dynamic> json) {
+  SettingsState fromJson(Map<dynamic, dynamic>? json) {
     return SettingsState.fromJson(json);
   }
 }
@@ -25,7 +25,7 @@ class SettingsNotifier extends StatePersistingChangeNotifier<SettingsState> {
 class SettingsState extends SerializableClass {
   final ViewMode viewMode;
 
-  SettingsState({@required this.viewMode});
+  SettingsState({required this.viewMode});
 
   @override
   String toString() {
@@ -35,7 +35,7 @@ class SettingsState extends SerializableClass {
   SettingsState.initial() : viewMode = ViewMode.card;
 
   @override
-  factory SettingsState.fromJson(Map json) {
+  factory SettingsState.fromJson(Map? json) {
     if (json == null) {
       return SettingsState.initial();
     }
@@ -47,7 +47,7 @@ class SettingsState extends SerializableClass {
   @override
   Map<String, dynamic> toJson() => {'viewMode': viewMode.toString()};
 
-  static ViewMode viewModeFromString(String viewModeString) {
+  static ViewMode viewModeFromString(String? viewModeString) {
     switch (viewModeString) {
       case 'ViewMode.card':
         return ViewMode.card;
@@ -63,7 +63,7 @@ class SettingsState extends SerializableClass {
   }
 
   SettingsState copyWith({
-    ViewMode viewMode,
+    ViewMode? viewMode,
   }) =>
       SettingsState(
         viewMode: viewMode ?? this.viewMode,

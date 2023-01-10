@@ -17,9 +17,9 @@ class SubredditInfoAdapter extends TypeAdapter<SubredditInfo> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SubredditInfo(
-      name: fields[0] as String,
-      postsFeed: fields[1] as PostsFeedEntity,
-      subredditInformation: fields[2] as SubredditInformationEntity,
+      name: fields[0] as String?,
+      postsFeed: fields[1] as PostsFeedEntity?,
+      subredditInformation: fields[2] as SubredditInformationEntity?,
     );
   }
 

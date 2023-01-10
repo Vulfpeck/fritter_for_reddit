@@ -15,7 +15,7 @@ extension PlatformX on Platform {
 extension StringX on String {
   String get withSubredditLinksAsMarkdownLinks {
     return replaceAllMapped(RegExp(r'(\/r\/[\w_-]+\b)'), (Match match) {
-      final String content = match[0];
+      final String? content = match[0];
       final convertedString = '[$content]($content)';
       return convertedString;
     });
@@ -23,7 +23,7 @@ extension StringX on String {
 
   String cleanupMarkdown() {
     return replaceAllMapped(RegExp(r'(#+\S)'), (Match match) {
-      final String content = match[0];
+      final String content = match[0]!;
       String convertedString;
       if (content.endsWith('#')) {
         convertedString =

@@ -12,7 +12,7 @@ class CommentsControlBar extends StatefulWidget {
 }
 
 class _CommentsControlBarState extends State<CommentsControlBar> {
-  CommentSortTypes _selectedSort;
+  CommentSortTypes? _selectedSort;
 
   initState() {
     if (widget.item.suggestedSort != null && widget.item.suggestedSort != "") {
@@ -37,8 +37,8 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 Icons.refresh,
                 color: Theme.of(context)
                     .textTheme
-                    .bodyText2
-                    .color
+                    .bodyText2!
+                    .color!
                     .withOpacity(0.6),
               ),
               label: Text(
@@ -46,8 +46,8 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                 style: TextStyle(
                     color: Theme.of(context)
                         .textTheme
-                        .bodyText2
-                        .color
+                        .bodyText2!
+                        .color!
                         .withOpacity(0.8)),
               ),
               onPressed: () {
@@ -73,7 +73,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                   ),
                   Text(
                     capitalizeString(
-                      changeCommentSortConvertToString[_selectedSort],
+                      changeCommentSortConvertToString[_selectedSort]!,
                     ),
                     style: Theme.of(context).textTheme.caption,
                   ),
@@ -96,7 +96,7 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                   sort: _selectedSort,
                 );
               },
-              items: <String>[
+              items: <String?>[
                 changeCommentSortConvertToString[CommentSortTypes.Best],
                 changeCommentSortConvertToString[CommentSortTypes.Top],
                 changeCommentSortConvertToString[CommentSortTypes.New],
@@ -104,11 +104,11 @@ class _CommentsControlBarState extends State<CommentsControlBar> {
                     CommentSortTypes.Controversial],
                 changeCommentSortConvertToString[CommentSortTypes.Old],
                 changeCommentSortConvertToString[CommentSortTypes.QandA],
-              ].map((String value) {
+              ].map((String? value) {
                 return new DropdownMenuItem<String>(
                   value: value.toString(),
                   child: new Text(
-                    capitalizeString(value),
+                    capitalizeString(value!),
                   ),
                 );
               }).toList(),

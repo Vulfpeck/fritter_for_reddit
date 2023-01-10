@@ -8,12 +8,12 @@ import 'package:fritter_for_reddit/v1/utils/extensions.dart';
 
 class PostUrlPreview extends StatelessWidget {
   const PostUrlPreview({
-    Key key,
-    @required this.data,
-    @required this.htmlUnescape,
+    Key? key,
+    required this.data,
+    required this.htmlUnescape,
   }) : super(key: key);
 
-  final PostsFeedDataChildrenData data;
+  final PostsFeedDataChildrenData? data;
   final HtmlUnescape htmlUnescape;
 
   @override
@@ -33,13 +33,13 @@ class PostUrlPreview extends StatelessWidget {
         child: ListTile(
           dense: true,
           onTap: () {
-            launchURL(Theme.of(context).primaryColor, data.url);
+            launchURL(Theme.of(context).primaryColor, data!.url);
           },
           title: Text(
-            data.url,
-            style: Theme.of(context).textTheme.subtitle2.copyWith(
+            data!.url!,
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
                   color:
-                      Theme.of(context).textTheme.subtitle2.color.withOpacity(
+                      Theme.of(context).textTheme.subtitle2!.color!.withOpacity(
                             0.8,
                           ),
                 ),
@@ -48,11 +48,11 @@ class PostUrlPreview extends StatelessWidget {
             overflow: TextOverflow.fade,
             textAlign: TextAlign.left,
           ),
-          trailing: data.preview != null
+          trailing: data!.preview != null
               ? CircleAvatar(
                   radius: 16,
                   backgroundImage: CachedNetworkImageProvider(
-                    data.preview.images.last.source.url.asSanitizedImageUrl,
+                    data!.preview!.images!.last.source!.url!.asSanitizedImageUrl,
                   ),
                 )
               : CircleAvatar(

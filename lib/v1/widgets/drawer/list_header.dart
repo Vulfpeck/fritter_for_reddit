@@ -4,7 +4,7 @@ class ListHeader extends StatelessWidget {
   final String title;
   final Color color;
 
-  const ListHeader({Key key, @required this.title, this.color = Colors.blue})
+  const ListHeader({Key? key, required this.title, this.color = Colors.blue})
       : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class SliverListHeader extends StatelessWidget {
   final Color color;
 
   const SliverListHeader(
-      {Key key, @required this.title, this.color = Colors.blue})
+      {Key? key, required this.title, this.color = Colors.blue})
       : super(key: key);
 
   @override

@@ -1,59 +1,59 @@
 class UserInformationEntity {
-  bool hasStripeSubscription;
-  bool canCreateSubreddit;
-  bool over18;
-  int prefClickgadget;
-  int commentKarma;
-  UserInformationSubreddit subreddit;
-  UserInformationFeatures features;
-  bool prefShowTrending;
-  String id;
-  bool hasVisitedNewProfile;
-  double createdUtc;
-  int numFriends;
-  int coins;
-  bool inRedesignBeta;
-  bool hasModMail;
-  bool hideFromRobots;
-  bool hasSubscribedToPremium;
-  double created;
-  bool hasSubscribed;
-  bool hasAndroidSubscription;
-  bool seenPremiumAdblockModal;
-  bool prefShowSnoovatar;
-  bool forcePasswordReset;
-  String name;
-  bool isGold;
-  bool isMod;
-  bool inBeta;
-  bool hasVerifiedEmail;
-  String prefGeopopular;
-  bool isSuspended;
+  bool? hasStripeSubscription;
+  bool? canCreateSubreddit;
+  bool? over18;
+  int? prefClickgadget;
+  int? commentKarma;
+  UserInformationSubreddit? subreddit;
+  UserInformationFeatures? features;
+  bool? prefShowTrending;
+  String? id;
+  bool? hasVisitedNewProfile;
+  double? createdUtc;
+  int? numFriends;
+  int? coins;
+  bool? inRedesignBeta;
+  bool? hasModMail;
+  bool? hideFromRobots;
+  bool? hasSubscribedToPremium;
+  double? created;
+  bool? hasSubscribed;
+  bool? hasAndroidSubscription;
+  bool? seenPremiumAdblockModal;
+  bool? prefShowSnoovatar;
+  bool? forcePasswordReset;
+  String? name;
+  bool? isGold;
+  bool? isMod;
+  bool? inBeta;
+  bool? hasVerifiedEmail;
+  String? prefGeopopular;
+  bool? isSuspended;
   dynamic newModmailExists;
-  bool isSponsor;
-  bool seenRedesignModal;
-  bool hasExternalAccount;
+  bool? isSponsor;
+  bool? seenRedesignModal;
+  bool? hasExternalAccount;
   dynamic suspensionExpirationUtc;
-  bool hasGoldSubscription;
-  bool seenLayoutSwitch;
-  bool prefNightmode;
-  int linkKarma;
-  bool hasMail;
-  String oauthClientId;
-  bool prefAutoplay;
-  int goldCreddits;
-  bool verified;
-  bool hasPaypalSubscription;
-  bool prefTopKarmaSubreddits;
-  bool prefShowTwitter;
-  bool isEmployee;
-  bool prefVideoAutoplay;
-  bool prefNoProfanity;
-  String iconImg;
-  int inboxCount;
-  bool hasIosSubscription;
+  bool? hasGoldSubscription;
+  bool? seenLayoutSwitch;
+  bool? prefNightmode;
+  int? linkKarma;
+  bool? hasMail;
+  String? oauthClientId;
+  bool? prefAutoplay;
+  int? goldCreddits;
+  bool? verified;
+  bool? hasPaypalSubscription;
+  bool? prefTopKarmaSubreddits;
+  bool? prefShowTwitter;
+  bool? isEmployee;
+  bool? prefVideoAutoplay;
+  bool? prefNoProfanity;
+  String? iconImg;
+  int? inboxCount;
+  bool? hasIosSubscription;
   dynamic goldExpiration;
-  bool seenSubredditChatFtux;
+  bool? seenSubredditChatFtux;
 
   UserInformationEntity(
       {this.hasStripeSubscription,
@@ -182,10 +182,10 @@ class UserInformationEntity {
     data['pref_clickgadget'] = this.prefClickgadget;
     data['comment_karma'] = this.commentKarma;
     if (this.subreddit != null) {
-      data['subreddit'] = this.subreddit.toJson();
+      data['subreddit'] = this.subreddit!.toJson();
     }
     if (this.features != null) {
-      data['features'] = this.features.toJson();
+      data['features'] = this.features!.toJson();
     }
     data['pref_show_trending'] = this.prefShowTrending;
     data['id'] = this.id;
@@ -240,44 +240,44 @@ class UserInformationEntity {
 }
 
 class UserInformationSubreddit {
-  String publicDescription;
-  String keyColor;
-  bool over18;
-  bool userIsBanned;
-  String description;
-  String title;
-  String submitTextLabel;
-  bool isDefaultBanner;
-  bool userIsMuted;
-  bool isDefaultIcon;
-  bool disableContributorRequests;
-  String displayNamePrefixed;
-  bool userIsSubscriber;
-  List<int> iconSize;
-  bool freeFormReports;
-  bool showMedia;
-  bool defaultSet;
-  bool userIsModerator;
+  String? publicDescription;
+  String? keyColor;
+  bool? over18;
+  bool? userIsBanned;
+  String? description;
+  String? title;
+  String? submitTextLabel;
+  bool? isDefaultBanner;
+  bool? userIsMuted;
+  bool? isDefaultIcon;
+  bool? disableContributorRequests;
+  String? displayNamePrefixed;
+  bool? userIsSubscriber;
+  List<int>? iconSize;
+  bool? freeFormReports;
+  bool? showMedia;
+  bool? defaultSet;
+  bool? userIsModerator;
   dynamic bannerSize;
-  String subredditType;
-  bool restrictCommenting;
-  int coins;
-  int subscribers;
+  String? subredditType;
+  bool? restrictCommenting;
+  int? coins;
+  int? subscribers;
   dynamic headerSize;
-  bool restrictPosting;
-  String communityIcon;
-  String displayName;
-  String primaryColor;
-  String url;
-  bool userIsContributor;
-  String linkFlairPosition;
-  bool linkFlairEnabled;
-  String submitLinkLabel;
+  bool? restrictPosting;
+  String? communityIcon;
+  String? displayName;
+  String? primaryColor;
+  String? url;
+  bool? userIsContributor;
+  String? linkFlairPosition;
+  bool? linkFlairEnabled;
+  String? submitLinkLabel;
   dynamic headerImg;
-  String iconColor;
-  String iconImg;
-  String bannerImg;
-  String name;
+  String? iconColor;
+  String? iconImg;
+  String? bannerImg;
+  String? name;
 
   UserInformationSubreddit(
       {this.publicDescription,
@@ -405,34 +405,34 @@ class UserInformationSubreddit {
 }
 
 class UserInformationFeatures {
-  bool chatUserSettings;
-  bool modAwards;
-  bool stewardUi;
-  bool chatGroupRollout;
-  bool mwebXpromoInterstitialCommentsAndroid;
-  bool twitterEmbed;
-  bool showAmpLink;
-  bool mwebXpromoInterstitialCommentsIos;
-  bool doNotTrack;
-  bool customFeeds;
-  bool spezModal;
-  UserInformationFeaturesMwebXpromoRevampV3 mwebXpromoRevampV3;
-  bool awarderNames;
-  bool chatRollout;
-  bool mwebXpromoModalListingClickDailyDismissibleAndroid;
-  UserInformationFeaturesMwebNsfwXpromo mwebNsfwXpromo;
-  UserInformationFeaturesDefaultSrsHoldout defaultSrsHoldout;
-  bool layersCreation;
-  bool premiumSubscriptionsTable;
-  bool mwebXpromoModalListingClickDailyDismissibleIos;
-  bool dualWriteUserPrefs;
-  bool modlogCopyrightRemoval;
-  bool richtextPreviews;
-  bool chatSubreddit;
-  bool communityAwards;
-  bool isEmailPermissionRequired;
-  bool readFromPrefService;
-  bool chatReddarReports;
+  bool? chatUserSettings;
+  bool? modAwards;
+  bool? stewardUi;
+  bool? chatGroupRollout;
+  bool? mwebXpromoInterstitialCommentsAndroid;
+  bool? twitterEmbed;
+  bool? showAmpLink;
+  bool? mwebXpromoInterstitialCommentsIos;
+  bool? doNotTrack;
+  bool? customFeeds;
+  bool? spezModal;
+  UserInformationFeaturesMwebXpromoRevampV3? mwebXpromoRevampV3;
+  bool? awarderNames;
+  bool? chatRollout;
+  bool? mwebXpromoModalListingClickDailyDismissibleAndroid;
+  UserInformationFeaturesMwebNsfwXpromo? mwebNsfwXpromo;
+  UserInformationFeaturesDefaultSrsHoldout? defaultSrsHoldout;
+  bool? layersCreation;
+  bool? premiumSubscriptionsTable;
+  bool? mwebXpromoModalListingClickDailyDismissibleIos;
+  bool? dualWriteUserPrefs;
+  bool? modlogCopyrightRemoval;
+  bool? richtextPreviews;
+  bool? chatSubreddit;
+  bool? communityAwards;
+  bool? isEmailPermissionRequired;
+  bool? readFromPrefService;
+  bool? chatReddarReports;
 
   UserInformationFeatures(
       {this.chatUserSettings,
@@ -524,17 +524,17 @@ class UserInformationFeatures {
     data['custom_feeds'] = this.customFeeds;
     data['spez_modal'] = this.spezModal;
     if (this.mwebXpromoRevampV3 != null) {
-      data['mweb_xpromo_revamp_v3'] = this.mwebXpromoRevampV3.toJson();
+      data['mweb_xpromo_revamp_v3'] = this.mwebXpromoRevampV3!.toJson();
     }
     data['awarder_names'] = this.awarderNames;
     data['chat_rollout'] = this.chatRollout;
     data['mweb_xpromo_modal_listing_click_daily_dismissible_android'] =
         this.mwebXpromoModalListingClickDailyDismissibleAndroid;
     if (this.mwebNsfwXpromo != null) {
-      data['mweb_nsfw_xpromo'] = this.mwebNsfwXpromo.toJson();
+      data['mweb_nsfw_xpromo'] = this.mwebNsfwXpromo!.toJson();
     }
     if (this.defaultSrsHoldout != null) {
-      data['default_srs_holdout'] = this.defaultSrsHoldout.toJson();
+      data['default_srs_holdout'] = this.defaultSrsHoldout!.toJson();
     }
     data['layers_creation'] = this.layersCreation;
     data['premium_subscriptions_table'] = this.premiumSubscriptionsTable;
@@ -553,9 +553,9 @@ class UserInformationFeatures {
 }
 
 class UserInformationFeaturesMwebXpromoRevampV3 {
-  String owner;
-  int experimentId;
-  String variant;
+  String? owner;
+  int? experimentId;
+  String? variant;
 
   UserInformationFeaturesMwebXpromoRevampV3(
       {this.owner, this.experimentId, this.variant});
@@ -576,9 +576,9 @@ class UserInformationFeaturesMwebXpromoRevampV3 {
 }
 
 class UserInformationFeaturesMwebNsfwXpromo {
-  String owner;
-  int experimentId;
-  String variant;
+  String? owner;
+  int? experimentId;
+  String? variant;
 
   UserInformationFeaturesMwebNsfwXpromo(
       {this.owner, this.experimentId, this.variant});
@@ -599,9 +599,9 @@ class UserInformationFeaturesMwebNsfwXpromo {
 }
 
 class UserInformationFeaturesDefaultSrsHoldout {
-  String owner;
-  int experimentId;
-  String variant;
+  String? owner;
+  int? experimentId;
+  String? variant;
 
   UserInformationFeaturesDefaultSrsHoldout(
       {this.owner, this.experimentId, this.variant});

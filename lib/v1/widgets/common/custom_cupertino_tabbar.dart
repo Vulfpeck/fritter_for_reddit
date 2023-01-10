@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 
 class CustomCupertinoTabBar extends CupertinoTabBar {
-  final backgroundColor;
-  final activeColor;
-  final items;
+  final Color? backgroundColor;
+  final Color? activeColor;
+  final List<BottomNavigationBarItem> items;
 
-  CustomCupertinoTabBar({this.backgroundColor, this.activeColor, this.items})
+  CustomCupertinoTabBar({this.backgroundColor, this.activeColor, required this.items})
       : super(
             items: items,
             backgroundColor: backgroundColor,
