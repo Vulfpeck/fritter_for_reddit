@@ -1,11 +1,11 @@
 # This file tracks properties of this Flutter project.
 # Used by Flutter tool to assess capabilities and perform upgrades etc.
 #
-# This file should be version controlled.
+# This file should be version controlled and should not be manually edited.
 
 version:
-  revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
-  channel: master
+  revision: "f430c81e5e5799a617ddf10cc21cc034bb59a682"
+  channel: "master"
 
 project_type: app
 
@@ -13,17 +13,26 @@ project_type: app
 migration:
   platforms:
     - platform: root
-      create_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
-      base_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+    - platform: android
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+    - platform: ios
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
     - platform: linux
-      create_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
-      base_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
     - platform: macos
-      create_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
-      base_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+    - platform: web
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
     - platform: windows
-      create_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
-      base_revision: a707d05e9d4c7ec95403444e04a65cd69c0da3b0
+      create_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
+      base_revision: f430c81e5e5799a617ddf10cc21cc034bb59a682
 
   # User provided section
 
